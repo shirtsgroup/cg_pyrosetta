@@ -7,6 +7,12 @@ Coarse Grained PyRosetta
 
 An implementation of Pyrosetta with CG capabilities
 
+### Installation
+
+This repository is currently underdevelopment. To install local version of this package, clone this repo, and run the following from the main directory:
+
+`pip install -e .`
+
 ### Copyright
 
 Copyright (c) 2019, Theodore Fobe
