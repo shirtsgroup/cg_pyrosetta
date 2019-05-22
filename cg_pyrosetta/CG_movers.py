@@ -122,7 +122,7 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized CG mover analogous to the "small" mover in PyRosetta.
     """
-    def __init__(self, pose, angle = 10):
+    def __init__(self, pose, angle = 180):
         """
         Build Small Mover for CG polymers
 
@@ -193,7 +193,7 @@ class CGSmallSCMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized CG mover analogous to the "small" mover in PyRosetta.
     """
-    def __init__(self, sc_model, pose, angle = 10):
+    def __init__(self, sc_model, pose, angle = 30):
         """
         Build Small Mover for CG polymers
 

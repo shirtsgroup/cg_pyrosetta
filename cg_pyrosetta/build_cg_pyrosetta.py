@@ -156,7 +156,7 @@ class PyRosettaBuilder():
                 if mm_atom_line not in previous_lines:
                     mm_atom_file.write(mm_atom_line)
                 else:
-                    print('Skipping Torsion:',mm_atom_line)
+                    print('Skipping MM AtomType:',mm_atom_line)
 
 
         

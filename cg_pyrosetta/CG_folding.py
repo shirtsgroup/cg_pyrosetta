@@ -34,7 +34,7 @@ class CGFoldingAlgorithm():
         self.PDB_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
         self.PDB_writer.apply(self.pose) # write initial structure
         self.PDB_writer.file_name('outputs/traj.pdb')
-        self.PDB_writer.stride(1000)
+        self.PDB_writer.stride(10)
 
         # Define scorefunction terms
         self.scorefxn = pyrosetta.ScoreFunction()

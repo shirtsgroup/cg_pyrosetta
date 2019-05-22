@@ -12,7 +12,6 @@ import os
 import yaml
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-print(current_path)
 pyrosetta_path = os.path.join(current_path, '../PyRosetta4.modified')
 data_path    = os.path.join(current_path, 'data')
 configs_file = open(os.path.join(current_path, '../.configs.yml'), 'r')
