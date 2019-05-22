@@ -8,9 +8,9 @@ class PyRosettaBuilder():
     pyrosetta.
     """
     
-    def __init__(self, pyrosetta_path, inputs):
+    def __init__(self, clean_pyrosetta_path, pyrosetta_path, inputs):
         if not os.path.isdir(pyrosetta_path):
-            self.pyrosetta_path = self.copyPyRosetta(input('Please enter path to a fresh copy of PyRosetta4 : '),pyrosetta_path)
+            self.pyrosetta_path = self.copyPyRosetta(clean_pyrosetta_path, pyrosetta_path)
         else:
             self.pyrosetta_path = os.path.abspath(pyrosetta_path)
         self.inputs = inputs
@@ -36,11 +36,12 @@ class PyRosettaBuilder():
         path : path to the pyrosetta package being edited
         inputs : input directory with specific file structure denoting residue types and atom types
         """
-        self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
+        self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=False)
         self.turnOffExtras()
-        self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
+        self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=False)
         self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
-        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = True)
+        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = False)
+        self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
 
 
     def unBuildCGPyRosetta(self, path):
@@ -91,6 +92,7 @@ class PyRosettaBuilder():
                     atom_file.write(atom_line)
                 else:
                     print('Skipping Atom :',atom_line.rstrip('\n'))
+    
     def addMMTorsionTypes(self, path):
         """
         Method for adding torsion definitions from a specific path to the modified PyRosetta filesystem, checks for duplicates
@@ -119,9 +121,43 @@ class PyRosettaBuilder():
             for torsion_line in torsion_lines:
                 # Ensure there are no duplicate atom_properties lines
                 if torsion_line not in previous_lines:
-                    torsion_file.write('\n'+torsion_line)
+                    torsion_file.write(torsion_line)
                 else:
                     print('Skipping Torsion:',torsion_line)
+
+    def addMMAtomTypes(self, path):
+        """
+        Method for adding MM AtomTypes into PyRosetta, required for evaluating mm_lj_atr/rep/etc. and for use in mm_twist and mm_bend terms
+
+        Arguments
+        ---------
+
+        self: PyRosettaBuilder Class
+        path: str path of where input mm_torsion_params.txt
+        header: Bool used to determine whether or not write the header showing where custom atoms are added
+        """
+        input_path = os.path.abspath(path)
+        
+        mm_atom_lines = []
+
+        # Reading each line of 'mm_atom_properties.txt'
+        with open(os.path.join(input_path,'mm_atom_properties.txt'), 'r') as f:  
+            for line in f.readlines()[1:]: # Skip header of atom_properties.txt files
+                mm_atom_lines.append(line)
+        
+        # Write lines to modified pyrosetta/.../mm_torsion_params.txt
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'r') as mm_atom_file:
+            previous_lines = mm_atom_file.readlines()
+
+
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'a') as mm_atom_file:
+            for mm_atom_line in mm_atom_lines:
+                # Ensure there are no duplicate atom_properties lines
+                if mm_atom_line not in previous_lines:
+                    mm_atom_file.write(mm_atom_line)
+                else:
+                    print('Skipping Torsion:',mm_atom_line)
+
 
         
     def turnOffExtras(self):

@@ -5,17 +5,22 @@ An implementation of Pyrosetta with CG capabilities
 
 # Add imports here
 from .cg_pyrosetta import *
-from .build_cg_pyrosetta import *
+import cg_pyrosetta.build_cg_pyrosetta
+import cg_pyrosetta.CG_movers
+import cg_pyrosetta.CG_folding
+import os
+import yaml
 
-# pyrosetta_path = os.path.abspath('PyRosetta4.modified')
-# input_path = os.path.abspath('cg_pyrosetta/data')
-    
-# builder = PyRosettaBuilder(pyrosetta_path, input_path)
-# builder.buildCGPyRosetta()
+current_path = os.path.dirname(os.path.abspath(__file__))
+print(current_path)
+pyrosetta_path = os.path.join(current_path, '../PyRosetta4.modified')
+data_path    = os.path.join(current_path, 'data')
+configs_file = open(os.path.join(current_path, '../.configs.yml'), 'r')
+configs = yaml.load(configs_file)
+clean_pyrosetta_path = configs['clean_pyrosetta_path']
 
-from .CG_movers import *
-from .CG_folding import *
-
+builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
+builder.buildCGPyRosetta()
 
 # Handle versioneer
 from ._version import get_versions

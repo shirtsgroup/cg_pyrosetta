@@ -9,7 +9,11 @@ An implementation of Pyrosetta with CG capabilities
 
 ### Installation
 
-This repository is currently underdevelopment. To install local version of this package, clone this repo, and run the following from the main directory:
+This repository is currently underdevelopment. To install a local version of this package, first change the `clean_pyrosetta_path` variable in setup.py to a working version of PyRosetta4.
+
+`clean_pyrosetta_path = /path/to/PyRosetta4`
+
+Then run the following from the top directory:
 
 `pip install -e .`
 

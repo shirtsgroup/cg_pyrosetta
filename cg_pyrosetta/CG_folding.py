@@ -1,11 +1,12 @@
 import numpy as np
-import cg_pyrosetta.CG_movers
-from cg_pyrosetta.build_cg_pyrosetta import *
+import cg_pyrosetta.CG_movers as CG_movers
 import os
-add_import_path(os.path.abspath('PyRosetta4.modified'))
-print(os.path.abspath('PyRosetta4.modified'))
-import pyrosetta
 import sys
+
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
+
+import pyrosetta
 pyrosetta.init()
 
 class CGFoldingAlgorithm():

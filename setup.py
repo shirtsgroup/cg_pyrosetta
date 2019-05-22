@@ -3,10 +3,26 @@ Coarse Grained PyRosetta
 An implementation of Pyrosetta with CG capabilities
 """
 import sys
+import os
 from setuptools import setup, find_packages
 import versioneer
-
+import cg_pyrosetta.build_cg_pyrosetta
+import yaml
 short_description = __doc__.split("\n")
+
+
+# Setting up PyRosetta Build within package
+
+                        #### CHANGE THIS PATH #####
+config_file =  open('.configs.yml', 'r')
+configs = yaml.load(config_file)
+fresh_pyrosetta_path = configs['clean_pyrosetta_path']
+pyrosetta_path = os.path.abspath('PyRosetta4.modified')
+input_path = os.path.abspath('cg_pyrosetta/data')
+
+builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(fresh_pyrosetta_path ,pyrosetta_path, input_path)
+builder.buildCGPyRosetta()
+
 
 # from https://github.com/pytest-dev/pytest-runner#conditional-requirement
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
@@ -17,6 +33,8 @@ try:
         long_description = handle.read()
 except:
     long_description = "\n".join(short_description[2:]),
+
+
 
 
 setup(
