@@ -107,3 +107,4 @@ PyRosetta4.modified
 *.pdb
 test
 __pycache__/*
+.vscode/*

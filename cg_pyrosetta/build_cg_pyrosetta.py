@@ -36,12 +36,14 @@ class PyRosettaBuilder():
         path : path to the pyrosetta package being edited
         inputs : input directory with specific file structure denoting residue types and atom types
         """
-        self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=False)
+        self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
         self.turnOffExtras()
-        self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=False)
+        self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
         self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
-        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = False)
+        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = True)
         self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
+        self.addMMAngleTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
+
 
 
     def unBuildCGPyRosetta(self, path):
@@ -123,7 +125,7 @@ class PyRosettaBuilder():
                 if torsion_line not in previous_lines:
                     torsion_file.write(torsion_line)
                 else:
-                    print('Skipping Torsion:',torsion_line)
+                    print('Skipping MM Torsion:',torsion_line)
 
     def addMMAtomTypes(self, path):
         """
@@ -158,8 +160,41 @@ class PyRosettaBuilder():
                 else:
                     print('Skipping MM AtomType:',mm_atom_line)
 
+    def addMMAngleTypes(self, path):
+            """
+            Method for adding bond angle definitions from a specific path to the modified PyRosetta filesystem, checks for duplicates
 
-        
+            Arguments
+            ---------
+
+            self: PyRosettaBuilder Class
+            path: str path of where input mm_torsion_params.txt
+            header: Bool used to determine whether or not write the header showing where custom atoms are added
+            """
+            input_path = os.path.abspath(path)
+            
+            angle_lines = []
+            
+            with open(os.path.join(input_path,'mm_angle_params.txt'), 'r') as f:  
+                for line in f.readlines()[1:]: # Skip header of atom_properties.txt files
+                    angle_lines.append(line)
+            
+            
+            # Write lines to modified pyrosetta/.../mm_torsion_params.txt
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'r') as angle_file:
+                previous_lines = angle_file.readlines()
+            
+            start_angles = previous_lines.index('ANGLES\n')
+            print(start_angles)
+            for angle_line in angle_lines:
+                if angle_line not in previous_lines:
+                    previous_lines.insert(start_angles+1, angle_line)
+                else:
+                    print('Skipping MM Angle:', angle_line)
+
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'w') as angle_file:
+                angle_file.writelines(previous_lines)
+     
     def turnOffExtras(self):
         """
         Method used for commenting the extras.txt file in pyrosetta.
@@ -234,7 +269,6 @@ class PyRosettaBuilder():
         # Rewrite the residue_types.txt file with modifications
         with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types.txt'), 'w') as rtf:
             rtf.writelines(residue_type_lines)
-
 
     def addPatches(self, path, header = False):
         """

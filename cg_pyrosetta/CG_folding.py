@@ -42,7 +42,8 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 0.1)
+        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
@@ -58,12 +59,12 @@ class CGFoldingAlgorithm():
 
         # Build standard CG 1-1 movers
         self.small = CG_movers.CGSmallMover(self.pose)
-        self.small_angle = CG_movers.CG11SmallAngleMover()
-        self.shear = CG_movers.CG11ShearMover()
+        self.shear = CG_movers.CGShearMover(self.pose)
 
         # Build MC object + Trial Mover (empty for now)
         self.mc = pyrosetta.MonteCarlo(self.pose, self.scorefxn, 1)
         self.trial_mc = pyrosetta.TrialMover()
+        
         # Building variable to store various folding algorithms
         self.folding_protocols = {}
 
@@ -72,8 +73,7 @@ class CGFoldingAlgorithm():
         # Adding a default mover
         self.build_fold_alg('default')
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
-        # self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
-        # self.add_folding_move('default', pyrosetta.RepeatMover(self.small_angle, 10))
+        self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
 
     def set_BBB_angles(self, pose, angle):
@@ -205,7 +205,6 @@ def main():
         obj.PDB_writer.stride(2000)
         obj.small.angle = 180
         obj.shear.angle = 180
-        obj.small_angle.angle = 180
         obj.add_folding_move('default', obj.PDB_writer)
         obj.run_anneal_fold('default', 150, kt_anneal)
         obj.mc.lowest_score_pose().dump_pdb('outputs/11_lowest_energy_'+str(s)+'.pdb')
