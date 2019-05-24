@@ -7,6 +7,9 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 import pyrosetta
 import numpy as np
 
+# Random Movers, these movers will randomly change an internal coordinate
+# of a CG model
+
 class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized CG mover analogous to the "small" mover in PyRosetta.
@@ -20,8 +23,6 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
         angle : float
             maximum angle the mover can change an angle
-        bb_model: int
-            describes how many backbone beads are in a given CG model
         pose: pyrosetta.Pose()
             used to generate list of possible atoms
         """
@@ -31,7 +32,7 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
         #  1 bb model [[1 1] [2 1] [3 1] [4 1]][]
         #  2 bb model [[1 1] [1 2] [2 1] [2 2]][ [3 1] [3 2]]
         #  3 bb model [[1 1] [1 2] [1 3] [2 1] [2 2] [2 3] [3 1] [3 2] [3 3]]
-        conf = pose.conformation()
+        self.conf = pose.conformation()
 
         # build list of all torsion angles in backbone
         self.atoms = []
@@ -52,7 +53,7 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
         # initializing conformation 
         for i in range(0, len(self.dihes)):
-            old = conf.torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3])
+            old = self.conf.torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3])
             pose.conformation().set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], old)
 
     def __str__(self):
@@ -61,13 +62,11 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
     def apply(self, pose):
         d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
-
-        conf = pose.conformation()
         dihe_start = np.random.randint(0, len(self.dihes)) # has to be able to move only bb atoms
-        old = conf.torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3])
+        old = self.conf.torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3])
         new = old + d_angle
         # print('Changing Torsion',dihe_start, 'from', old, 'to', new)
-        conf.set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], new)
+        self.conf.set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], new)
 
 class CGShearMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
@@ -214,7 +213,7 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized CG mover analogous to the "small" mover in PyRosetta.
     """
-    def __init__(self, pose, angle = 45):
+    def __init__(self, pose, angle = 10):
         """
         Build Small Mover for CG polymers specifically for moving backbone bond angles
 
@@ -267,3 +266,63 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
         new = old + d_angle
         # print('Changing Torsion',angle_start, 'from', old, 'to', new)
         conf.set_bond_angle(self.angles[angle_start][0], self.angles[angle_start][1], self.angles[angle_start][2], new)
+
+
+# Set Movers, these movers are used to uniformly change internal coordinates
+# for a CG model. ex. change all bb dihedral angles to a value.
+#                     randomize all bb dihedral angles
+
+class randomizeBackBone(CGSmallMover):
+    """
+    Generalized CG model dihedral randomizer. Used for random initial starting configurations
+    """
+    def __init__(self, pose):
+        """
+        Build randomizeBackBone Mover for CG models
+
+        Arguments
+        ---------
+
+        pose: pyrosetta.Pose()
+            used to generate list of possible dihedrals used in randomizing pose
+        
+
+        Example
+        -------
+
+        >>>pose = pyrosetta.pose_from_seqence('X[CG11]X[CG11]X[CG11]X[CG11]')
+        >>>randomizer = cg_pyrosetta.CG_movers.randomizeBackBone(pose)
+        >>>randomizer.apply(pose)
+
+        """
+        # inherits CGSmallMover's init call, but runs with a different apply call
+        CGSmallMover.__init__(self, pose)
+
+    def apply(self, pose):
+        for i in range(len(self.dihes)):
+            angle = np.random.uniform(-180, 180)
+            self.conf.set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
+            
+class randomizeBackBoneAngles(CGSmallAngleMover):
+    """
+    Generalized CG model dihedral randomizer. Used for random initial starting configurations
+    """
+    def __init__(self, pose):
+        """
+        Build randomizeBackBoneAngles Mover for CG models
+
+        Arguments
+        ---------
+
+        pose: pyrosetta.Pose()
+            used to generate list of possible dihedrals used in randomizing pose
+        
+
+        Example
+        -------
+
+        >>>pose = pyrosetta.pose_from_seqence('X[CG11]X[CG11]X[CG11]X[CG11]')
+        >>>randomizer = cg_pyrosetta.CG_movers.randomizeBackBoneAngles(pose)
+        >>>randomizer.apply(pose)
+
+        """

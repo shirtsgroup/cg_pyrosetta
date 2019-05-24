@@ -13,7 +13,7 @@ names = ['CG11', 'CG21', 'CG31', 'mixed']
 
 # Defining the various kt values used over course of sim.
 kt_i = 100
-kt_anneal = [kt_i*(0.9)**i for i in range(80)]
+kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 
 for i in range(len(sequences)):
     # first generate a folded structure using CGFoldingAlgorithm
@@ -30,12 +30,12 @@ for i in range(len(sequences)):
     folding_object.add_folding_move('default', folding_object.pymol)
     
     # Adding an angle mover to this folding algorithm
-    # angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(folding_object.pose)
-    # repeat_angle_mover = pyrosetta.RepeatMover(angle_mover, 10)
-    # folding_object.add_folding_move('default', repeat_angle_mover)
+    angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(folding_object.pose)
+    repeat_angle_mover = pyrosetta.RepeatMover(angle_mover, 10)
+    folding_object.add_folding_move('default', repeat_angle_mover)
 
     # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    folding_object.run_anneal_fold('default', 200, kt_anneal)
+    folding_object.run_anneal_fold('default', 2000, kt_anneal)
 
     # Dump the lowest energy structure from the MC simulation
     folding_object.mc.lowest_score_pose().dump_pdb(names[i]+'_example.pdb')

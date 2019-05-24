@@ -22,12 +22,15 @@ class CGFoldingAlgorithm():
         """
         # Build CG model and set desired initial angles
         self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)
-        self.pose = self.set_BBB_angles(self.pose, BBB_angle)
-        self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
+        # self.pose = self.set_BBB_angles(self.pose, BBB_angle)
+        # self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
         # PyMOL mover, if wanting to visualize
         self.pymol = pyrosetta.PyMOLMover()
         self.pymol.apply(self.pose)
-        self.pose = self.random_BBBB_dihe(self.pose)
+
+        randomizer = CG_movers.randomizeBackBone(self.pose)
+        randomizer.apply(self.pose)
+
         self.pymol.apply(self.pose)
         # Building PDBTrajWriter object, used for writing multiple structures
         # to a single file
