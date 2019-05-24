@@ -6,8 +6,6 @@ An implementation of Pyrosetta with CG capabilities
 # Add imports here
 from .cg_pyrosetta import *
 import cg_pyrosetta.build_cg_pyrosetta
-import cg_pyrosetta.CG_movers
-import cg_pyrosetta.CG_folding
 import os
 import yaml
 
@@ -20,6 +18,10 @@ clean_pyrosetta_path = configs['clean_pyrosetta_path']
 
 builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
 builder.buildCGPyRosetta()
+
+import cg_pyrosetta.CG_movers
+import cg_pyrosetta.CG_folding
+
 
 # Handle versioneer
 from ._version import get_versions
