@@ -36,9 +36,21 @@ class PyRosettaBuilder():
         path : path to the pyrosetta package being edited
         inputs : input directory with specific file structure denoting residue types and atom types
         """
+
+        # Creating files where new residues will be injected
+
+        if not os.path.exists(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models')):
+            os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models'))
+
+        if not os.path.exists(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','cg_models')):
+            os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','cg_models'))
+
+        if not os.path.exists(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models')):
+            os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models'))
+
         self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
-        self.turnOffExtras()
-        self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
+        # self.turnOffExtras()
+        self.addResidueTypesNew(os.path.join(self.inputs, 'residue_type_sets'), header=True)
         self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
         self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = True)
         self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
@@ -51,6 +63,8 @@ class PyRosettaBuilder():
         Intentions is to 'unbuild' our CG PyRosetta
         """
         pass
+
+
 
     def addAtomTypes(self, path, header = False):
         """
@@ -75,7 +89,7 @@ class PyRosettaBuilder():
 
         # opening atom_properties.txt and appending new atom lines
         if header:
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'a') as atom_file:
                 atom_file.write('\n')
                 atom_file.write('##############################\n')
                 atom_file.write('## Custom Added Atom Types ###\n')
@@ -83,11 +97,11 @@ class PyRosettaBuilder():
                 atom_file.write('\n')
         
         # Write lines to modified pyrosetta/.../atom_properties.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'r') as atom_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'r') as atom_file:
             previous_lines = atom_file.readlines()
 
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'a') as atom_file:
             for atom_line in atom_lines:
                 # Ensure there are no duplicate atom_properties lines
                 if atom_line not in previous_lines:
@@ -115,11 +129,11 @@ class PyRosettaBuilder():
                 torsion_lines.append(line)
         
         # Write lines to modified pyrosetta/.../mm_torsion_params.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_torsion_params.txt'), 'r') as torsion_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'r') as torsion_file:
             previous_lines = torsion_file.readlines()
 
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_torsion_params.txt'), 'a') as torsion_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'a') as torsion_file:
             for torsion_line in torsion_lines:
                 # Ensure there are no duplicate atom_properties lines
                 if torsion_line not in previous_lines:
@@ -140,7 +154,7 @@ class PyRosettaBuilder():
         """
         input_path = os.path.abspath(path)
         
-        mm_atom_lines = []
+        # mm_atom_lines = []
 
         # Reading each line of 'mm_atom_properties.txt'
         with open(os.path.join(input_path,'mm_atom_properties.txt'), 'r') as f:  
@@ -148,17 +162,13 @@ class PyRosettaBuilder():
                 mm_atom_lines.append(line)
         
         # Write lines to modified pyrosetta/.../mm_torsion_params.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'r') as mm_atom_file:
-            previous_lines = mm_atom_file.readlines()
+        #with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_atom_properties.txt'), 'r') as mm_atom_file:
+        #    previous_lines = mm_atom_file.readlines()
 
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'a') as mm_atom_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_atom_properties.txt'), 'w') as mm_atom_file:
             for mm_atom_line in mm_atom_lines:
-                # Ensure there are no duplicate atom_properties lines
-                if mm_atom_line not in previous_lines:
-                    mm_atom_file.write(mm_atom_line)
-                else:
-                    print('Skipping MM AtomType:',mm_atom_line)
+                mm_atom_file.write(mm_atom_line)
 
     def addMMAngleTypes(self, path):
             """
@@ -181,7 +191,7 @@ class PyRosettaBuilder():
             
             
             # Write lines to modified pyrosetta/.../mm_torsion_params.txt
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'r') as angle_file:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','par_all27_prot_na.prm'), 'r') as angle_file:
                 previous_lines = angle_file.readlines()
             
             start_angles = previous_lines.index('ANGLES\n')
@@ -192,7 +202,7 @@ class PyRosettaBuilder():
                 else:
                     print('Skipping MM Angle:', angle_line)
 
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'w') as angle_file:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','par_all27_prot_na.prm'), 'w') as angle_file:
                 angle_file.writelines(previous_lines)
      
     def turnOffExtras(self):
@@ -203,13 +213,13 @@ class PyRosettaBuilder():
         """
         # comment out extras.txt files
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'r') as exf:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'r') as exf:
             extras = exf.readlines()
         if extras[0][0]  == '#':
             print("PyRosetta's extra.txt file is already off!")
         else:
             extras = ['# '+line for line in extras]
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'w') as exf:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'w') as exf:
                 exf.writelines(extras)
     
     def turnOnExtras(self):
@@ -220,13 +230,13 @@ class PyRosettaBuilder():
         """
         # comment out extras.txt files
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'r') as exf:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'r') as exf:
             extras = exf.readlines()
         if extras[0][0]  != '#':
             print("PyRosetta's extra.txt file is already on!")
         else:
             extras = [line[2:] for line in extras]
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'w') as exf:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'w') as exf:
                 exf.writelines(extras)
 
     def addResidueTypes(self, path, header = False):
@@ -239,11 +249,11 @@ class PyRosettaBuilder():
         path : str path of where residue.param files are located
         header : Bool to write a header for the custom residue types locations
         """
-        # add residue types into fa_standard residue types
-        custom_residue_path = os.path.abspath(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
+        # add residue types into cg_models residue types
+        custom_residue_path = os.path.abspath(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','cg_models','residue_types','custom'))
 
         if not os.path.isdir(custom_residue_path):
-            os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
+            os.mkdirs(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','cg_models','residue_types','custom'))
         
         for files in os.listdir(path):
             if files.endswith('.params'):
@@ -254,7 +264,7 @@ class PyRosettaBuilder():
 
         # add residue types to 'residue_types.txt' at the above l-caa residues (give priority for io strings)
         
-        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types.txt'), 'r') as rtf:
+        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','cg_models','residue_types.txt'), 'r') as rtf:
             residue_type_lines = rtf.readlines()
 
         if header:
@@ -267,8 +277,34 @@ class PyRosettaBuilder():
                 print('Skipping Residue: ', os.path.join('residue_types','custom',files))
 
         # Rewrite the residue_types.txt file with modifications
-        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types.txt'), 'w') as rtf:
+        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','cg_models','residue_types.txt'), 'w') as rtf:
             rtf.writelines(residue_type_lines)
+    
+    def addResidueTypesNew(self, path, header = False):
+        """
+        Method for adding new residue types to a PyRosetta4 build
+
+        Parameters
+        ----------
+        self: PyRosettaBuilder Class
+            object running addResidueTypes
+        path : str
+            string indicating path to direcctory where residue.param files are
+        header : Bool
+            whether to include a header denoting custom residues
+ 
+        """
+
+        rel_path = os.path.relpath(path, os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets','cg_models'))
+
+        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','cg_models','residue_types.txt'), 'w') as rtf:
+
+            if header:
+                rtf.write('### custom residues\n')
+            # writting custom lines first
+            for residue in os.listdir(path):
+                rtf.write(os.path.join(rel_path, residue)+'\n')
+
 
     def addPatches(self, path, header = False):
         """
@@ -279,26 +315,20 @@ class PyRosettaBuilder():
         self : PyRosettaBuilder Class
             object running addPatches
         path : str
-            string indicating path patch.txt files are
+            string indicating dir where patch.txt files are
         header : Bool
             whether to include a header denoting custom patches
 
         """
-        rel_path = os.path.relpath(path, os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets','fa_standard'))
-        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','fa_standard','patches.txt'), 'r') as rtf:
-            patches_lines = rtf.readlines()
+        rel_path = os.path.relpath(path, os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets','cg_models'))
 
-
-        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','fa_standard','patches.txt'), 'a') as rtf:
+        with open(os.path.join(self.pyrosetta_path, 'pyrosetta','database','chemical','residue_type_sets','cg_models','patches.txt'), 'w') as rtf:
         
             if header:
                 rtf.write('### custom patches residues\n')
             # writting custom lines first
             for patch in os.listdir(path):
-                if os.path.join(rel_path, patch)+'\n' not in patches_lines:
-                    rtf.write(os.path.join(rel_path, patch)+'\n')
-                else:
-                    print('Skipping Patch: ', os.path.join(rel_path ,patch))
+                rtf.write(os.path.join(rel_path, patch)+'\n')
             
 
 

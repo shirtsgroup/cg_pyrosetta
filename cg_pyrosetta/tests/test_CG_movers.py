@@ -70,4 +70,3 @@ def testCGSmallAngleMover():
     assert x_new != x_old
     assert y_new != y_old
     assert z_new != z_old
-
