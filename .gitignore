@@ -108,3 +108,4 @@ PyRosetta4.modified
 test
 __pycache__/*
 .vscode/*
+*.png
