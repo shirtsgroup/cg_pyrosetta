@@ -21,7 +21,7 @@ builder.buildCGPyRosetta()
 
 import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
-
+import pyrosetta
 
 # Handle versioneer
 from ._version import get_versions
