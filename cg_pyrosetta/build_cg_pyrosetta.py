@@ -129,17 +129,14 @@ class PyRosettaBuilder():
                 torsion_lines.append(line)
         
         # Write lines to modified pyrosetta/.../mm_torsion_params.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'r') as torsion_file:
-            previous_lines = torsion_file.readlines()
+        # with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'r') as torsion_file:
+        #    previous_lines = torsion_file.readlines()
 
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'a') as torsion_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','mm_torsion_params.txt'), 'w') as torsion_file:
             for torsion_line in torsion_lines:
                 # Ensure there are no duplicate atom_properties lines
-                if torsion_line not in previous_lines:
                     torsion_file.write(torsion_line)
-                else:
-                    print('Skipping MM Torsion:',torsion_line)
 
     def addMMAtomTypes(self, path):
         """
@@ -154,7 +151,7 @@ class PyRosettaBuilder():
         """
         input_path = os.path.abspath(path)
         
-        # mm_atom_lines = []
+        mm_atom_lines = []
 
         # Reading each line of 'mm_atom_properties.txt'
         with open(os.path.join(input_path,'mm_atom_properties.txt'), 'r') as f:  
@@ -186,24 +183,24 @@ class PyRosettaBuilder():
             angle_lines = []
             
             with open(os.path.join(input_path,'mm_angle_params.txt'), 'r') as f:  
-                for line in f.readlines()[1:]: # Skip header of atom_properties.txt files
+                for line in f.readlines(): # Skip header of atom_properties.txt files
                     angle_lines.append(line)
             
             
             # Write lines to modified pyrosetta/.../mm_torsion_params.txt
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','par_all27_prot_na.prm'), 'r') as angle_file:
-                previous_lines = angle_file.readlines()
+            # with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','par_all27_prot_na.prm'), 'r') as angle_file:
+            #    previous_lines = angle_file.readlines()
             
-            start_angles = previous_lines.index('ANGLES\n')
-            print(start_angles)
-            for angle_line in angle_lines:
-                if angle_line not in previous_lines:
-                    previous_lines.insert(start_angles+1, angle_line)
-                else:
-                    print('Skipping MM Angle:', angle_line)
+            # start_angles = previous_lines.index('ANGLES\n')
+            # print(start_angles)
+            # for angle_line in angle_lines:
+            #     if angle_line not in previous_lines:
+            #         previous_lines.insert(start_angles+1, angle_line)
+            #     else:
+            #         print('Skipping MM Angle:', angle_line)
 
             with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models','par_all27_prot_na.prm'), 'w') as angle_file:
-                angle_file.writelines(previous_lines)
+                angle_file.writelines(angle_lines)
      
     def turnOffExtras(self):
         """

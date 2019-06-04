@@ -1,3 +1,4 @@
+ANGLES
 !atom types     Ktheta    Theta0   Kub     S0
 CG1  CG1  CG1   40.000    120.00
 CG2  CG1  CG1   40.000    120.00
