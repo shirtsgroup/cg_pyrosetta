@@ -19,6 +19,18 @@ class CGFoldingAlgorithm():
         """
         folding object used for easily implementing different
         movers into a single folding algorithm.
+
+        Arguments
+        ---------
+
+        sequence : str
+            Sequence of CG residues
+        BBB_angle : float
+            Desired angle of all B-B-B angles. Generalizes to all backbone models (not working)
+        BBBB_angle : float
+            Desired dihedral of all B-B-B-B torsion angles. Generalizes to all backbone models (not working)
+
+        
         """
         # Build CG model and set desired initial angles
         self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)

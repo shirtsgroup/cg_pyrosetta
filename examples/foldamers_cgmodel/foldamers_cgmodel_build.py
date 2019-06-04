@@ -3,6 +3,7 @@ import cg_pyrosetta
 import pyrosetta
 import mdtraj as md
 from simtk import unit
+import foldamers
 from foldamers.utilities.iotools import write_pdbfile_without_topology
 from foldamers.utilities.util import *
 from foldamers.cg_model.cgmodel import *
@@ -510,7 +511,7 @@ def compare_pose_scores(scorefxn,pose_1,pose_2,compare_pdb_sequence=True):
         return
 
 def compare_openmm_energy_pyrosetta_score(cgmodel):
-        from cg_openmm.src.cg_mm_tools.cg_openmm import build_mm_simulation
+        from cg_openmm.cg_mm_tools.cg_openmm import build_mm_simulation
 
         """
         Given a cgmodel class object, this function determines if PyRosetta and OpenMM give the same score/energy with identical model settings.
