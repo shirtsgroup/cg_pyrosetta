@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
@@ -134,80 +135,130 @@ class CGShearMover(pyrosetta.rosetta.protocols.moves.Mover):
         conf.set_torsion_angle(self.dihes[dihe_start+1][0], self.dihes[dihe_start+1][1], self.dihes[dihe_start+1][2], self.dihes[dihe_start+1][3], new_2)
 
 class CGSmallSCMover(pyrosetta.rosetta.protocols.moves.Mover):
-    """        # builds list of all atoms in backbone
-        # self.atoms = []
-        # for i in range(1, pose.size()+1):  # should be genearlizeable to any combination of residues
-        #     res_name = pose.residue(i).name()
-        #    bb = int(res_name[2])  # hard coded... since we shouldn't need more than CG99 model            
-        #    for j in range(1, bb+1):
-        #        self.atoms.append(pyrosetta.AtomID(j, i))
-    Gen        # builds list of all atoms in backbone
-        # self.atoms = []
-        # for i in range(1, pose.size()+1):  # should be genearlizeable to any combination of residues
-        #     res_name = pose.residue(i).name()
-        #    bb = int(res_name[2])  # hard coded... since we shouldn't need more than CG99 model            
-        #    for j in range(1, bb+1):
-        #        self.atoms.append(pyrosetta.AtomID(j, i))
     """
-    def __init__(self, sc_model, pose, angle = 30):
+    Generalized SC torsion mover 
+    """
+
+    def __init__(self, pose, angle = 30):
         """
-        Build Small Mover for CG polymers
+        Build Small Mover for CG polymers sidechains
 
         Arguments
         ---------
 
-        angle : float, maximum angle the mover can change an angle
-        bb_model: int, describes how many backbone beads are in a given CG model
-        pose: pyrosetta.Pose(), used to generate list of possible atoms
+        angle : float
+            maximum angle the mover can change an angle
+        bb_model: int
+            describes how many backbone beads are in a given CG model
+        pose : pyrosetta.Pose()
+             used to generate list of possible atoms
         """
         self.angle = angle
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         # Generate a list of all possible dihe in a provided pose with the bb_model given
-        #
-        #  Legend : atoms --> [atomno, resno] residues --> {all possible atoms} 
-        #
-        #  1 sc model assert no backbone dihedral
-        #
-        #  2 sc model [{[1 2][1 1][2 1][3 1]} {[1 1][1 2][2 2][3 2]} {[1 2][1 3][3 2][3 3]}]
-        #                First entry is a Unique case
-        #  3 bb model [[1 1] [1 2] [1 3] [2 1] [2 2] [2 3] [3 1] [3 2] [3 3]]
-        #
+
+
+        # All of the following logic depends on the conformation object
 
         conf = pose.conformation()
+        
+        
+        # will populate this list with all side chain dihedrals
         self.dihes = []
-        
-        for i in range(1, pose.size()+1):  # should be genearlizeable to any combination of residues
-            res_dihes = []
-            res_name = pose.residue(i).name()
-            sc = int(res_name[3])  # hard coded... since we shouldn't need more than CG99 model            
-            if i == 1:
-                # edge case for first residue
-                res_dihes.append(pyrosetta.AtomID(1, 2))
-            else:
-                # else use first atom of previous residue
-                res_dihes.append(pyrosetta.AtomID(1, i-1))
 
-            for j in range(1, sc+1):                    
-                res_dihes.append(pyrosetta.AtomID(j, i))
-                # print(res, res+1, res+2, res+3)
-        
-        for i in range(0, len(self.dihes)):
-            old = conf.torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3])
-            pose.conformation().set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], old)
+
+        # Take a residue based approach
+        for i in range(1, pose.size()+1):  # should be genearlizeable to any combination of residues
+            # Start each search for dihedrals at the first atom of each CG residue
+            start_atom = pyrosetta.AtomID(1, i)
+
+
+            # Getting 2 bb atoms used for building SC dihedral
+            bb1 = start_atom
+            bb2 = None
+
+            # Will determine 
+            residue_atoms = [start_atom]
+            sidechain_atoms = []
+            # get side chain atoms in residue and define bb2  for SC dihedral definition
+
+            for atom in residue_atoms:
+                neighbors = conf.bonded_neighbor_all_res(atom, virt=False)
+                for neigh in neighbors:
+                    info = [neigh.rsd(), neigh.atomno()]
+                    isBackbone = conf.atom_is_backbone_norefold(info[0], info[1])
+
+                    # extracting 2nd backbone atom
+                    if isBackbone and bb2 == None:
+                        bb2 = neigh
+                    
+                    # exluding atoms from other residues and previously seen atoms
+                    if info in [[prev_atom.rsd(), prev_atom.atomno()] for prev_atom in residue_atoms] or info[0] != i:  #skip atom if already visted or not in residue
+                        continue
+
+                    # atoms that haven't been seen before are added to the residue_atoms list and side chain atoms are added to the sidechain_atoms list
+                    else:
+                        residue_atoms.append(neigh)
+                        if not isBackbone:
+                            sidechain_atoms.append(neigh)
+            
+            # generating sidechain dihedrals from sidechain atoms
+            
+            for sc in sidechain_atoms:
+                # Build dihedral candidates from SC atoms
+                potential_dihe = [sc]
+                pos = sc
+
+                # Recusively populate potential_dihe by moving down SC
+                # If we reach backbone, appends the two backbone atoms describe above 
+                 
+                while len(potential_dihe) < 4:
+                    neighbors = conf.bonded_neighbor_all_res(pos, virt=False)
+
+                    # Next atom will always be that with the lowest atomno in the residue
+                    atom_ids = [atom.atomno() for atom in neighbors]
+                    i_next = atom_ids.index(min(atom_ids))
+
+                    # If atom is in the backbone, append bb1 and bb2 to the potential dihe
+                    if conf.atom_is_backbone_norefold(i, atom_ids[i_next]):
+                        potential_dihe.append(bb1)
+                        potential_dihe.append(bb2)
+                        break
+
+                    # Otherwise add the neighbor w/ lowest atomno and change the current pos to that atom    
+                    else:
+                        pos = neighbors[i_next+1]
+                        potential_dihe.append(pos)
+                
+
+                # Quality control : Only potential_dihes over length 4 are considered and 
+                # only use the first 4 entries of the dihedral. 
+                # (Ex. This would be generated for CG13 model --> [SC3 SC2 SC1 BB1 BB2] )
+                if len(potential_dihe) >= 4:
+                    self.dihes.append(potential_dihe[0:4])
+
+
+
+                                        
+
+        #exit()
 
     def __str__(self):
         # pretty sure we don't need this
         pass
 
     def apply(self, pose):
-        d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
+        if self.dihes:
+            d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
+            conf = pose.conformation()
+            dihe = np.random.randint(0, len(self.dihes)) # has to be able to move only bb atoms
+            old = conf.torsion_angle(self.dihes[dihe][0], self.dihes[dihe][1], self.dihes[dihe][2], self.dihes[dihe][3])
+            new = old + d_angle
+            # print('Changing Torsion',dihe_start, 'from', old, 'to', new)
+            conf.set_torsion_angle(self.dihes[dihe][0], self.dihes[dihe][1], self.dihes[dihe][2], self.dihes[dihe][3], new)
+        else:
+            warnings.warn('No Sidechain Dihedrals Available')
 
-        conf = pose.conformation()
-        dihe_start = np.random.randint(0, len(self.dihes)) # has to be able to move only bb atoms
-        old = conf.torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3])
-        new = old + d_angle
-        # print('Changing Torsion',dihe_start, 'from', old, 'to', new)
-        conf.set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], new)
 
 class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
