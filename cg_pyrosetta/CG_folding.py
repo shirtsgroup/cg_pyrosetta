@@ -21,7 +21,7 @@ class CGFoldingAlgorithm():
         movers into a single folding algorithm.
         """
         # Build CG model and set desired initial angles
-        self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)
+        self.pose = pyrosetta.pose_from_sequence(sequence, 'cg_models', auto_termini=False)
         # self.pose = self.set_BBB_angles(self.pose, BBB_angle)
         # self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
         # PyMOL mover, if wanting to visualize
@@ -45,6 +45,7 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
+        print("This is Working! Don't kill me!")
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)

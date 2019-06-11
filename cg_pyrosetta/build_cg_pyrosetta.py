@@ -49,7 +49,7 @@ class PyRosettaBuilder():
             os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models'))
 
         self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
-        # self.turnOffExtras()
+        self.turnOffExtras()
         self.addResidueTypesNew(os.path.join(self.inputs, 'residue_type_sets'), header=True)
         self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
         self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header = True)
@@ -89,7 +89,7 @@ class PyRosettaBuilder():
 
         # opening atom_properties.txt and appending new atom lines
         if header:
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'a') as atom_file:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
                 atom_file.write('\n')
                 atom_file.write('##############################\n')
                 atom_file.write('## Custom Added Atom Types ###\n')
@@ -97,11 +97,11 @@ class PyRosettaBuilder():
                 atom_file.write('\n')
         
         # Write lines to modified pyrosetta/.../atom_properties.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'r') as atom_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'r') as atom_file:
             previous_lines = atom_file.readlines()
 
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','atom_properties.txt'), 'a') as atom_file:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
             for atom_line in atom_lines:
                 # Ensure there are no duplicate atom_properties lines
                 if atom_line not in previous_lines:
@@ -210,13 +210,13 @@ class PyRosettaBuilder():
         """
         # comment out extras.txt files
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'r') as exf:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'r') as exf:
             extras = exf.readlines()
         if extras[0][0]  == '#':
             print("PyRosetta's extra.txt file is already off!")
         else:
             extras = ['# '+line for line in extras]
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'w') as exf:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'w') as exf:
                 exf.writelines(extras)
     
     def turnOnExtras(self):
@@ -227,13 +227,13 @@ class PyRosettaBuilder():
         """
         # comment out extras.txt files
 
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'r') as exf:
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'r') as exf:
             extras = exf.readlines()
         if extras[0][0]  != '#':
             print("PyRosetta's extra.txt file is already on!")
         else:
             extras = [line[2:] for line in extras]
-            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','cg_models','extras.txt'), 'w') as exf:
+            with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','extras.txt'), 'w') as exf:
                 exf.writelines(extras)
 
     def addResidueTypes(self, path, header = False):
