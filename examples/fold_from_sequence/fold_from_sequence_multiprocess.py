@@ -14,19 +14,22 @@ def run_anneal_folding(sequence, name,rep, kt_anneal):
     # 10x CGShearMober
     # 10x MinMover
     # MC evaluation
-    # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 0.1)
-    folding_object.add_folding_move('default', folding_object.pymol)
+
+    # Adding a pymol object to the folding algorithm so we can confirm
+    # folding is happening
+    folding_object.build_fold_alg('no_min')
     
-    # Adding an angle mover to this folding algorithm
-    # angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(folding_object.pose)
-    # repeat_angle_mover = pyrosetta.RepeatMover(angle_mover, 10)
-    # folding_object.add_folding_move('default', repeat_angle_mover)
+    # Editing the PDB_writer object in our folding object so we can get an output of
+    # the annealing process
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small, 10))
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.shear, 10))
+    folding_object.add_folding_move('no_min', folding_object.pymol)
 
     # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    folding_object.run_anneal_fold('default', 100, kt_anneal)
+    folding_object.run_anneal_fold('no_min', 5000, kt_anneal)
 
     # Dump the lowest energy structure from the MC simulation
-    folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names+'_example_'+str(rep)+'.pdb')
+    folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+name+'_example_'+str(rep)+'.pdb')
 
 def multiprocess_anneal_folding(sequence_name_rep_kts):
     run_anneal_folding(sequence_name_rep_kts[0], sequence_name_rep_kts[1], sequence_name_rep_kts[2], sequence_name_rep_kts[3])
@@ -45,7 +48,7 @@ def build_inputs(seqences, name, rep, kts):
 
 
 if __name__ == '__main__':
-    p = Pool(10)
+    p = Pool(5)
 
     # list of sequences of several CG models [CG11*5, CG21*5, CG31*5, mixed]
     sequences = ['X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
@@ -57,6 +60,6 @@ if __name__ == '__main__':
     # Defining the various kt values used over course of sim.
     kt_i = 100
     kt_anneal = [kt_i*(0.9)**i for i in range(50)]
-    inputs = build_inputs(sequences, names, 2, kt_anneal)
+    inputs = build_inputs(sequences, names, 30, kt_anneal)
     for i in p.imap_unordered(multiprocess_anneal_folding, inputs):
         print(i)

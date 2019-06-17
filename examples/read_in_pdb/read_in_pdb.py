@@ -15,7 +15,7 @@ kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 folding_object.add_folding_move('default', folding_object.pymol)
 
 # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-folding_object.run_anneal_fold('default', 200, kt_anneal)
+folding_object.run_anneal_fold('default', 10, kt_anneal)
 
 # Dump the lowest energy structure from the MC simulation
 folding_object.mc.lowest_score_pose().dump_pdb('1_1_example.pdb')
