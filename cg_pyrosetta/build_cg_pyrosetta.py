@@ -87,6 +87,13 @@ class PyRosettaBuilder():
                         atom_lines.append(line)
 
 
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'r') as atom_file:
+            original_file = atom_file.readlines()
+            original_file = original_file[:172]
+            
+        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'w') as atom_file: 
+            atom_file.writelines(original_file)
+
         # opening atom_properties.txt and appending new atom lines
         if header:
             with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
@@ -95,19 +102,12 @@ class PyRosettaBuilder():
                 atom_file.write('## Custom Added Atom Types ###\n')
                 atom_file.write('##############################\n')
                 atom_file.write('\n')
-        
-        # Write lines to modified pyrosetta/.../atom_properties.txt
-        with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'r') as atom_file:
-            previous_lines = atom_file.readlines()
-
+                    
 
         with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','atom_type_sets','fa_standard','atom_properties.txt'), 'a') as atom_file:
             for atom_line in atom_lines:
-                # Ensure there are no duplicate atom_properties lines
-                if atom_line not in previous_lines:
-                    atom_file.write(atom_line)
-                else:
-                    print('Skipping Atom :',atom_line.rstrip('\n'))
+                atom_file.write(atom_line)
+
     
     def addMMTorsionTypes(self, path):
         """
