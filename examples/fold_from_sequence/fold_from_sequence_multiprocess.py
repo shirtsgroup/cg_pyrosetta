@@ -54,9 +54,11 @@ if __name__ == '__main__':
     sequences = ['X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
             'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
             'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
-            'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]']
+            'X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]',
+            'X[CG13]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]',
+            'X[CG11]X[CG21]X[CG31]X[CG12]X[CG13]X[CG11]X[CG21]X[CG11]X[CG21]X[CG13]X[CG13]X[CG21]X[CG12]X[CG31]X[CG31]']
 
-    names = ['CG11', 'CG21', 'CG31', 'mixed']
+    names = ['CG11', 'CG21', 'CG31', 'CG13', 'CG12', 'mixed']
     # Defining the various kt values used over course of sim.
     kt_i = 100
     kt_anneal = [kt_i*(0.9)**i for i in range(50)]
