@@ -83,8 +83,82 @@ def changeAtomParameters(param_dict):
         for param in atom_params_list:
             # print param line with specific formating
             f.write("%s%6.1s%10.4f%10.4f%10.4f%10.4f%10.4f\n" % (param[0], param[1], float(param[2]), float(param[3]), float(param[4]), float(param[5]), float(param[6])))
+    
+    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_atom_properties.txt'), 'w') as f:
+        # write header
+        f.write('NAME    LJ_WDEPTH   LJ_RADIUS   LJ_3B_WDEPTH    LJ_3B_RADIUS\n')
         
+        # rewrite updated parameters
+        for param in atom_params_list:
+            # print param line with specific formating
+            f.write("%s%10.4f%10.4f%10.4f%10.4f\n" % (param[0], -float(param[3]), float(param[2]), -float(param[3]), float(param[2])))
+            
     
         
-        
+
+def changeTorsionParameters(param_dict):
+    """
+    function to change atom parameters on the fly
+
+    Arguments
+    ---------
     
+    dict : dict
+        Dictionary containing name of atom and list of specific parameters for
+        that atom type. (Parameters are expected in the following order
+        ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME)
+
+    Examples
+    --------
+
+    params = {'CG1':['X', 1.0, 0.2, 1.0, 3.5, 23.7]}
+    cg_pyrosetta.change_parameters.changeAtomParameters(params)
+    
+    """
+
+    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_torsion_params.txt'), 'r') as f:
+        torsion_lines = f.readlines()
+
+
+    # Build torsion params list [name_of_torsion k_constant periodicity phase_shift]
+    torsion_params_list = []
+    for line in torsion_lines[1:]:
+        split_line = line.rstrip('\n').split()
+        name = ' '.join(split_line[:4])
+        torsion_params_list.append([name, split_line[4], split_line[5], split_line[6]])
+
+    prev_torsion = [ torsion[0] for torsion in torsion_params_list]
+    names = param_dict.keys()
+
+    for name in names:
+        
+        # extract LJ parameters and atom name
+        force_constant = param_dict[name][0]
+        periodicity = param_dict[name][1]
+        phase_shift = param_dict[name][2]
+
+        if name in prev_torsion:
+            i_torsion = prev_torsion.index(name)
+            torsion_params_list[i_torsion][0] = name
+            torsion_params_list[i_torsion][1] = force_constant
+            torsion_params_list[i_torsion][2] = periodicity
+            torsion_params_list[i_torsion][3] = phase_shift
+
+        else:
+            new_entry = [name,
+                         force_constant,
+                         periodicity,
+                         phase_shift]
+            torsion_params_list.append(new_entry)
+
+            
+    # Rewrite parameters to atom_properties.txt file
+    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_torsion_params.txt'), 'w') as f:
+        # write header
+        f.write('# CG torsion parameters\n')
+        
+        # rewrite updated parameters
+        for param in torsion_params_list:
+            # print param line with specific formating
+            atom_names = param[0].split()
+            f.write("%4.4s%4.4s%4.4s%4.4s%10.4f%10.1i%10.4f\n" % (atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
