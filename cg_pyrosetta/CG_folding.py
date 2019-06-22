@@ -21,7 +21,7 @@ class CGFoldingAlgorithm():
         movers into a single folding algorithm.
         """
         # Build CG model and set desired initial angles
-        self.pose = pyrosetta.pose_from_sequence(sequence, 'cg_models', auto_termini=False)
+        self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)
         # self.pose = self.set_BBB_angles(self.pose, BBB_angle)
         # self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
         # PyMOL mover, if wanting to visualize
@@ -37,7 +37,7 @@ class CGFoldingAlgorithm():
         self.PDB_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
         self.PDB_writer.apply(self.pose) # write initial structure
         self.PDB_writer.file_name('outputs/traj.pdb')
-        self.PDB_writer.stride(10)
+        self.PDB_writer.stride(100)
 
         # Define scorefunction terms
         self.scorefxn = pyrosetta.ScoreFunction()
@@ -45,7 +45,6 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-        print("This is Working! Don't kill me!")
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
@@ -79,6 +78,11 @@ class CGFoldingAlgorithm():
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
+        
+        # If writing a trajectory file or pymol visualization is desired uncomment these lines
+
+        # self.add_folding_move('default', self.PDB_writer)
+        # self.add_folding_move('default', self.pymol)
 
     def set_BBB_angles(self, pose, angle):
         """

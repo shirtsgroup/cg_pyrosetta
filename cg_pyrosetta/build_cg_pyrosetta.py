@@ -174,7 +174,7 @@ class PyRosettaBuilder():
 
         with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'r') as atom_file:
             original_file = atom_file.readlines()
-            original_file = original_file[:128]  # should get this number when building PyRosetta.modified
+            original_file = original_file[:129]  # should get this number when building PyRosetta.modified
             
         with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','mm_atom_properties.txt'), 'w') as atom_file: 
             atom_file.writelines(original_file)
@@ -296,7 +296,8 @@ class PyRosettaBuilder():
                 rtf.write('### custom residues\n')
             # writting custom lines first
             for residue in os.listdir(path):
-                rtf.write(os.path.join(rel_path, residue)+'\n')
+                if residue.endswith('.params'):
+                    rtf.write(os.path.join(rel_path, residue)+'\n')
 
 
     def addPatches(self, path, header = False):

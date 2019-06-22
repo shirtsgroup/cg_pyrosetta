@@ -98,20 +98,20 @@ def changeAtomParameters(param_dict):
 
 def changeTorsionParameters(param_dict):
     """
-    function to change atom parameters on the fly
+    function to change torsion parameters on the fly
 
     Arguments
     ---------
     
     dict : dict
-        Dictionary containing name of atom and list of specific parameters for
+        Dictionary containing name of torsion and list of specific parameters for
         that atom type. (Parameters are expected in the following order
         ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME)
 
     Examples
     --------
 
-    params = {'CG1':['X', 1.0, 0.2, 1.0, 3.5, 23.7]}
+    params = {'CG1 CG1 CG1 CG1':[k_force, periodicity, phase_shift]}
     cg_pyrosetta.change_parameters.changeAtomParameters(params)
     
     """
@@ -162,3 +162,69 @@ def changeTorsionParameters(param_dict):
             # print param line with specific formating
             atom_names = param[0].split()
             f.write("%4.4s%4.4s%4.4s%4.4s%10.4f%10.1i%10.4f\n" % (atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
+
+def changeAngleParameters(param_dict):
+    """
+    function to change angle parameters (mm_bend)on the fly
+
+    Arguments
+    ---------
+    
+    dict : dict
+        Dictionary containing name of atom and list of specific parameters for
+        that atom type. (Parameters are expected in the following order
+        !atom types     Ktheta    Theta0   Kub     S0)
+
+    Examples
+    --------
+
+    params = {'CG1':['X', 1.0, 0.2, 1.0, 3.5, 23.7]}
+    cg_pyrosetta.change_parameters.changeAtomParameters(params)
+    
+    """
+
+    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt'), 'r') as f:
+        angle_lines = f.readlines()
+
+
+    # Build torsion params list [name_of_torsion k_constant periodicity phase_shift]
+    angle_params_list = []
+    for line in angle_lines[2:]:
+        split_line = line.rstrip('\n').split()
+        name = ' '.join(split_line[:3])
+        angle_params_list.append([name, split_line[3], split_line[4]])
+
+    prev_angles = [ angle[0] for angle in angle_params_list]
+    names = param_dict.keys()
+    print(prev_angles)
+    for name in names:
+        
+        # extract LJ parameters and atom name
+        force_constant = param_dict[name][0]
+        angle = param_dict[name][1]
+
+        if name in prev_angles:
+            i_angle = prev_angles.index(name)
+            angle_params_list[i_angle][0] = name
+            angle_params_list[i_angle][1] = force_constant
+            angle_params_list[i_angle][2] = angle
+
+        else:
+            new_entry = [name,
+                         force_constant,
+                         angle,]
+            angle_params_list.append(new_entry)
+
+            
+    # Rewrite parameters to atom_properties.txt file
+    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt'), 'w') as f:
+        # write header
+        f.write('ANGLES\n')
+        f.write('!atom types     Ktheta    Theta0   Kub     S0\n')
+        
+        
+        # rewrite updated parameters
+        for param in angle_params_list:
+            # print param line with specific formating
+            atom_names = param[0].split()
+            f.write("%-4.4s%4.3s%4.3s%10.4f%10.4f\n" % (atom_names[0], atom_names[1], atom_names[2], float(param[1]), float(param[2])))
