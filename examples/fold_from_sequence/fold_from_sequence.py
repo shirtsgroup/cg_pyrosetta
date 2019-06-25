@@ -1,12 +1,13 @@
 # This example file will be used to show how to generally use the CG_folding.FoldingAlgorithm object
 import cg_pyrosetta
-from cg_pyrosetta.CG_folding import pyrosetta as pyrosetta
+import pyrosetta
+pyrosetta.init()
+
 
 # list of sequences of several CG models [CG11*5, CG21*5, CG31*5, mixed]
 sequences = ['X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]',
           'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
           'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
-          'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]',
           'X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]',
           'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
           'X[CG11]X[CG12]X[CG21]X[CG31]X[CG13]X[CG21]X[CG13]X[CG11]X[CG11]X[CG21]X[CG13]X[CG11]X[CG12]X[CG21]X[CG31]']
@@ -45,7 +46,11 @@ for rep in range(5):
 
 
         # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-        folding_object.run_anneal_fold('default', 1000, kt_anneal)
+        folding_object.run_anneal_fold('default', 10, kt_anneal)
 
         # Dump the lowest energy structure from the MC simulation
         folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
+        twist_score = pyrosetta.ScoreFunction()
+        twist_score.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
+        print(twist_score(folding_object.pose))
+

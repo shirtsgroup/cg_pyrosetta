@@ -20,7 +20,8 @@ def initializeParameters():
     )
     cg_pyrosetta.change_parameters.changeAngleParameters(
     {'CG1 CG1 CG1':[0,0],
-     'CG2 CG1 CG1':[0,0]},
+     'CG2 CG1 CG1':[0,0],
+     'X CG2 CG1':[0,0]},
     )
 
 
@@ -37,9 +38,10 @@ def updateParameters(param_dict):
 def runAnnealingProcess(param_dict, rep, kts, k, p):
     folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]')
     folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
-    folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
+    # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
+    folding_object.add_folding_move('default', folding_object.pymol)
     folding_object.run_anneal_fold('default', 1000, kts)
-    folding_object.mc.dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb'))
+    folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb'))
 
 
 
@@ -58,7 +60,7 @@ def main():
     # Reset all parameters to zero
     reps = 20
     initializeParameters()
-    torsion_name = 'CG1 CG1 CG1 CG1'
+    torsion_name = 'CG2 CG1 CG1 CG2'
     k_torsions = np.linspace(0, 50, 20)
     periodicities  = np.arange(1,6)
 

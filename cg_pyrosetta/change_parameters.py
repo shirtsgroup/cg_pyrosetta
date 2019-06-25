@@ -161,7 +161,7 @@ def changeTorsionParameters(param_dict):
         for param in torsion_params_list:
             # print param line with specific formating
             atom_names = param[0].split()
-            f.write("%4.4s%4.4s%4.4s%4.4s%10.4f%10.1i%10.4f\n" % (atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
+            f.write("%s %s %s %s %.4f %.1i %.4f\n" % (atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
 
 def changeAngleParameters(param_dict):
     """
