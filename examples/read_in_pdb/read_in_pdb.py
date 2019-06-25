@@ -1,8 +1,7 @@
 # This example file will be used to show how to read in a PDB and sample the local backbone space around the starting conformation
 
 import cg_pyrosetta
-from cg_pyrosetta.CG_folding import pyrosetta
-
+import pyrosetta
 
 # first generate a folded structure using CGFoldingAlgorithm
 folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]')

@@ -49,7 +49,7 @@ class CGFoldingAlgorithm():
         self.PDB_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
         self.PDB_writer.apply(self.pose) # write initial structure
         self.PDB_writer.file_name('outputs/traj.pdb')
-        self.PDB_writer.stride(10)
+        self.PDB_writer.stride(100)
 
         # Define scorefunction terms
         self.scorefxn = pyrosetta.ScoreFunction()
@@ -57,7 +57,7 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
@@ -90,6 +90,11 @@ class CGFoldingAlgorithm():
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
+        
+        # If writing a trajectory file or pymol visualization is desired uncomment these lines
+
+        # self.add_folding_move('default', self.PDB_writer)
+        # self.add_folding_move('default', self.pymol)
 
     def set_BBB_angles(self, pose, angle):
         """

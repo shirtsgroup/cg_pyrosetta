@@ -5,6 +5,7 @@
 NAME CG11
 IO_STRING CG11 X
 TYPE POLYMER
+AA UNK
 
 ATOM BB1 CG1 CG1 0  # 1 bead backbone
 ATOM SC1 CG2 CG2 0  # 1 bead sidechain

@@ -25,15 +25,15 @@ def testAtoms():
         lines = atom_file.readlines()
     assert '## Custom Added Atom Types ###\n' in lines
 
-def testResidueDir():
-    assert os.path.isdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
+# def testResidueDir():
+#     assert os.path.isdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
 
-def testResiduefiles():
-    """
-    Confirms the 'custom directory' is populated
-    """
-
-    assert os.listdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
+# def testResiduefiles():
+#     """
+#     Confirms the 'custom directory' is populated
+#     """
+# 
+#     assert os.listdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
 
 def testExtras():
     """
