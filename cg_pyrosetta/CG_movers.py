@@ -69,6 +69,28 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
         # print('Changing Torsion',dihe_start, 'from', old, 'to', new)
         self.conf.set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start][1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], new)
 
+
+class CGSmallMoverNew(pyrosetta.rosetta.protocols.moves.Mover):
+    """
+    Geberalized CG Mover
+    """
+    def __init__(self, pose, angle = 180):
+        """
+        Build a Small Mover for CG polymer backbone dihedrals
+
+        Arguments
+        ---------
+
+        angle : float
+            maximum angle the mover can change an angle
+        pose : pyrosetta.Pose()
+            used to generate list of possible atoms
+        """
+
+        self.angle = angle
+        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
+
+
 class CGShearMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized CG mover analogous to the "shear" mover in PyRosetta.
@@ -148,8 +170,6 @@ class CGSmallSCMover(pyrosetta.rosetta.protocols.moves.Mover):
 
         angle : float
             maximum angle the mover can change an angle
-        bb_model: int
-            describes how many backbone beads are in a given CG model
         pose : pyrosetta.Pose()
              used to generate list of possible atoms
         """
