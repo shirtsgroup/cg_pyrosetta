@@ -52,5 +52,5 @@ for rep in range(5):
         folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
         twist_score = pyrosetta.ScoreFunction()
         twist_score.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
-        print(twist_score(folding_object.pose))
+        # print(twist_score(folding_object.pose))
 

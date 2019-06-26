@@ -190,8 +190,6 @@ class PyRosettaBuilder():
 
         Arguments
         ---------
-
-<<<<<<< HEAD
         self: PyRosettaBuilder Class
         path: str path of where input mm_torsion_params.txt
         header: Bool used to determine whether or not write the header showing where custom atoms are added
@@ -219,11 +217,6 @@ class PyRosettaBuilder():
 
         with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'w') as angle_file:
             angle_file.writelines(previous_lines)
-=======
-            self: PyRosettaBuilder Class
-            path: str path of where input mm_torsion_params.txt
-            header: Bool used to determine whether or not write the header showing where custom atoms are added
-            """
             input_path = os.path.abspath(path)
             
             angle_lines = []
@@ -258,7 +251,6 @@ class PyRosettaBuilder():
 
             with open(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','fa_standard','par_all27_prot_na.prm'), 'a') as angle_file:
                 angle_file.writelines(angle_lines)
->>>>>>> working_branch
      
     def turnOffExtras(self):
         """

@@ -37,16 +37,17 @@ def updateParameters(param_dict):
 
 def runAnnealingProcess(param_dict, rep, kts, k, p):
     folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]')
-    folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
+    # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
     folding_object.add_folding_move('default', folding_object.pymol)
-    folding_object.run_anneal_fold('default', 1000, kts)
+    folding_object.run_anneal_fold('default', 10, kts)
     folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb'))
 
 
 
 def multiprocess_function(list_of_params):
     runAnnealingProcess(list_of_params[0], list_of_params[1], list_of_params[2], list_of_params[3], list_of_params[4])
+    return(list_of_params[1])
     
 def combineReplicas(k, p, reps):
     file_names = [os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb') for rep in range(1, reps+1)]
@@ -58,10 +59,16 @@ def combineReplicas(k, p, reps):
 
 def main():
     # Reset all parameters to zero
-    reps = 20
+
+    # Would like to generalize this work flow to:
+
+    # 1) select parameters you would like to scan (modularly) (e.g. [torsion_force_k, BB_LJ_epsilon, SC_LJ_sigma])
+    # 2) select ranges for parameter scan (e.g. np.linspace(), np.linspace(), np.linspace(), np.linspace())
+    # 3) automatically builds loops/simulations for this
+    reps = 30
     initializeParameters()
     torsion_name = 'CG2 CG1 CG1 CG2'
-    k_torsions = np.linspace(0, 50, 20)
+    k_torsions = np.linspace(0, 15, 20)
     periodicities  = np.arange(1,6)
 
     kts = [0.59616*(1/0.9)**i for i in range(50)]   # ends at 300K starting at a kt ~ 100 --> ~ 50K K
