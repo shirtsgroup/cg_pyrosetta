@@ -40,7 +40,7 @@ def runAnnealingProcess(param_dict, rep, kts, k, p):
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
     folding_object.add_folding_move('default', folding_object.pymol)
-    folding_object.run_anneal_fold('default', 10, kts)
+    folding_object.run_anneal_fold('default', 100, kts)
     folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb'))
 
 
@@ -83,7 +83,7 @@ def main():
                 torsion_params = buildTorsionParamDict(torsion_name, k, p)
                 updateParameters(torsion_params)
                 multiprocess_params = [[torsion_params, rep, kts, k, p] for rep in range(1,reps+1)]
-                pool = Pool(10)
+                pool = Pool(5)
                 for i in pool.imap_unordered(multiprocess_function, multiprocess_params):
                     print('Working on rep:', i)
 
