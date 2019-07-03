@@ -59,7 +59,7 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
-        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
+        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
@@ -69,9 +69,10 @@ class CGFoldingAlgorithm():
         # Build minimization movers
         self.mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover()
         self.movemap = pyrosetta.MoveMap()
+        self.mini.score_function(self.scorefxn)
+        self.movemap.set(pyrosetta.rosetta.core.id.THETA, True)        
         self.movemap.set_bb_true_range(1, self.pose.size())
         self.mini.movemap(self.movemap)
-        self.mini.score_function(self.scorefxn)
 
         # Build standard CG 1-1 movers
         self.small = CG_movers.CGSmallMover(self.pose)
@@ -215,6 +216,7 @@ class CGFoldingAlgorithm():
                 print('Folding at T =',kt,'...')
                 run.apply(self.pose)
                 self.mc.show_counters()
+                print('Minimum Energy : ', self.scorefxn(self.mc.lowest_score_pose()))
             else:
                 # Updat kt in MC object
                 self.mc.set_temperature(kt)
@@ -230,7 +232,8 @@ class CGFoldingAlgorithm():
                 old_energy = self.scorefxn(self.mc.lowest_score_pose())
                 new_energy = None
                 counter = 0
-                while new_energy == None or not math.isclose(old_energy, new_energy):
+                while counter <= 10:
+                    #  new_energy == None or not math.isclose(old_energy, new_energy) and
                     counter += 1
                     print('Folding at T =',kt,'...', 'Rep:', counter)
                     old_energy = self.scorefxn(self.mc.lowest_score_pose())
