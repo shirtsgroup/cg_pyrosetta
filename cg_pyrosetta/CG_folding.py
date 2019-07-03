@@ -65,18 +65,20 @@ class CGFoldingAlgorithm():
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_atr, 1)
         
-
-        # Build minimization movers
-        self.mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover()
-        self.movemap = pyrosetta.MoveMap()
-        self.mini.score_function(self.scorefxn)
-        self.movemap.set(pyrosetta.rosetta.core.id.THETA, True)        
-        self.movemap.set_bb_true_range(1, self.pose.size())
-        self.mini.movemap(self.movemap)
-
         # Build standard CG 1-1 movers
         self.small = CG_movers.CGSmallMover(self.pose)
         self.shear = CG_movers.CGShearMover(self.pose)
+        self.small_angle = CG_movers.CGSmallAngleMover(self.pose)
+
+        
+        # Build minimization movers
+        self.mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover('lbfgs_armijo_nonmonotone')
+        self.movemap = pyrosetta.MoveMap()
+        self.mini.score_function(self.scorefxn)
+        for atom in self.small_angle.bb_atoms:
+            self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True) 
+        self.movemap.set_bb_true_range(1, self.pose.size())
+        self.mini.movemap(self.movemap)
 
         # Build MC object + Trial Mover (empty for now)
         self.mc = pyrosetta.MonteCarlo(self.pose, self.scorefxn, 1)
@@ -91,7 +93,7 @@ class CGFoldingAlgorithm():
         self.build_fold_alg('default')
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
-        self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
+        # self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
         
         # If writing a trajectory file or pymol visualization is desired uncomment these lines
 
@@ -188,6 +190,7 @@ class CGFoldingAlgorithm():
         run = pyrosetta.RepeatMover(self.trial_mc, iter)
         print('Folding...')
         run.apply(self.pose)
+        self.mc.set_last_accepted_pose(self.mc.lowest_score_pose())
 
 
     def run_anneal_fold(self, name, iter, kt_range):
@@ -204,43 +207,29 @@ class CGFoldingAlgorithm():
         
         for kt in kt_range:
 
-            if kt !=  kt_range[len(kt_range)-1]:
-                # Update kt in MC object
-                self.mc.set_temperature(kt)
+            # Updat kt in MC object
+            self.mc.set_temperature(kt)
 
-                # Rebuild trial mc object with new kT value
-                self.build_trial_mc_alg(self.folding_protocols[name])
-                
-                # Build RepeatMover with MC trial to iterate iter times
-                run = pyrosetta.RepeatMover(self.trial_mc, iter)
-                print('Folding at T =',kt,'...')
+            # Rebuild trail mc object with new kT value
+            self.build_trial_mc_alg(self.folding_protocols[name])
+
+            # Build RepeatMover with MC trial to iterate iter times
+            run = pyrosetta.RepeatMover(self.trial_mc, iter)
+            
+            old_energy = self.scorefxn(self.mc.lowest_score_pose())
+            new_energy = None
+            counter = 0
+            while old_energy != new_energy or counter < 10:
+                #  new_energy == None or not math.isclose(old_energy, new_energy) and
+                counter += 1
+                print('Folding at T =',kt,'...', 'Rep:', counter)
+                old_energy = self.scorefxn(self.mc.lowest_score_pose())
                 run.apply(self.pose)
                 self.mc.show_counters()
-                print('Minimum Energy : ', self.scorefxn(self.mc.lowest_score_pose()))
-            else:
-                # Updat kt in MC object
-                self.mc.set_temperature(kt)
-
-                # Rebuild trail mc object with new kT value
-                self.build_trial_mc_alg(self.folding_protocols[name])
-
-                # Build RepeatMover with MC trial to iterate iter times
-                run = pyrosetta.RepeatMover(self.trial_mc, iter)
-                print('Folding at T =',kt,'...')
-                
-                
-                old_energy = self.scorefxn(self.mc.lowest_score_pose())
-                new_energy = None
-                counter = 0
-                while counter <= 10:
-                    #  new_energy == None or not math.isclose(old_energy, new_energy) and
-                    counter += 1
-                    print('Folding at T =',kt,'...', 'Rep:', counter)
-                    old_energy = self.scorefxn(self.mc.lowest_score_pose())
-                    run.apply(self.pose)
-                    self.mc.show_counters()
-                    new_energy = self.scorefxn(self.mc.lowest_score_pose())
-                    print('Old Energy:',old_energy, 'New Energy:', new_energy)
+                new_energy = self.scorefxn(self.mc.lowest_score_pose())
+                print('Old Energy:',old_energy, 'New Energy:', new_energy)
+                if old_energy != new_energy:
+                    counter = 0
 
 
         

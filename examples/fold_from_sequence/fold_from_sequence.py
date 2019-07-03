@@ -23,20 +23,20 @@ names = [# 'CG13',
         ]
 
 # Defining the various kt values used over course of sim.
-kt_i = 100
-kt_anneal = [kt_i*(0.9)**i for i in range(50)]
+kt_i = 20
+kt_anneal = [kt_i*(0.9)**i for i in range(35)]
 
 
 cg_pyrosetta.change_parameters.changeTorsionParameters(
-   {'CG1 CG1 CG1 CG1':[15,3,0],
+   {'CG1 CG1 CG1 CG1':[3,3,0],
     'CG2 CG1 CG1 CG2':[0,0,0],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]},
     )
 
 cg_pyrosetta.change_parameters.changeAngleParameters(
-    {'CG1 CG1 CG1':[30,120],
-     'CG2 CG1 CG1':[30,120],
+    {'CG1 CG1 CG1':[2,120],
+     'CG2 CG1 CG1':[2,120],
      'CG1 CG1 CG2':[0,0],
       'X CG2 CG1':[0,0]}        
 )
@@ -73,10 +73,10 @@ for rep in range(5):
         folding_object.add_folding_move('AngleMC', repeat_sc_mover)
 
         small_bb_angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(folding_object.pose)
-        small_bb_angle_mover.angle = 10
-        repeat_bb_angle_mover = pyrosetta.RepeatMover(small_bb_angle_mover, 5)
-        folding_object.add_folding_move('AngleMC', repeat_bb_angle_mover)
-        folding_object.add_folding_move('AngleMC', folding_object.mini)
+        small_bb_angle_mover.angle = 5
+        # repeat_bb_angle_mover = pyrosetta.RepeatMover(small_bb_angle_mover, 5)
+        # folding_object.add_folding_move('AngleMC', repeat_bb_angle_mover)
+        # folding_object.add_folding_move('AngleMC', folding_object.mini)
         # Adding a PyMOL object to the folding sequence so we can see output
         
         # folding_object.add_folding_move('AngleMC', pyrosetta.RepeatMover(folding_object.mini, 10))
@@ -86,7 +86,7 @@ for rep in range(5):
 
 
         # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-        folding_object.run_anneal_fold('AngleMC', 5000, kt_anneal)
+        folding_object.run_anneal_fold('AngleMC', 10000, kt_anneal)
 
         # Dump the lowest energy structure from the MC simulation
         folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
