@@ -20,10 +20,10 @@ def run_anneal_folding(sequence, name,rep, kt_anneal):
     folding_object.add_folding_move('no_min', folding_object.pymol)
 
     # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    folding_object.run_anneal_fold('no_min', 1000, kt_anneal)
+    folding_object.run_anneal_fold('no_min', 50, kt_anneal)
 
     # Dump the lowest energy structure from the MC simulation
-    folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+name+'_example_'+str(rep)+'.pdb')
+    folding_object.mc.lowest_score_pose().dump_pdb('outputs/short'+name+'_example_'+str(rep)+'.pdb')
 
 def multiprocess_anneal_folding(sequence_name_rep_kts):
     run_anneal_folding(sequence_name_rep_kts[0], sequence_name_rep_kts[1], sequence_name_rep_kts[2], sequence_name_rep_kts[3])
@@ -60,15 +60,16 @@ if __name__ == '__main__':
     cg_pyrosetta.builder.buildCGPyRosetta()
 
     # list of sequences of several CG models [CG11*5, CG21*5, CG31*5, mixed]
-    sequences = ['X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
-            'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
+    sequences = [
+            #'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
+            #'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
             'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
-            'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]']
+            #'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]']
 
     names = ['CG11', 'CG21', 'CG31', 'mixed']
     # Defining the various kt values used over course of sim.
     kt_i = 100
-    kt_anneal = [kt_i*(0.9)**i for i in range(50)]
+    kt_anneal = [kt_i*(0.9)**i for i in range(150)]
     inputs = build_inputs(sequences, names, 20, kt_anneal)
     for i in p.imap_unordered(multiprocess_anneal_folding, inputs):
         print(i)
