@@ -71,7 +71,7 @@ class CGSmallMoverOld(pyrosetta.rosetta.protocols.moves.Mover):
 
 class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
-    Geberalized CG Mover
+    Generalized Small Mover for arbitrary CG models
     """
     def __init__(self, pose, angle = 180):
         """

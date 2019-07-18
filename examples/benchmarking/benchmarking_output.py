@@ -8,32 +8,31 @@ import timeit
 # This code is similar to fold_sequence_multiprocess.py, except we time the specific runs
 
 def run_anneal_folding(sequence, name,rep, kt_anneal):
-    repeats = 1
-    setup = """
-import cg_pyrosetta
-import pyrosetta
 
-# first generate a folded structure using CGFoldingAlgorithm
-folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('%s')
+    import cg_pyrosetta
+    import pyrosetta
 
-# If running PyMOL this will ensure structure output during MC simulation
-# 'default' is the folding algorithm selected
-# this algorithn consists of:
-# 10x CGSmallMover
-# 10x CGShearMober
-# 10x MinMover
-# MC evaluation
-folding_object.build_fold_alg('no_min')
-folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.shear, 10))
-folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 5))
-folding_object.add_folding_move('no_min', folding_object.pymol)
+    # first generate a folded structure using CGFoldingAlgorithm
+    folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm(sequence)
 
-# Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    """ % sequence
-    time = timeit.timeit("folding_object.run_anneal_fold('no_min', 1000, %s)" % kt_anneal, setup=setup, number = repeats)
+    # If running PyMOL this will ensure structure output during MC simulation
+    # 'default' is the folding algorithm selected
+    # this algorithn consists of:
+    # 10x CGSmallMover
+    # 10x CGShearMober
+    # 10x MinMover
+    # MC evaluation
+    folding_object.build_fold_alg('no_min')
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.shear, 10))
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 5))
+    folding_object.add_folding_move('no_min', folding_object.pymol)
+
+    # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
+
+    folding_object.run_anneal_fold('no_min', 1000, kt_anneal)
     
     # Dump the lowest energy structure from the MC simulation
-    return(time/repeats)
+    return(folding_object.mc.total_trials())
 
 def multiprocess_anneal_folding(sequence_name_rep_kts):
     time = run_anneal_folding(sequence_name_rep_kts[0], sequence_name_rep_kts[1], sequence_name_rep_kts[2], sequence_name_rep_kts[3])
@@ -95,8 +94,9 @@ if __name__ == '__main__':
     average_times = {}
     for out in p.imap_unordered(multiprocess_anneal_folding, inputs):
         average_times[out[0]] = out[1]
+        with open('outputs/mc_steps.yml','w') as outfile:
+            yaml.dump(average_times, outfile)
 
-    print(average_times)
-    with open('outputs/time_data.yml','w') as outfile:
+    with open('outputs/mc_steps.yml','w') as outfile:
         yaml.dump(average_times, outfile)
 
