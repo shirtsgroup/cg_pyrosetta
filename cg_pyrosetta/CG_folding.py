@@ -93,7 +93,7 @@ class CGFoldingAlgorithm():
         self.build_fold_alg('default')
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
-        # self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
+        self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
         
         # If writing a trajectory file or pymol visualization is desired uncomment these lines
 

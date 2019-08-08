@@ -74,9 +74,9 @@ for rep in range(5):
 
         small_bb_angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(folding_object.pose)
         small_bb_angle_mover.angle = 5
-        # repeat_bb_angle_mover = pyrosetta.RepeatMover(small_bb_angle_mover, 5)
-        # folding_object.add_folding_move('AngleMC', repeat_bb_angle_mover)
-        # folding_object.add_folding_move('AngleMC', folding_object.mini)
+        repeat_bb_angle_mover = pyrosetta.RepeatMover(small_bb_angle_mover, 5)
+        folding_object.add_folding_move('AngleMC', repeat_bb_angle_mover)
+        folding_object.add_folding_move('AngleMC', folding_object.mini)
         # Adding a PyMOL object to the folding sequence so we can see output
         
         # folding_object.add_folding_move('AngleMC', pyrosetta.RepeatMover(folding_object.mini, 10))
