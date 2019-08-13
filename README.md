@@ -1,10 +1,10 @@
 Coarse Grained PyRosetta
 ==============================
-[//]: # (Badges)
+[//]: # (Badges
 [![Travis Build Status](https://travis-ci.org/REPLACE_WITH_OWNER_ACCOUNT/Coarse Grained PyRosetta.png)](https://travis-ci.org/REPLACE_WITH_OWNER_ACCOUNT/Coarse Grained PyRosetta)
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/REPLACE_WITH_APPVEYOR_LINK/branch/master?svg=true)](https://ci.appveyor.com/project/REPLACE_WITH_OWNER_ACCOUNT/Coarse Grained PyRosetta/branch/master)
 [![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/Coarse Grained PyRosetta/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/Coarse Grained PyRosetta/branch/master)
-
+)
 ### Description
 
 An implementation of Pyrosetta with CG capabilities. This repository is currently underdevelopment. Current features include:
