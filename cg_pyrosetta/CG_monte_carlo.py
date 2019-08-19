@@ -61,8 +61,9 @@ class CGMonteCarlo:
 
     # def __call__():
     def run(self):
+        run = pyrosetta.RepeatMover(self.mc_trial, 1)
         for i in range(self.n_steps):
-            self.mc_trial.apply(self.pose)
+            run.apply(self.pose)
             if self.output:
 
                 print("Step :", i)
@@ -81,11 +82,39 @@ class CGMonteCarloScheduler:
     Docstring here
     """
     def __init__(self,
-            seq_mover_maker,
-            energy_builder,
-            pose_adapter,
+            seq_mover_maker : object = None,
+            energy_builder : object = None,
+            pose_adapter : object = None,
+            param_file_object : object = None: 
             ):
+
+        self.seq_builder = seq_mover_maker
+        self.energy_builder = energy_builder
+        self.pose = pose_adapter.get_pose()
+        self.param_file_object = param_file_object 
+        # ^^^^^^^^
+        # These will hold the set of instructions the scheduler will have to
+        # follow
+
+
+        
+    def _get_score_function():
         pass
+
+    def _get_seq_mover():
+        pass
+    
+    def _build_MC_job():
+        pass
+
+    def run_schedule():
+        pass
+
+    def _add_to_schedule():
+        pass
+
+
+
 
 
 # class PoseAdapter(ABC):
@@ -98,7 +127,7 @@ class SequenceMoverFactory:
     def __init__(self):
         self.methods = {
                         'small_dihe': CG_movers.CGSmallMover,
-                        'small_anlge': CG_movers.CGSmallAngleMover,
+                        'small_angle': CG_movers.CGSmallAngleMover,
                         'shear_dihe': CG_movers.CGShearMover,
                         'sc_small_dihe': CG_movers.CGSmallSCMover,
                         'sc_small_angle': CG_movers.CGSmallAngleMover,
@@ -127,7 +156,10 @@ class EnergyFunctionFactory:
         score = pyrosetta.ScoreFunction()
         
         for term, weight in zip(score_terms, term_weights):
-            score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), weight)
+            if term in self.methods.keys():
+                score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), weight)
+            else:
+                warnings.warn("Energy Term not implemented :"+term+"\n Skipping term")
 
         return(score)
 
