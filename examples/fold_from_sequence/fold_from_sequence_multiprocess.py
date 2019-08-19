@@ -15,12 +15,14 @@ def run_anneal_folding(sequence, name,rep, kt_anneal):
     # 10x MinMover
     # MC evaluation
     folding_object.build_fold_alg('no_min')
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small, 10))
     folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.shear, 10))
-    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 5))
+    # folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 5))
+    folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.mini, 10))
     folding_object.add_folding_move('no_min', folding_object.pymol)
 
     # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    folding_object.run_anneal_fold('no_min', 50, kt_anneal)
+    folding_object.run_anneal_fold('no_min', 100, kt_anneal)
 
     # Dump the lowest energy structure from the MC simulation
     folding_object.mc.lowest_score_pose().dump_pdb('outputs/short'+name+'_example_'+str(rep)+'.pdb')
@@ -44,32 +46,50 @@ if __name__ == '__main__':
     p = Pool(10)
 
     cg_pyrosetta.change_parameters.changeTorsionParameters(
-        {'CG1 CG1 CG1 CG1':[5,3,0],
+        {'CG1 CG1 CG1 CG1':[0,0,0],
             'CG2 CG1 CG1 CG2':[0,0,0],
             'CG2 CG1 CG1 CG1':[0,0,0],
             'X CG2 CG1 CG1':[0,0,0]},
     )
 
     cg_pyrosetta.change_parameters.changeAngleParameters(
-        {'CG1 CG1 CG1':[20,120],
-        'CG2 CG1 CG1':[20,120],
+        {'CG1 CG1 CG1':[0,0],
+        'CG2 CG1 CG1':[0,0],
         'CG1 CG1 CG2':[0,0],
         'X CG2 CG1':[0,0]}        
+    )
+
+    cg_pyrosetta.change_parameters.changeAtomParameters(
+        {'CG2':['X', 1, 0.2]} # Large sidechain
     )
 
     cg_pyrosetta.builder.buildCGPyRosetta()
 
     # list of sequences of several CG models [CG11*5, CG21*5, CG31*5, mixed]
     sequences = [
-            #'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
-            #'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
-            'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
-            #'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]']
+             'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
+            # 'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
+            # 'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
+            # 'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]'
+            ]
 
-    names = ['CG11', 'CG21', 'CG31', 'mixed']
+    names = [ 'CG11',
+             # 'CG21',
+             # 'CG31',
+             # 'mixed',
+             ]
     # Defining the various kt values used over course of sim.
     kt_i = 100
-    kt_anneal = [kt_i*(0.9)**i for i in range(150)]
-    inputs = build_inputs(sequences, names, 20, kt_anneal)
+    kt_anneal = [kt_i*(0.9)**i for i in range(50)]
+    inputs = build_inputs(sequences, names, 10, kt_anneal)
     for i in p.imap_unordered(multiprocess_anneal_folding, inputs):
         print(i)
+
+    import mdtraj as md
+    import os
+
+    file_names = ['outputs/'+names[0]+'_example_'+str(rep)+'.pdb' for rep in range(10)]
+    traj = md.load(file_names)
+    traj.save_pdb(os.path.join('outputs/'+names[0]+'_all.pdb'))
+    for rm_file in file_names[1:]:
+        os.remove(rm_file)

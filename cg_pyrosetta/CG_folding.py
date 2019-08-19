@@ -59,7 +59,7 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
-        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
@@ -72,11 +72,11 @@ class CGFoldingAlgorithm():
 
         
         # Build minimization movers
-        self.mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover('lbfgs_armijo_nonmonotone')
+        self.mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover()
         self.movemap = pyrosetta.MoveMap()
         self.mini.score_function(self.scorefxn)
-        for atom in self.small_angle.bb_atoms:
-            self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True) 
+        # for atom in self.small_angle.bb_atoms:
+        #     self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True) 
         self.movemap.set_bb_true_range(1, self.pose.size())
         self.mini.movemap(self.movemap)
 
@@ -93,7 +93,7 @@ class CGFoldingAlgorithm():
         self.build_fold_alg('default')
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
-        # self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
+        self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
         
         # If writing a trajectory file or pymol visualization is desired uncomment these lines
 
