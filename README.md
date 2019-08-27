@@ -27,7 +27,7 @@ Then run the following from the top directory:
 
 ### Copyright
 
-Copyright (c) 2019, Theodore Fobe
+Copyright (c) 2019, University of Colorado Boulder
 
 
 #### Acknowledgements
