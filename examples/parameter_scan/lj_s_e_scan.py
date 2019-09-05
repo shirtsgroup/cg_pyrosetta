@@ -6,7 +6,6 @@
 import numpy as np
 from multiprocessing import Pool
 import mdtraj as md
-from cg_pyrosetta.change_parameters import changeAtomParameters
 import os
 from importlib import reload
 
@@ -43,13 +42,18 @@ def runAnnealingProcess(rep, kts, sigma, epsilon):
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
     folding_object.add_folding_move('default', folding_object.pymol)
-    folding_object.run_anneal_fold('default', 100, kts)
+
+    assert(folding_object.pose.residue(2).atom_type(2).lj_radius() == sigma)  # Throws error if SC isn't actually scanning
+    assert(folding_object.pose.residue(2).atom_type(2).lj_wdepth() == epsilon) # Should include more of these in scripts to make sure parameter scans are actually happening
+
+    folding_object.run_anneal_fold('default', 1, kts)
     folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'sigma_'+str(round(sigma, 3)), 'epsilon_'+str(round(epsilon,3)), 'CG11_rep_'+str(rep)+'.pdb'))
 
 def runMultiProcess(list_of_params):
     runAnnealingProcess(list_of_params[0], list_of_params[1], list_of_params[2], list_of_params[3])
 
 def main():
+    from cg_pyrosetta.change_parameters import changeAtomParameters
     # Reset all parameters to zero
 
     # Would like to generalize this work flow to:
@@ -71,6 +75,8 @@ def main():
             if not os.path.exists(os.path.join('outputs', 'sigma_'+str(round(sigma, 3)), 'epsilon_'+str(round(epsilon,3)))):
                 os.makedirs(os.path.join('outputs', 'sigma_'+str(round(sigma, 3)), 'epsilon_'+str(round(epsilon,3))))
             changeAtomParameters({atom_name:['X', sigma, epsilon]})
+
+
             multiprocess_params = [[rep, kts, sigma, epsilon] for rep in range(1,reps+1)]
             pool = Pool(1)
 

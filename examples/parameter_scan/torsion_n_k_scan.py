@@ -36,12 +36,12 @@ def updateParameters(param_dict):
     
 
 def runAnnealingProcess(param_dict, rep, kts, k, p):
-    folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]')
+    folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]')
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
     folding_object.add_folding_move('default', folding_object.pymol)
     folding_object.run_anneal_fold('default', 100, kts)
-    folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb'))
+    folding_object.mc.lowest_score_pose().dump_pdb(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG31_rep_'+str(rep)+'.pdb'))
 
 
 
@@ -50,9 +50,9 @@ def multiprocess_function(list_of_params):
     return(list_of_params[1])
     
 def combineReplicas(k, p, reps):
-    file_names = [os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11_rep_'+str(rep)+'.pdb') for rep in range(1, reps+1)]
+    file_names = [os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG31_rep_'+str(rep)+'.pdb') for rep in range(1, reps+1)]
     traj = md.load(file_names)
-    traj.save_dcd(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG11.dcd'))
+    traj.save_dcd(os.path.join('outputs', 'force_constant_'+str(round(k, 3)), 'period_'+str(p), 'CG31.dcd'))
     for rm_file in file_names[1:]:
         os.remove(rm_file)
 
