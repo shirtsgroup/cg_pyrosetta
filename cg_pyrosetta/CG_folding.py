@@ -10,13 +10,16 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 import pyrosetta
 pyrosetta.init()
 
+np.random.seed()
+
 class CGFoldingAlgorithm():
 
     def __init__(self, \
         sequence, \
         BBB_angle = 120, \
         BBBB_dihe = 180, \
-        file_name = 'output/traj.pdb'):
+        file_name = 'outputs/traj.pdb',
+        energy_graph_output = False):
         """
         folding object used for easily implementing different
         movers into a single folding algorithm.
@@ -35,6 +38,7 @@ class CGFoldingAlgorithm():
         """
         # Build CG model and set desired initial angles
         self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)
+        self.energy_graph_output = energy_graph_output
         # self.pose = self.set_BBB_angles(self.pose, BBB_angle)
         # self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
         # PyMOL mover, if wanting to visualize
@@ -48,7 +52,7 @@ class CGFoldingAlgorithm():
         # Building PDBTrajWriter object, used for writing multiple structures
         # to a single file
         self.PDB_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
-        self.PDB_writer.apply(self.pose) # write initial structure
+        # self.PDB_writer.apply(self.pose) # write initial structure
         self.PDB_writer.file_name('outputs/traj.pdb')
         self.PDB_writer.stride(100)
 
@@ -58,8 +62,8 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
-        self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1) segfaults beware!
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
@@ -204,7 +208,8 @@ class CGFoldingAlgorithm():
 
         Note will run len(kt_range)*iter trial MC steps
         """
-        
+        if self.energy_graph_output:
+            e_graph = []
         for kt in kt_range:
 
             # Updat kt in MC object
@@ -217,6 +222,8 @@ class CGFoldingAlgorithm():
             run = pyrosetta.RepeatMover(self.trial_mc, iter)
             
             old_energy = self.scorefxn(self.mc.lowest_score_pose())
+            if self.energy_graph_output:
+                e_graph.append(old_energy)
             new_energy = None
             counter = 0
             while old_energy != new_energy or counter < 10:
@@ -228,8 +235,18 @@ class CGFoldingAlgorithm():
                 self.mc.show_counters()
                 new_energy = self.scorefxn(self.mc.lowest_score_pose())
                 print('Old Energy:',old_energy, 'New Energy:', new_energy)
+                if self.energy_graph_output:
+                    e_graph.append(new_energy)
                 if old_energy != new_energy:
                     counter = 0
+        
+        if self.energy_graph_output:
+            e_graph = np.array(e_graph)
+            count = 0
+            while os.path.exists(name+"_"+str(iter)+"_"+str(count)+".npy"):
+                count += 1
+            np.save(name+"_"+str(iter)+"_"+str(count)+".npy", e_graph)
+
 
 
         

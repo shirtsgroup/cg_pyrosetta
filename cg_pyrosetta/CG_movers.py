@@ -1,6 +1,7 @@
 import os
 import sys
 import warnings
+import random
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
@@ -411,7 +412,10 @@ class randomizeBackBone(CGSmallMover):
 
     def apply(self, pose):
         for i in range(len(self.dihes)):
+            a = random.randint(0,1000000)
+            np.random.seed(a)
             angle = np.random.uniform(-180, 180)
+            print("Position :", i, ":", angle)
             self.conf.set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
             
 class randomizeBackBoneAngles(CGSmallAngleMover):

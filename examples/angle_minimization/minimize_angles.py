@@ -41,18 +41,18 @@ polyA.conformation().set_bond_angle(
     0.5
 )
 
-polyCG.conformation().set_bond_angle(
-    pyrosetta.AtomID(3, 2),
-    pyrosetta.AtomID(2, 2),
-    pyrosetta.AtomID(1, 2),
-    0.5
-)
+# polyCG.conformation().set_bond_angle(
+#     pyrosetta.AtomID(3, 2),
+#     pyrosetta.AtomID(2, 2),
+#     pyrosetta.AtomID(1, 2),
+#     0.5
+# )
 pymol.apply(polyA)
 pymol.apply(polyCG)
 
-for _ in range(20):
-    mini.apply(polyA)
-    pymol.apply(polyA)
+#for _ in range(20):
+#    mini.apply(polyA)
+#    pymol.apply(polyA)
 
 for _ in range(20):
     mini.apply(polyCG)
