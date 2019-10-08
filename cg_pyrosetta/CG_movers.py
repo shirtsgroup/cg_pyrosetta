@@ -408,15 +408,24 @@ class randomizeBackBone(CGSmallMover):
 
         """
         # inherits CGSmallMover's init call, but runs with a different apply call
-        CGSmallMover.__init__(self, pose)
+        super().__init__(self, pose)
 
     def apply(self, pose):
+        """
+        applies mover to a given pose
+
+        Arguments
+        ---------
+
+        pose : pyrosetta.Pose()
+            pose which you would like to apply randomizeBackbone mover to
+        """
         for i in range(len(self.dihes)):
             a = random.randint(0,1000000)
             np.random.seed(a)
             angle = np.random.uniform(-180, 180)
-            print("Position :", i, ":", angle)
-            self.conf.set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
+            # print("Position :", i, ":", angle)
+            self.conf.set_torsion_angle(self.angles[i][0], self.angles[i][1], self.angles[i][2], self.angles[i][3], angle)
             
 class randomizeBackBoneAngles(CGSmallAngleMover):
     """
@@ -441,3 +450,22 @@ class randomizeBackBoneAngles(CGSmallAngleMover):
         >>>randomizer.apply(pose)
 
         """
+        super.__init__(self, pose)
+
+    def apply(self, pose):
+        """
+        applies mover to a given pose
+
+        Arguments
+        ---------
+
+        pose : pyrosetta.Pose()
+            pose which you would like to apply randomizeBackbone mover to
+        """
+        for i in range(len(self.dihes)):
+            a = random.randint(0,1000000)
+            np.random.seed(a)
+            angle = np.random.uniform(-180, 180)
+            # print("Position :", i, ":", angle)
+            self.conf.set_bond_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
+

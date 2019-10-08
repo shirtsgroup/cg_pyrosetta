@@ -110,3 +110,5 @@ test
 __pycache__/*
 .vscode/*
 *.png
+*.npy
+*.tga

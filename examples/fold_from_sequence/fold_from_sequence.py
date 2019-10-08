@@ -8,7 +8,7 @@ pyrosetta.init()
 sequences = [
         #  'X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]',
         #  'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
-           'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
+           'X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]',
         #  'X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]',
         #  'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
         #  'X[CG11]X[CG12]X[CG21]X[CG31]X[CG13]X[CG21]X[CG13]X[CG11]X[CG11]X[CG21]X[CG13]X[CG11]X[CG12]X[CG21]X[CG31]'
@@ -29,14 +29,14 @@ kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 
 cg_pyrosetta.change_parameters.changeTorsionParameters(
    {'CG1 CG1 CG1 CG1':[3,3,0],
-    'CG2 CG1 CG1 CG2':[0,0,0],
+    'CG2 CG1 CG1 CG2':[3,2,120],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]},
     )
 
 cg_pyrosetta.change_parameters.changeAngleParameters(
-    {'CG1 CG1 CG1':[2,120],
-     'CG2 CG1 CG1':[2,120],
+    {'CG1 CG1 CG1':[2,70],
+     'CG2 CG1 CG1':[2,70],
      'CG1 CG1 CG2':[0,0],
       'X CG2 CG1':[0,0]}        
 )

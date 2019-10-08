@@ -17,12 +17,12 @@ def run_anneal_folding(sequence, name,rep, kt_anneal):
     folding_object.build_fold_alg('no_min')
     folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small, 10))
     folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.shear, 10))
-    # folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 5))
+    # folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.small_angle, 10))
     folding_object.add_folding_move('no_min', pyrosetta.RepeatMover(folding_object.mini, 10))
     folding_object.add_folding_move('no_min', folding_object.pymol)
 
     # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-    folding_object.run_anneal_fold('no_min', 1000, kt_anneal)
+    folding_object.run_anneal_fold('no_min', 5000, kt_anneal)
 
     # Dump the lowest energy structure from the MC simulation
     folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+name+'_example_'+str(rep)+'.pdb')
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     cg_pyrosetta.change_parameters.changeTorsionParameters(
         {'CG1 CG1 CG1 CG1':[0,0,0],
-            'CG2 CG1 CG1 CG2':[0,0,0],
+            'CG2 CG1 CG1 CG2':[1.579/2,1,0],
             'CG2 CG1 CG1 CG1':[0,0,0],
             'X CG2 CG1 CG1':[0,0,0]},
     )
@@ -60,17 +60,24 @@ if __name__ == '__main__':
     )
 
     cg_pyrosetta.change_parameters.changeAtomParameters(
-        {'CG2':['X', 2, 0.2]} # Large sidechain
+        {'CG2':['X', 1 , 0]} # Large sidechain
+    )
+
+    cg_pyrosetta.change_parameters.changeAngleParameters(
+        {'CG1 CG1 CG1':[1, 90],
+        'CG2 CG1 CG1':[0,0],
+        'CG1 CG1 CG2':[0,0],
+        'X CG2 CG1':[0,0]}        
     )
 
     cg_pyrosetta.builder.buildCGPyRosetta()
 
     # list of sequences of several CG models [CG11*5, CG21*5, CG31*5, mixed]
     sequences = [
-              'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
-            # 'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
-            # 'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
-            # 'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]'
+              'X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]',
+            #  'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
+            #  'X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]',
+            #  'X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]X[CG11]X[CG21]X[CG31]X[CG21]X[CG11]'
             ]
 
     names = [ 'CG11',
