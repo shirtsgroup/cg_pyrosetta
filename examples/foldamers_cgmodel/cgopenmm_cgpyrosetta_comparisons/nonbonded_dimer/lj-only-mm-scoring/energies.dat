@@ -1,0 +1,4 @@
+The nonbonded interaction list is: [[0, 1]]
+The distances between these particles are: [Quantity(value=0.1, unit=nanometer)]
+The LJ energy calculated by hand is: [Quantity(value=-0.19999999999999996, unit=kilocalorie/mole)]
+The OpenMM potential energy is: -0.20000000927689882 kcal/mol

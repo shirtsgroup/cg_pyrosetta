@@ -3,21 +3,23 @@ import pyrosetta
 from simtk import unit
 from cg_openmm.simulation.tools import *
 from cg_openmm.build.cg_build import *
+from cg_openmm.utilities.iotools import *
+from cg_openmm.utilities.util import *
 from foldamers.cg_model.cgmodel import CGModel
 # Identify the Rosetta database directory
 pyrosetta_database_path = pyrosetta._rosetta_database_from_env()
 
-def build_cgmodel():
+def build_cgmodel(rosetta_scoring):
  # Set values for the parameters in our coarse grained model:
- polymer_length=15
+ polymer_length=2
  backbone_lengths=[1]
- sidechain_lengths=[1]
+ sidechain_lengths=[0]
  sidechain_positions=[0]
- include_bond_forces=False # NOTE: Bonds are constrained to their equilibrium lengths, by default, even when this variable is set to False.
+ include_bond_forces=False # NOTE: By default bonds are constrained to their equilibrium lengths, even when this variable is set to False, unless 'constrain_bonds'=False
+ constrain_bonds=False
  include_bond_angle_forces=False
  include_nonbonded_forces=True
  include_torsion_forces=False
- rosetta_scoring = False
 
  # Particle properties
  mass = 100.0 * unit.amu
@@ -28,31 +30,16 @@ def build_cgmodel():
  bond_force_constants = {'bb_bb_bond_k': bond_force_constant, 'bb_sc_bond_k': bond_force_constant, 'sc_sc_bond_k': bond_force_constant}
  r_min = bond_length
  sigma = r_min / (2.0**(1/6))
- sigmas = {'bb_bb_sigma': sigma,'sc_sc_sigma': sigma}
+ sigmas = {'bb_sigma': sigma,'sc_sigma': sigma}
  epsilon = 0.2 * unit.kilocalorie_per_mole
- epsilons = {'bb_bb_eps': epsilon,'sc_sc_eps': epsilon}
- # Bond angle properties
- bond_angle_force_constant = 2 * unit.kilocalorie_per_mole / unit.radian / unit.radian
- bond_angle_force_constants = {'bb_bb_bb_angle_k': bond_angle_force_constant,'bb_bb_sc_angle_k': bond_angle_force_constant}
- equil_bond_angle = 120.0*(3.141/180.0)
- equil_bond_angles = {'bb_bb_bb_angle_0': equil_bond_angle,'bb_bb_sc_angle_0': equil_bond_angle}
- # Torsion properties
- torsion_force_constant = 3
- torsion_force_constants = {'bb_bb_bb_bb_torsion_k': torsion_force_constant,'sc_bb_bb_sc_torsion_k': 0.0,'bb_bb_bb_sc_torsion_k': 0.0,'sc_bb_bb_bb_torsion_k': 0.0}
- torsion_periodicity = 3
- torsion_periodicities = {'bb_bb_bb_bb_period': torsion_periodicity,'sc_bb_bb_sc_period': 0,'bb_bb_bb_sc_period': 0,'sc_bb_bb_bb_period': 0}
- equil_torsion_angle = 0.0*(3.141/180.0)
- equil_torsion_angles = {'bb_bb_bb_bb_torsion_0': equil_torsion_angle,'sc_bb_bb_sc_torsion_0': 0.0,'bb_bb_bb_sc_torsion_0': 0.0,'sc_bb_bb_bb_torsion_0': 0.0}
+ epsilons = {'bb_eps': epsilon,'sc_eps': epsilon}
+ exclusions = False
+
+ # Get positions from a local PDB file written by PyRosetta, and modified (by hand) to have a geometry where the nonbonded interactions are easy to evaluate
+ positions = get_positions_from_pdbfile("init.pdb")
 
  # Build a coarse grained model
- cgmodel = CGModel(polymer_length=polymer_length,backbone_lengths=backbone_lengths,sidechain_lengths=sidechain_lengths,sidechain_positions=sidechain_positions,masses=masses,sigmas=sigmas,epsilons=epsilons,bond_lengths=bond_lengths,bond_force_constants=bond_force_constants,bond_angle_force_constants=bond_angle_force_constants,torsion_force_constants=torsion_force_constants,equil_bond_angles=equil_bond_angles,equil_torsion_angles=equil_torsion_angles,include_nonbonded_forces=include_nonbonded_forces,include_bond_forces=include_bond_forces,include_bond_angle_forces=include_bond_angle_forces,include_torsion_forces=include_torsion_forces,rosetta_scoring=rosetta_scoring,torsion_periodicities=torsion_periodicities)
-
- # Get positions by building a pose with PyRosetta
- pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
- pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
- pose.dump_pdb("init.pdb")
- cgmodel.positions = PDBFile("init.pdb").getPositions()
- cgmodel.topology = build_topology(cgmodel)
+ cgmodel = CGModel(polymer_length=polymer_length,backbone_lengths=backbone_lengths,sidechain_lengths=sidechain_lengths,sidechain_positions=sidechain_positions,masses=masses,sigmas=sigmas,epsilons=epsilons,bond_lengths=bond_lengths,include_nonbonded_forces=include_nonbonded_forces,include_bond_forces=include_bond_forces,include_bond_angle_forces=include_bond_angle_forces,include_torsion_forces=include_torsion_forces,rosetta_scoring=rosetta_scoring,exclusions=exclusions,constrain_bonds=constrain_bonds,positions=positions)
 
  return(cgmodel)
 
@@ -87,15 +74,15 @@ def build_scorefxn(cgmodel,mm=False):
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
         cg_pyrosetta.change_parameters.changeTorsionParameters(
-          {'CG1 CG1 CG1 CG1':[3,3,0],
+          {'CG1 CG1 CG1 CG1':[0,0,0],
           'CG2 CG1 CG1 CG2':[0,0,0],
           'CG2 CG1 CG1 CG1':[0,0,0],
           'X CG2 CG1 CG1':[0,0,0]}
         )
 
         cg_pyrosetta.change_parameters.changeAngleParameters(
-          {'CG1 CG1 CG1':[2,120],
-          'CG2 CG1 CG1':[2,120],
+          {'CG1 CG1 CG1':[0,0],
+          'CG2 CG1 CG1':[0,0],
           'CG1 CG1 CG2':[0,0],
           'X CG2 CG1':[0,0]}
         )
@@ -113,28 +100,33 @@ def compare_openmm_energy_pyrosetta_score(cgmodel,mm=False):
 
         """
 
-        pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
         # Build a PyRosetta pose
-        pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
-        pose.dump_pdb("test_pyrosetta.pdb")
+        pose = pyrosetta.pose_from_pdb("init.pdb")
         # Define a PyRosetta scoring function
         scorefxn = build_scorefxn(cgmodel,mm=mm)
-        # Assign this pose to cgmodel.positions
-        cgmodel.positions = PDBFile("test_pyrosetta.pdb").getPositions()
-        cgmodel.topology = build_topology(cgmodel)
         # Get the PyRosetta score
         score = scorefxn(pose)
         # Get the cg_openmm energy
         energy = get_mm_energy(cgmodel.topology,cgmodel.system,cgmodel.positions).in_units_of(unit.kilocalorie_per_mole)
         # Obtain a state for our simulation context
-        print("The PyRosetta score is: "+str(score))
+        #print("The PyRosetta score is: "+str(score))
+        print("The bond list is: "+str(cgmodel.bond_list))
         print("The OpenMM potential energy is: "+str(energy))
+        file = open("energies.dat","w")
+        file.write("The nonbonded interaction list is: "+str(cgmodel.nonbonded_interaction_list)+"\n")
+        file.write("The distances between these particles are: "+str([distance(cgmodel.positions[interaction[0]],cgmodel.positions[interaction[1]]) for interaction in cgmodel.nonbonded_interaction_list])+"\n")
+        file.write("The LJ energy calculated by hand is: "+str([lj_v(cgmodel.positions[interaction[0]],cgmodel.positions[interaction[1]],cgmodel.get_sigma(0),cgmodel.get_epsilon(0)) for interaction in cgmodel.nonbonded_interaction_list])+"\n")
+        #file.write("The PyRosetta score is: "+str(score)+"\n")
+        file.write("The OpenMM potential energy is: "+str(energy)+"\n")
+        file.close()
         return
 
 # Build a cg_openmm cgmodel
-cgmodel = build_cgmodel()
+mm=True
+rosetta_scoring=False
+cgmodel = build_cgmodel(rosetta_scoring)
 
 # Compare Rosetta score and OpenMM energy
-compare_openmm_energy_pyrosetta_score(cgmodel,mm=False)
+compare_openmm_energy_pyrosetta_score(cgmodel,mm=mm)
 
 #exit()

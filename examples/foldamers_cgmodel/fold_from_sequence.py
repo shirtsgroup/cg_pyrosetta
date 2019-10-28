@@ -16,9 +16,9 @@ sequences = [
 
 names = [# 'CG13',
          # 'CG21',
-         'CG31',
+         # 'CG31',
          # 'CG12',
-         # 'CG11', 
+          'CG11', 
          # 'mixed'
         ]
 
@@ -28,15 +28,15 @@ kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 
 
 cg_pyrosetta.change_parameters.changeTorsionParameters(
-   {'CG1 CG1 CG1 CG1':[3,3,0],
+   {'CG1 CG1 CG1 CG1':[0,0,0],
     'CG2 CG1 CG1 CG2':[0,0,0],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]},
     )
 
 cg_pyrosetta.change_parameters.changeAngleParameters(
-    {'CG1 CG1 CG1':[2,120],
-     'CG2 CG1 CG1':[2,120],
+    {'CG1 CG1 CG1':[0,0],
+     'CG2 CG1 CG1':[0,0],
      'CG1 CG1 CG2':[0,0],
       'X CG2 CG1':[0,0]}        
 )
@@ -80,17 +80,17 @@ for rep in range(5):
 
         # Adding a PyMOL object to the folding sequence so we can see output
         
-        folding_object.add_folding_move('AngleMC', pyrosetta.RepeatMover(folding_object.mini, 100))
+        folding_object.add_folding_move('AngleMC', pyrosetta.RepeatMover(folding_object.mini, 10))
                 
         pymol = pyrosetta.PyMOLMover()
         folding_object.add_folding_move('AngleMC', pymol)
 
 
         # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-        folding_object.run_anneal_fold('AngleMC', 100, kt_anneal)
+        folding_object.run_anneal_fold('AngleMC', 10, kt_anneal)
 
         # Dump the lowest energy structure from the MC simulation
-        folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
+        folding_object.mc.lowest_score_pose().dump_pdb('fold_from_sequence_output/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
         
         twist_score = pyrosetta.ScoreFunction()
         twist_score.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)

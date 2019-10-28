@@ -1,0 +1,6 @@
+UNFOLDED_ENERGIES_TYPE UNFOLDED_MM_STD
+mm_lj_intra_rep 1.0
+mm_lj_intra_atr 1.0
+mm_lj_inter_rep 1.0
+mm_lj_inter_atr 1.0
+mm_twist 0.0
