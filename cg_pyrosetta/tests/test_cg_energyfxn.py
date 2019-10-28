@@ -7,7 +7,7 @@ def test_mm_twist():
     cg_pyrosetta.change_parameters.changeTorsionParameters({'CG2 CG1 CG1 CG2':[10, 6, 35]})
     pyrosetta.init()
     # Build 1-1 CG model
-    pose = pyrosetta.pose_from_sequence('X[CG11:CGLower]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11:CGUpper]')
+    pose = pyrosetta.pose_from_sequence('X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]')
     
     # Randomize torsion in backbone
     randomize = cg_pyrosetta.CG_movers.randomizeBackBone(pose)
@@ -32,10 +32,10 @@ def test_mm_twist():
 
 def test_mm_bend():
     #Set CG1-CG1-CG1-CG1 torsion
-    cg_pyrosetta.change_parameters.changeAngleParameters({'CG2 CG1 CG1':[10, 50]})
+    cg_pyrosetta.change_parameters.changeAngleParameters({'CG2 CG1 CG1':[0, 0]})
     pyrosetta.init()
     # Build 1-1 CG model
-    pose = pyrosetta.pose_from_sequence('X[CG11:CGLower]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11:CGUpper]')
+    pose = pyrosetta.pose_from_sequence('X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]')
 
     # Randomize torsion in backbone
     randomize = cg_pyrosetta.CG_movers.randomizeBackBone(pose)

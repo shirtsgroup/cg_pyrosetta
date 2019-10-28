@@ -120,7 +120,6 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
             for atom in residue_bb:
                 neighbors = self.conf.bonded_neighbor_all_res(atom, virt=False)
-                print(neighbors)
                 for n in neighbors:
                     info = [n.rsd(), n.atomno()]
                     isBackbone = self.conf.atom_is_backbone_norefold(info[0], info[1])
@@ -132,13 +131,13 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
                     # Skip atoms not in backbone
                     if isBackbone == False:
-                        print("Skipping:", n)
+                        # print("Skipping:", n)
                         continue
 
                     else:
                         residue_bb.append(n)
                         self.bb_atoms.append(n)
-                        print("Adding:", n)
+                        # print("Adding:", n)
 
         bb_atoms_info = [[bb_atom.rsd(), bb_atom.atomno()] for bb_atom in self.bb_atoms]
 

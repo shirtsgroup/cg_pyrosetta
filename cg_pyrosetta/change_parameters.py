@@ -1,6 +1,7 @@
 import shutil
 import os
 import re
+import cg_pyrosetta.build_cg_pyrosetta
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
@@ -94,7 +95,7 @@ def changeAtomParameters(param_dict):
             # print param line with specific formating
             f.write("%s%10.4f%10.4f%10.4f%10.4f\n" %
                     (param[0], -float(param[3]), float(param[2]), -float(param[3]), float(param[2])))
-
+    cg_pyrosetta.builder.buildCGPyRosetta()
 
 def changeTorsionParameters(param_dict):
     """
@@ -161,6 +162,7 @@ def changeTorsionParameters(param_dict):
             atom_names = param[0].split()
             f.write("%s %s %s %s %.4f %.1i %.4f\n" % (
                 atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
+    cg_pyrosetta.builder.buildCGPyRosetta()
 
 
 def changeAngleParameters(param_dict):
@@ -226,3 +228,4 @@ def changeAngleParameters(param_dict):
             atom_names = param[0].split()
             f.write("%-4.4s%4.3s%4.3s%10.4f%10.4f\n" %
                     (atom_names[0], atom_names[1], atom_names[2], float(param[1]), float(param[2])))
+    cg_pyrosetta.builder.buildCGPyRosetta()
