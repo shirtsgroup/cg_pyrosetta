@@ -229,5 +229,5 @@ dependencies:
     - panedr==0.5.2
     - pbr==5.2.1
     - pyrosetta==2018.25+release.9d22951
-prefix: /home/tfobe/anaconda3/envs/python36
+##prefix: /home/tfobe/anaconda3/envs/python36
 

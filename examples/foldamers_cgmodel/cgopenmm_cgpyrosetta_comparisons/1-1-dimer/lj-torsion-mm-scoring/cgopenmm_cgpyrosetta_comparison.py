@@ -37,7 +37,7 @@ def build_cgmodel(rosetta_scoring):
  exclusions = True
 
  # Torsion properties
- torsion_force_constant = 0.1 * unit.kilocalorie_per_mole / unit.radian / unit.radian
+ torsion_force_constant = 3 * unit.kilocalorie_per_mole / unit.radian / unit.radian
  torsion_force_constants = {'sc_bb_bb_sc_torsion_k': torsion_force_constant}
  torsion_periodicity = 1
  torsion_periodicities = {'sc_bb_bb_sc_period': torsion_periodicity}
@@ -163,7 +163,7 @@ cgmodel,pose = build_cgmodel(rosetta_scoring)
 compare_openmm_energy_pyrosetta_score(cgmodel,pose=pose,mm=mm)
 
 # Perform cgopenmm simulation
-temperature = 300.0 * unit.kelvin
+temperature = 1.0 * unit.kelvin
 total_simulaton_time = 100.0 * unit.picosecond
 simulation_time_step = 5.0 * unit.femtosecond
 run_simulation(cgmodel,os.getcwd(),total_simulaton_time,simulation_time_step,temperature,5,output_pdb="simulation.pdb",output_data="simulation.dat")

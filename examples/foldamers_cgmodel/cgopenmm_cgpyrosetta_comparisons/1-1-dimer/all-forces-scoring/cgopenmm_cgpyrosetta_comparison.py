@@ -1,14 +1,66 @@
 import cg_pyrosetta
-import pyrosetta
+import os
 from simtk import unit
 from cg_openmm.simulation.tools import *
 from cg_openmm.build.cg_build import *
 from cg_openmm.utilities.iotools import *
 from cg_openmm.utilities.util import *
 from foldamers.cg_model.cgmodel import CGModel
-# Identify the Rosetta database directory
-pyrosetta.init()
+#pyrosetta.init()
 #pyrosetta_database_path = pyrosetta._rosetta_database_from_env()
+
+def build_params_files(cgmodel):
+ for monomer in cgmodel.sequence:
+  file_name = str(str(monomer['monomer_name'])+".params")
+  file_name = str(str(residue_code)+".param")
+  file_obj = open(file_name,'w')
+  file_obj.write("# Rosetta residue topology file\n")
+  file_obj.write("# Authors: Lenny T. Fobe, Garrett A. Meek\n")
+  file_obj.write("# ( Research group of Professor Michael R. Shirts )\n")
+  file_obj.write("# Dept. of Chemical and Biological Engineering\n")
+  file_obj.write("# University of Colorado Boulder\n")
+  file_obj.write("# This file was written on: "+str(datetime.datetime.today())+"\n")
+  file_obj.write("\n")
+  file_obj.write("NAME "+str(residue_type_name)+"\n")
+  file_obj.write("IO_STRING "+str(residue_type_name)+" "+str(residue_code)+"\n")
+  file_obj.write("TYPE POLYMER\n")
+  file_obj.write("\n")
+  file_obj.write(str("VARIANT\n"))
+  file_obj.write("\n")
+  for backbone_bead in range(residue['backbone_length']):
+           atom_name = str("BB"+str(backbone_bead+1))
+           file_obj.write("ATOM "+str(atom_name)+" VIRT X 0.0\n")
+           if backbone_bead in [residue['sidechain_positions']]:
+             for sidechain_bead in range(residue['sidechain_length']):
+               atom_name = str("SC"+str(sidechain_bead+1))
+               file_obj.write("ATOM "+str(atom_name)+" VIRT X 0.0\n")
+             if residue['sidechain_length'] == 1:
+               file_obj.write("ATOM VIRT VIRT X 0.0\n")
+  file_obj.write("\n")
+  upper_connect = str("BB"+str(residue['backbone_length']))
+  file_obj.write("LOWER CONNECT BB1\n")
+  file_obj.write("UPPER_CONNECT "+str(upper_connect)+"\n")
+  atom_1_name = str("BB1")
+  for backbone_bead in range(residue['backbone_length']):
+           if backbone_bead != 0:
+             atom_2_name = str("BB"+str(backbone_bead+1))
+             file_obj.write("BOND "+str(atom_1_name)+" "+str(atom_2_name)+"\n")
+             atom_1_name = atom_2_name
+           if backbone_bead in [residue['sidechain_positions']]:
+             for sidechain_bead in range(residue['sidechain_length']):
+               atom_2_name = str("SC"+str(sidechain_bead+1))
+               file_obj.write("BOND "+str(atom_1_name)+" "+str(atom_2_name)+"\n")
+               atom_1_name = atom_2_name
+             if residue['sidechain_length'] == 1:
+               atom_2_name = str("VIRT")
+               file_obj.write("BOND "+str(atom_1_name)+" "+str(atom_2_name)+"\n")
+           atom_1_name = str("BB"+str(backbone_bead+1))  
+  file_obj.write("\n")
+  file_obj.write("FIRST_SIDECHAIN_ATOM SC1\n")
+  file_obj.write("PROPERTIES\n")
+  file_obj.write("\n")
+  file_obj.close()
+ return
 
 def build_cgmodel(rosetta_scoring):
  # Set values for the parameters in our coarse grained model:
@@ -32,18 +84,18 @@ def build_cgmodel(rosetta_scoring):
  r_min = bond_length
  sigma = r_min / (2.0**(1/6))
  sigmas = {'bb_sigma': sigma,'sc_sigma': sigma}
- epsilon = 0.2 * unit.kilocalorie_per_mole
+ epsilon = 10.0 * unit.kilocalorie_per_mole
  epsilons = {'bb_eps': epsilon,'sc_eps': epsilon}
  exclusions = True
 
  # Bond angle properties
- bond_angle_force_constant = 0.1 * unit.kilocalorie_per_mole / unit.radian / unit.radian
+ bond_angle_force_constant = 2 * unit.kilocalorie_per_mole / unit.radian / unit.radian
  bond_angle_force_constants = {'bb_bb_sc_angle_k': bond_angle_force_constant}
- equil_bond_angle = 120.0*(3.141/180.0)
+ equil_bond_angle = 90.0*(3.141/180.0)
  equil_bond_angles = {'bb_bb_sc_angle_0': equil_bond_angle}
 
  # Torsion properties
- torsion_force_constant = 0.1 * unit.kilocalorie_per_mole / unit.radian / unit.radian
+ torsion_force_constant = 3 * unit.kilocalorie_per_mole / unit.radian / unit.radian
  torsion_force_constants = {'sc_bb_bb_sc_torsion_k': torsion_force_constant}
  torsion_periodicity = 1
  torsion_periodicities = {'sc_bb_bb_sc_period': torsion_periodicity}
@@ -53,7 +105,18 @@ def build_cgmodel(rosetta_scoring):
  # Get positions from a local PDB file written by PyRosetta, and modified (by hand) to have a geometry where the nonbonded interactions are easy to evaluate
  cgmodel = CGModel(polymer_length=polymer_length,backbone_lengths=backbone_lengths,sidechain_lengths=sidechain_lengths,sidechain_positions=sidechain_positions,masses=masses,sigmas=sigmas,epsilons=epsilons,bond_lengths=bond_lengths,include_nonbonded_forces=include_nonbonded_forces,include_bond_forces=include_bond_forces,include_bond_angle_forces=include_bond_angle_forces,include_torsion_forces=include_torsion_forces,rosetta_scoring=rosetta_scoring,exclusions=exclusions,constrain_bonds=constrain_bonds,equil_torsion_angles=equil_torsion_angles,torsion_force_constants=torsion_force_constants,torsion_periodicities=torsion_periodicities,equil_bond_angles=equil_bond_angles,bond_angle_force_constants=bond_angle_force_constants)
  pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
+ res_file_list = list(set([str(str(monomer['monomer_name'])+".params") for monomer in cgmodel.sequence]))
+ res_file_list = " ".join(res_file_list)
+ pyrosetta.init(extra_options = str("-extra_res "+str(res_file_list)))
+ pyrosetta_database_path = pyrosetta._rosetta_database_from_env()
+ mm_atom_data = read_mm_atom_properties_txt(pyrosetta_database_path)
+ particle_list = get_particle_list_from_cgmodel(cgmodel)
+ assign_mm_atom_properties(cgmodel,pyrosetta_database_path)
+ exit()
  pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
+ for residue_index in range(pose.total_residue()):
+  print(pose.residue(residue_index))
+ exit()
  pose.dump_pdb("test_pyrosetta.pdb")
  cgmodel.positions = PDBFile("test_pyrosetta.pdb").getPositions()
  cgmodel.topology = build_topology(cgmodel)
@@ -100,7 +163,8 @@ def build_scorefxn(cgmodel,mm=False):
           file.close()
 
           scorefxn = pyrosetta.create_score_function("mm.wts")
-
+          #print(scorefxn)
+          #exit()
           #print(pyrosetta.rosetta.core.scoring.mm.MMLJLibrary.lookup(1))
           #exit()
         
@@ -146,7 +210,7 @@ def compare_openmm_energy_pyrosetta_score(cgmodel,pose=None,mm=False):
         energy = get_mm_energy(cgmodel.topology,cgmodel.system,cgmodel.positions).in_units_of(unit.kilocalorie_per_mole)
         # Obtain a state for our simulation context
         print("The PyRosetta score is: "+str(score))
-        print("The bond list is: "+str(cgmodel.bond_list))
+        #print("The bond list is: "+str(cgmodel.bond_list))
         print("The OpenMM potential energy is: "+str(energy))
         file = open("energies.dat","w")
         file.write("The OpenMM nonbonded interaction list is: "+str(cgmodel.nonbonded_interaction_list)+"\n")
@@ -169,10 +233,11 @@ cgmodel,pose = build_cgmodel(rosetta_scoring)
 compare_openmm_energy_pyrosetta_score(cgmodel,pose=pose,mm=mm)
 
 # Perform cgopenmm simulation
-temperature = 300.0 * unit.kelvin
-total_simulaton_time = 100.0 * unit.picosecond
+temperature = 1.0 * unit.kelvin
+total_simulation_time = 100.0 * unit.picosecond
 simulation_time_step = 5.0 * unit.femtosecond
-run_simulation(cgmodel,os.getcwd(),total_simulaton_time,simulation_time_step,temperature,5,output_pdb="simulation.pdb",output_data="simulation.dat")
-plot_simulation_results("simulation.dat",os.getcwd(),simulation_time_step,total_simulation_time)
+print_frequency=5
+run_simulation(cgmodel,'output',total_simulation_time,simulation_time_step,temperature,print_frequency)
+#plot_simulation_results("simulation.dat",str(os.getcwd()+'/output'),simulation_time_step,total_simulation_time)
 
 exit()

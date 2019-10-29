@@ -5,4 +5,4 @@ The LJ epsilon value (in kJ/mol) is: 0.8368000000000001 kJ/mol
 The LJ energy calculated by hand is: [Quantity(value=-0.006201984054994929, unit=kilocalorie/mole)]
 (in kJ/mol): [Quantity(value=-0.025949101286098786, unit=kilojoule/mole)]
 The PyRosetta score is: -0.19918328858605003
-The OpenMM potential energy is: 0.19379801594500506 kcal/mol
+The OpenMM potential energy is: 5.993798015945004 kcal/mol

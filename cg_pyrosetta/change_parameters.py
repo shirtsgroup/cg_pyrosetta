@@ -5,6 +5,97 @@ import re
 current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
 
+def read_mm_atom_properties_txt(data_path):
+        """
+
+        """
+        mm_atom_type_sets_directory = str(str(data_path)+"/mm_atom_type_sets")
+        mm_atom_properties_file = str(str(mm_atom_type_sets_directory)+"/mm_atom_properties.txt")
+        mm_atom_types = {}
+        file = open(mm_atom_properties_file,'r')
+        lines = file.readlines()
+        for line in lines[1:]:
+          mm_atom_data = line.split()
+          mm_atom_types.update({'name':mm_atom_data[0],'lj_wdepth':mm_atom_data[1],'lj_radius':mm_atom_data[2],'lj_3b_wdepth':mm_atom_data[3],'lj_3b_radius':mm_atom_data[4]})
+        file.close()
+        return(mm_atom_types)
+
+def replace_mm_atom_properties_txt(data_path,mm_param_dict):
+        """
+
+        """
+        mm_atom_type_sets_directory = str(str(data_path)+"/mm_atom_type_sets")
+        mm_atom_properties_file = str(str(mm_atom_type_sets_directory)+"/mm_atom_properties.txt")
+        file = open(mm_atom_properties_file,'r')
+        lines = file.readlines()
+        for line in lines[1:]:
+          mm_atom_data = line.split()
+          mm_atom_types.update({'name':mm_atom_data[0],'lj_wdepth':mm_atom_data[1],'lj_radius':mm_atom_data[2],'lj_3b_wdepth':mm_atom_data[3],'lj_3b_radius':mm_atom_data[4]})
+        file.close()
+        return(mm_atom_types)
+
+
+def add_mm_atom_types(mm_param_dict):
+        """
+        Given a cgmodel and an 'mm' atom type parameter dictionary, this function writes the atoms to 'mm_atom_properties.txt' in the cg_pyrosetta database. 
+
+        """
+        mm_atom_type_sets_directory = str(str(data_path)+"/mm_atom_type_sets")
+        mm_atom_properties_file = str(str(mm_atom_type_sets_directory)+"/mm_atom_properties.txt")
+        mm_atom_types = {}
+        file = open(mm_atom_properties_file,'a')
+        for atom in mm_atom_types:
+          file.write(str(mm_atom_types['name'])+"   "+str(mm_atom_types['lj_wdepth'])+"   "+str(mm_atom_types['lj_radius'])+"   "+str(mm_atom_types['lj_3b_wdepth'])+"   "+str(mm_atom_types['lj_3b_radius']))
+        return
+
+def get_param_dict_from_cgopenmm_cgmodel(cgmodel):
+    """
+    """
+    particle_list = cgmodel.get_particle_list()
+    mm_param_dict = {}
+    for particle_index in range(len(particle_list)):
+          particle = particle_list[particle_index]
+          lj_wdepth = cgmodel.get_epsilon(particle_index)
+          lj_radius = cgmodel.get_sigma(particle_index)*(2.0**(1/6))
+          lj_3b_wdepth = lj_wdepth
+          lj_3b_radius = lj_radius
+          if 'X' in particle:
+           particle_name = particle.replace('X','BB')
+          if 'A' in particle:
+           particle_name = particle.replace('A','SC')
+          if 'X' in particle_name or 'A' in particle_name:
+           print("ERROR: the particle names are not being re-assigned correctly for cg_pyrosetta")
+           exit()
+
+          mm_param_dict.update({'name':particle_name,'lj_wdepth':lj_wdepth,'lj_radius':lj_radius,'lj_3b_wdepth':lj_3b_wdepth,'lj_3b_radius':lj_3b_radius})
+
+    return(mm_param_dict)
+
+
+def assign_mm_atom_properties_with_cgopenmm_cgmodel(cgmodel):
+        """
+        """
+        existing_mm_atom_data = read_mm_atom_properties_txt(data_path)
+        new_mm_atom_data = get_param_dict_from_cgopenmm_cgmodel(cgmodel)
+        mm_atoms_to_replace = {}
+        mm_atoms_to_add = {}
+        for new_atom in new_mm_atom_data:
+          new = True
+          for existing_atom in existing_mm_atom_data:
+            if existing_atom['name'] == new_atom['name']:
+              new = False
+              mm_atoms_to_replace.update({'name':new_atom['name'],'lj_wdepth':new_atom['lj_wdepth'],'lj_radius':new_atom['lj_radius'],'lj_3b_wdepth':new_atom['lj_3b_wdepth'],'lj_3b_radius':new_atom['lj_3b_radius']})
+                                
+            if new:
+              mm_atoms_to_add.update({'name':new_atom['name'],'lj_wdepth':new_atom['lj_wdepth'],'lj_radius':new_atom['lj_radius'],'lj_3b_wdepth':new_atom['lj_3b_wdepth'],'lj_3b_radius':new_atom['lj_3b_radius']})
+
+        if mm_atoms_to_add != {}:
+          add_mm_atom_types(mm_atoms_to_add)
+        if mm_atoms_to_replace != {}:
+          replace_mm_atom_types(mm_atoms_to_replace)
+
+        return
+
 def changeAtomParameters(param_dict):
     """
     function to change atom parameters on the fly

@@ -12,9 +12,9 @@ import yaml
 current_path = os.path.dirname(os.path.abspath(__file__))
 pyrosetta_path = os.path.join(current_path, '../PyRosetta4.modified')
 data_path    = os.path.join(current_path, 'data')
-configs_file = open(os.path.join(current_path, '../.configs.yml'), 'r')
-configs = yaml.load(configs_file)
-clean_pyrosetta_path = configs['clean_pyrosetta_path']
+#configs_file = open(os.path.join(current_path.split('/cg_pyrosetta/')[1], '.configs.yml'), 'r')
+#configs = yaml.load(configs_file)
+clean_pyrosetta_path = "/home/gmeek/software/pyrosetta"
 
 builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
 builder.buildCGPyRosetta()
