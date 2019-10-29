@@ -1,6 +1,7 @@
 import cg_pyrosetta
 import pyrosetta
 import math
+import pytest
 
 def test_mm_twist():
     #Set CG1-CG1-CG1-CG1 torsion
