@@ -11,6 +11,7 @@ def read_mm_atom_properties_txt(data_path):
         """
         mm_atom_type_sets_directory = str(str(data_path)+"/mm_atom_type_sets")
         mm_atom_properties_file = str(str(mm_atom_type_sets_directory)+"/mm_atom_properties.txt")
+        print("Reading "+str(mm_atom_properties_file))
         mm_atom_types = {}
         file = open(mm_atom_properties_file,'r')
         lines = file.readlines()
@@ -76,7 +77,9 @@ def assign_mm_atom_properties_with_cgopenmm_cgmodel(cgmodel):
         """
         """
         existing_mm_atom_data = read_mm_atom_properties_txt(data_path)
+        print(existing_mm_atom_data)
         new_mm_atom_data = get_param_dict_from_cgopenmm_cgmodel(cgmodel)
+        print(new_mm_atom_data)
         mm_atoms_to_replace = {}
         mm_atoms_to_add = {}
         for new_atom in new_mm_atom_data:

@@ -1,4 +1,5 @@
 import cg_pyrosetta
+from cg_pyrosetta.change_parameters import assign_mm_atom_properties_with_cgopenmm_cgmodel
 import os
 from simtk import unit
 from cg_openmm.simulation.tools import *
@@ -107,11 +108,7 @@ def build_cgmodel(rosetta_scoring):
  pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
  res_file_list = list(set([str(str(monomer['monomer_name'])+".params") for monomer in cgmodel.sequence]))
  res_file_list = " ".join(res_file_list)
- pyrosetta.init(extra_options = str("-extra_res "+str(res_file_list)))
- pyrosetta_database_path = pyrosetta._rosetta_database_from_env()
- mm_atom_data = read_mm_atom_properties_txt(pyrosetta_database_path)
- particle_list = get_particle_list_from_cgmodel(cgmodel)
- assign_mm_atom_properties(cgmodel,pyrosetta_database_path)
+ assign_mm_atom_properties_with_cgopenmm_cgmodel(cgmodel)
  exit()
  pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
  for residue_index in range(pose.total_residue()):
