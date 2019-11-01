@@ -43,24 +43,30 @@ def test_change_atom_parameters():
 
 def test_changing_score():
     pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3:CGUpper]')
+    cg_pyrosetta.change_parameters.changeAtomParameters(
+            {'CG1':['X', 10.0, 10.2, 1.0, 1.5, 23.7],
+            'CG2':['X', 10.0, 10.2, 1.0, 1.5, 23.7],
+            'CG3':['X', 10.0, 10.2, 1.0, 1.5, 23.7]})
+    
     sf = pyrosetta.ScoreFunction()
     sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
     sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
     sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_atr, 1)
     sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
-
-    old_score = sf(pose)
-    print("Old Score:", old_score)
-    cg_pyrosetta.change_parameters.changeAtomParameters(
-                    {'CG1':['X', 10.0, 10.2, 1.0, 1.5, 23.7]})
     new_pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3:CGUpper]')
-    new_sf = pyrosetta.ScoreFunction()
-    new_sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
-    new_sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
-    new_sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_atr, 1)
-    new_sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
 
-    new_score = new_sf(new_pose)
-    print("New Score:", new_score)
+    score = sf(new_pose)
+    print("New Score:", score)
 
-    assert new_score !=  old_score
+    assert int(score) == -260459002
+
+    # Reset to "default values"
+    cg_pyrosetta.change_parameters.changeAtomParameters(
+            {'CG1':['X', 1.0, 0.2, 1.0, 1.5, 23.7],
+            'CG2':['X', 1.0, 0.2, 1.0, 1.5, 23.7],
+            'CG3':['X', 1.0, 0.2, 1.0, 1.5, 23.7]})
+
+    
+
+    
+
