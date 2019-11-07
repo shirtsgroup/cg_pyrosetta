@@ -13,71 +13,6 @@ import pyrosetta
 
 # Random Movers, these movers will randomly change an internal coordinate
 # of a CG model
-
-
-class CGSmallMoverOld(pyrosetta.rosetta.protocols.moves.Mover):
-    """
-    Generalized CG mover analogous to the "small" mover in PyRosetta.
-    """
-
-    def __init__(self, pose, angle=180):
-        """
-        Build Small Mover for CG polymers
-
-        Arguments
-        ---------
-
-        angle : float
-            maximum angle the mover can change an angle
-        pose: pyrosetta.Pose()
-            used to generate list of possible atoms
-        """
-        self.angle = angle
-        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
-        # Generate a list of all possible dihe in a provided pose with the bb_model given
-        #  1 bb model [[1 1] [2 1] [3 1] [4 1]][]
-        #  2 bb model [[1 1] [1 2] [2 1] [2 2]][ [3 1] [3 2]]
-        #  3 bb model [[1 1] [1 2] [1 3] [2 1] [2 2] [2 3] [3 1] [3 2] [3 3]]
-        self.conf = pose.conformation()
-
-        # build list of all torsion angles in backbone
-        self.atoms = []
-        for i in range(1, pose.size()+1):  # i == residue
-            res_name = pose.residue(i).name()
-            bb = int(res_name[2])  # hard coded... since we shouldn't need more than CG99 model
-            for j in range(1, bb+1):  # j == atom in backbone
-
-                if j == 1 and i == 1:  # first residue requires different start atom
-                    self.atoms.append(pyrosetta.AtomID(bb+1, i))
-                self.atoms.append(pyrosetta.AtomID(j, i))
-
-                if i == pose.size() and bb == 1:  # 1-1 specific modification for last atom
-                    self.atoms.append(pyrosetta.AtomID(bb+1, i))
-        self.dihes = []
-        for i in range(len(self.atoms)-3):  # builds dihedrals from atom list
-            self.dihes.append([self.atoms[i], self.atoms[i+1], self.atoms[i+2], self.atoms[i+3]])
-
-        # initializing conformation
-        for i in range(0, len(self.dihes)):
-            old = self.conf.torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3])
-            pose.conformation().set_torsion_angle(self.dihes[i][0],
-                                                  self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], old)
-
-    def __str__(self):
-        # pretty sure we don't need this
-        pass
-
-    def apply(self, pose):
-        d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
-        dihe_start = np.random.randint(0, len(self.dihes))  # has to be able to move only bb atoms
-        old = self.conf.torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start]
-                                      [1], self.dihes[dihe_start][2], self.dihes[dihe_start][3])
-        new = old + d_angle
-        # print('Changing Torsion',dihe_start, 'from', old, 'to', new)
-        self.conf.set_torsion_angle(self.dihes[dihe_start][0], self.dihes[dihe_start]
-                                    [1], self.dihes[dihe_start][2], self.dihes[dihe_start][3], new)
-
-
 class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Generalized Small Mover for arbitrary CG models
@@ -484,3 +419,49 @@ class randomizeBackBone(CGSmallMover):
             angle = np.random.uniform(-180, 180)
             # print("Position :", i, ":", angle)
             self.conf.set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
+
+
+class setBackBoneBondLengths(CGSmallMover):
+    def __init__(self, pose, bond_length_dict):
+        """
+        Build setBackBone Mover for CG models
+
+        Arguments
+        ---------
+
+        pose : pyrosetta.Pose()
+            used to generate list of possible dihedrals used in randomizing pose
+        bond_length_dicts : dict
+            dictionary with bond names and their desired length in r_bb
+
+        Example
+        -------
+
+        >>>pose = pyrosetta.pose_from_seqence('X[CG11]X[CG11]X[CG11]X[CG11]')
+        >>>randomizer = cg_pyrosetta.CG_movers.randomizeBackBoneAngles(pose)
+        >>>randomizer.apply(pose)
+
+        """
+        CGSmallMover.__init__(self, pose)
+        self.bond_length_dict = bond_length_dict
+        self.bb_bonds = []
+        self.bond_names = []
+        for i in range(len(self.bb_atoms)-1):
+            self.bb_bonds.append([self.bb_atoms[i], self.bb_atoms[i+1]])
+            atom_1_name = pose.residue(self.bb_atoms[i].rsd()).atom_name(self.bb_atoms[i].atomno()).rstrip()
+            atom_2_name = pose.residue(self.bb_atoms[i+1].rsd()).atom_name(self.bb_atoms[i+1].atomno()).rstrip()
+            self.bond_names.append(atom_1_name+" "+atom_2_name)
+        
+    def apply(self, pose):
+        """
+        """
+        conf = pose.conformation()
+        for bond_atoms, bond_name in zip(self.bb_bonds, self.bond_names):
+            print(bond_name)
+            print(self.bond_length_dict.keys())
+            if bond_name in self.bond_length_dict.keys():
+                print(self.bond_length_dict[bond_name])
+                print("Changing", bond_name, "to a length of:", self.bond_length_dict[bond_name])
+                conf.set_bond_length(bond_atoms[0], bond_atoms[1], self.bond_length_dict[bond_name])
+            else:
+                continue

@@ -6,6 +6,7 @@ import cg_pyrosetta
 import pyrosetta
 import pytest
 import sys
+import pytest
 
 @pytest.fixture()
 def pose():
@@ -53,6 +54,8 @@ def testCGShearMover(pose):
     assert y_new != y_old
     assert z_new != z_old
 
+def test_cgsmallscmover():
+    assert False
 
 def testCGSmallAngleMover(pose):
     x_old = pose.xyz(pyrosetta.AtomID(1,7)).x
@@ -104,8 +107,20 @@ def test_randomizeBBAngles(pose):
     bool_array = [old_angles[i] != new_angles[i] for i in range(len(small_angle.angles))]
     assert(all(bool_array))
 
-def test_setBB():
-    pass
+def test_setBBBL(pose):
+    set_bbbl = cg_pyrosetta.CG_movers.setBackBoneBondLengths(pose, {"BB1 BB1":20.3})
+    set_bbbl.apply(pose)
+    for atom1, atom2 in set_bbbl.bb_bonds[1:-1]:
+        assert pose.conformation().bond_length(atom1, atom2) == 20.3
+
+def test_setBBBL_variable_bb():
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence('X[CG31]'*10)
+    set_bbbl = cg_pyrosetta.CG_movers.setBackBoneBondLengths(pose, {"BB1 BB2":2.3, "BB3 BB1":3.3})
+    set_bbbl.apply(pose)
+    assert pose.conformation().bond_length(cg_pyrosetta.pyrosetta.AtomID(2,1),
+                                           cg_pyrosetta.pyrosetta.AtomID(3,1),
+                                          ) == pytest.approx(1.0)
+
 
 def test_setBBAngles():
     pass

@@ -60,13 +60,5 @@ def test_changing_score():
 
     assert int(score) == -260459002
 
-    # Reset to "default values"
-    cg_pyrosetta.change_parameters.changeAtomParameters(
-            {'CG1':['X', 1.0, 0.2, 1.0, 1.5, 23.7],
-            'CG2':['X', 1.0, 0.2, 1.0, 1.5, 23.7],
-            'CG3':['X', 1.0, 0.2, 1.0, 1.5, 23.7]})
-
-    
-
     
 
