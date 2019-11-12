@@ -114,3 +114,4 @@ __pycache__/*
 *.npy
 *.tga
 *.cif
+*.swp
