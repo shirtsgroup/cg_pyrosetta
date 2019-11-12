@@ -191,13 +191,22 @@ class PyRosettaBuilder():
                 angle_lines.append(line)
 
         # Write lines to modified pyrosetta/.../mm_torsion_params.txt
+        previous_angles = []
+        previous_lines = []
         with open(os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'mm_atom_type_sets', 'fa_standard', 'par_all27_prot_na.prm'), 'r') as angle_file:
-            previous_lines = angle_file.readlines()
+            for line in angle_file:
+                previous_lines.append(line)
+                angle_id = " ".join(line.split()[0:2])
+                previous_angles.append(angle_id)
+
 
         start_angles = previous_lines.index('ANGLES\n')
-        print(start_angles)
+
         for angle_line in angle_lines:
-            if angle_line not in previous_lines:
+            angle_id =  " ".join(angle_line.split()[0:3])
+            if angle_id in previous_angles:
+                previous_lines[previous_angles.index(angle_id)] =  angle_line
+            elif angle_line not in previous_lines:
                 previous_lines.insert(start_angles+1, angle_line)
             else:
                 print('Skipping MM Angle:', angle_line)

@@ -40,25 +40,3 @@ def test_change_atom_parameters():
 
     assert atom_prop_line in pyrosetta_fa_lines
     assert mm_atom_prop_line in pyrosetta_mm_lines
-
-def test_changing_score():
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3:CGUpper]')
-    cg_pyrosetta.change_parameters.changeAtomParameters(
-            {'CG1':['X', 10.0, 10.2, 1.0, 1.5, 23.7],
-            'CG2':['X', 10.0, 10.2, 1.0, 1.5, 23.7],
-            'CG3':['X', 10.0, 10.2, 1.0, 1.5, 23.7]})
-    
-    sf = pyrosetta.ScoreFunction()
-    sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
-    sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1)
-    sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_atr, 1)
-    sf.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
-    new_pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3:CGUpper]')
-
-    score = sf(new_pose)
-    print("New Score:", score)
-
-    assert int(score) == -260459002
-
-    
-
