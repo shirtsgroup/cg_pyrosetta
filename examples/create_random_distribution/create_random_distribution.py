@@ -2,6 +2,7 @@ import cg_pyrosetta
 import pyrosetta
 import argparse
 import yaml
+import sys
 import numpy as np
 
 def main():
@@ -17,7 +18,7 @@ def main():
                         required=False,
                         help = "Number of monomers for this model",
                         type = int,
-                        default = 10,
+                        default = 15,
                         )
     parser.add_argument("--kt",
                         required=True,
@@ -61,6 +62,21 @@ def main():
     # Parse Arguments
     args = parser.parse_args()
     
+    # Get parameters from .yml file
+    param_file = open(args.params, 'r')
+    params = yaml.load(param_file)
+    print(params)
+
+    for param_type in params:
+        if param_type == "atoms":
+            cg_pyrosetta.change_parameters.changeAtomParameters(params["atoms"])
+        if param_type == "dihedrals":
+            cg_pyrosetta.change_parameters.changeTorsionParameters(params["dihedrals"])
+        if param_type == "angles":
+            cg_pyrosetta.change_parameters.changeAngleParameters(params["angles"])
+        else:
+            print("Input YAML file had a key for", param_type+".", "This key is not a valid parameter type for this model.", file=sys.stderr)
+            print("Ignoring", param_type, "and continuing!", file=sys.stderr)
     # Build sequence for folder object
     monomer = "X["+args.model+"]"
     sequence = monomer*args.mer

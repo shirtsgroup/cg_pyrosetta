@@ -8,7 +8,7 @@ pyrosetta.init()
 sequences = [
         #  'X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]X[CG13]',
         #  'X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]X[CG21]',
-           'X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]',
+           'X[CG31:CGLower]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3]X[CG31]X[CG11x3:CGUpper]',
         #  'X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]X[CG12]',
         #  'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]',
         #  'X[CG11]X[CG12]X[CG21]X[CG31]X[CG13]X[CG21]X[CG13]X[CG11]X[CG11]X[CG21]X[CG13]X[CG11]X[CG12]X[CG21]X[CG31]'
@@ -29,14 +29,14 @@ kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 
 cg_pyrosetta.change_parameters.changeTorsionParameters(
    {'CG1 CG1 CG1 CG1':[3,3,0],
-    'CG2 CG1 CG1 CG2':[0,0,0],
+    'CG2 CG1 CG1 CG2':[3,2,120],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]},
     )
 
 cg_pyrosetta.change_parameters.changeAngleParameters(
-    {'CG1 CG1 CG1':[2,120],
-     'CG2 CG1 CG1':[2,120],
+    {'CG1 CG1 CG1':[2,70],
+     'CG2 CG1 CG1':[2,70],
      'CG1 CG1 CG2':[0,0],
       'X CG2 CG1':[0,0]}        
 )
@@ -87,7 +87,7 @@ for rep in range(5):
 
 
         # Runs a folding MC simulation with 200 repeats of the 'default' folder at each kt
-        folding_object.run_anneal_fold('AngleMC', 100, kt_anneal)
+        folding_object.run_anneal_fold('AngleMC', 5000, kt_anneal)
 
         # Dump the lowest energy structure from the MC simulation
         folding_object.mc.lowest_score_pose().dump_pdb('outputs/'+names[i]+'_example_angles_'+str(rep)+'.pdb')
