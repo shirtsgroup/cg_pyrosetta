@@ -6,6 +6,7 @@ import cg_pyrosetta.build_cg_pyrosetta
 current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
 
+
 def changeAtomParameters(param_dict):
     """
     function to change atom parameters on the fly
@@ -95,6 +96,7 @@ def changeAtomParameters(param_dict):
             f.write("%s%10.4f%10.4f%10.4f%10.4f\n" %
                     (param[0], -float(param[3]), float(param[2]), -float(param[3]), float(param[2])))
     cg_pyrosetta.builder.buildCGPyRosetta()
+
 
 def changeTorsionParameters(param_dict):
     """

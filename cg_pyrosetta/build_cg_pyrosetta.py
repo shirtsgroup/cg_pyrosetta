@@ -199,13 +199,12 @@ class PyRosettaBuilder():
                 angle_id = " ".join(line.split()[0:2])
                 previous_angles.append(angle_id)
 
-
         start_angles = previous_lines.index('ANGLES\n')
 
         for angle_line in angle_lines:
-            angle_id =  " ".join(angle_line.split()[0:3])
+            angle_id = " ".join(angle_line.split()[0:3])
             if angle_id in previous_angles:
-                previous_lines[previous_angles.index(angle_id)] =  angle_line
+                previous_lines[previous_angles.index(angle_id)] = angle_line
             elif angle_line not in previous_lines:
                 previous_lines.insert(start_angles+1, angle_line)
             else:
