@@ -1,0 +1,8 @@
+The OpenMM nonbonded interaction list is: [[1, 3]]
+The distances between these particles are: [Quantity(value=0.19999559995159893, unit=nanometer)]
+The LJ sigma value is: 0.8908987181403393 A
+The LJ epsilon value (in kJ/mol) is: 0.8368000000000001 kJ/mol
+The LJ energy calculated by hand is: [Quantity(value=-0.006201984054994929, unit=kilocalorie/mole)]
+(in kJ/mol): [Quantity(value=-0.025949101286098786, unit=kilojoule/mole)]
+The PyRosetta score is: -0.19918328858605003
+The OpenMM potential energy is: 5.993798015945004 kcal/mol

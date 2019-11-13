@@ -29,9 +29,9 @@ def plot_dihedral_histogram(filename, bins ):
     
 
 def main():
-    plot_dihedral_histogram(filename='CG11_merged.pdb', bins=10)
-    plot_dihedral_histogram(filename='CG21_merged.pdb', bins=10)
-    plot_dihedral_histogram(filename='CG31_merged.pdb', bins=10)
+    plot_dihedral_histogram(filename='CG11_merged.pdb', bins=15)
+    plot_dihedral_histogram(filename='CG21_merged.pdb', bins=15)
+    plot_dihedral_histogram(filename='CG31_merged.pdb', bins=15)
     #plot_dihedral_histogram(filename='CG11_example_angles_0.pdb', bins=7)
 
 

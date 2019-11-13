@@ -6,8 +6,9 @@ from simtk import unit
 import foldamers
 from foldamers.utilities.iotools import write_pdbfile_without_topology
 from foldamers.utilities.util import *
+from cg_openmm.simulation.tools import *
+from cg_openmm.build.cg_build import *
 from foldamers.cg_model.cgmodel import *
-from foldamers.cg_model.cgmodel import CGModel
 # Identify the Rosetta database directory
 pyrosetta_database_path = pyrosetta._rosetta_database_from_env()
 
@@ -470,6 +471,19 @@ def build_scorefxn(cgmodel):
         scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_rep, 1)
         scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
         scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
+        cg_pyrosetta.change_parameters.changeTorsionParameters(
+          {'CG1 CG1 CG1 CG1':[3,3,0],
+          'CG2 CG1 CG1 CG2':[0,0,0],
+          'CG2 CG1 CG1 CG1':[0,0,0],
+          'X CG2 CG1 CG1':[0,0,0]},
+        )
+
+        cg_pyrosetta.change_parameters.changeAngleParameters(
+          {'CG1 CG1 CG1':[2,120],
+          'CG2 CG1 CG1':[2,120],
+          'CG1 CG1 CG2':[0,0],
+          'X CG2 CG1':[0,0]}
+        )
 #        scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 0.1)
         return(scorefxn)
 
@@ -511,8 +525,6 @@ def compare_pose_scores(scorefxn,pose_1,pose_2,compare_pdb_sequence=True):
         return
 
 def compare_openmm_energy_pyrosetta_score(cgmodel):
-        from cg_openmm.cg_mm_tools.cg_openmm import build_mm_simulation
-
         """
         Given a cgmodel class object, this function determines if PyRosetta and OpenMM give the same score/energy with identical model settings.
 
@@ -523,18 +535,23 @@ def compare_openmm_energy_pyrosetta_score(cgmodel):
 
         """
 
-        build_params_files(cgmodel)
+        #build_params_files(cgmodel)
         pyrosetta.init()
 
-        pyrosetta_sequence = ''.join([str('['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
+        pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
         # Build a PyRosetta pose
         pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
         # Define a PyRosetta scoring function
+        pose.dump_pdb("test_pyrosetta.pdb")
         scorefxn = build_scorefxn(cgmodel)
+        cgmodel.positions = PDBFile("test_pyrosetta.pdb").getPositions()
+        cgmodel.topology = build_topology(cgmodel)
+        write_pdbfile_without_topology(cgmodel,"test_foldamers.pdb")
         # get the PyRosetta score
-        score = scorefxn.show(pose)
+        score = scorefxn(pose)
         # Build an OpenMM simulation object so that we can calculate the energy using a simulation Context()
-        simulation = build_mm_simulation(cgmodel.topology,cgmodel.system,cgmodel.positions,temperature=temperature,simulation_time_step=simulation_time_step,total_simulation_time=total_simulation_time,output_pdb=output_pdb,output_data=output_data,print_frequency=print_frequency)
+        temperature = 300.0 * unit.kelvin
+        simulation = build_mm_simulation(cgmodel.topology,cgmodel.system,cgmodel.positions,temperature=temperature,simulation_time_step=5.0 * unit.femtosecond)
         # Obtain a state for our simulation context
         energy = simulation.context.getState(getEnergy=True).getPotentialEnergy()
         print("The PyRosetta score is: "+str(score)+"\n")
@@ -543,37 +560,49 @@ def compare_openmm_energy_pyrosetta_score(cgmodel):
         
 
 # Set values for the parameters in our coarse grained model:
-polymer_length=8
-backbone_length=[1,2]
-sidechain_length=1
+polymer_length=12
+backbone_lengths=[1]
+sidechain_lengths=[1]
 sidechain_positions=[0]
-mass = unit.Quantity(10.0,unit.amu)
-sigma = unit.Quantity(2.4,unit.angstrom)
-bond_length = unit.Quantity(1.0,unit.angstrom)
-epsilon = unit.Quantity(0.5,unit.kilocalorie_per_mole)
-# charge = unit.Quantity(0.0,unit.elementary_charge)
+include_bond_forces=False
+include_bond_angle_forces=True
+include_nonbonded_forces=True
+include_torsion_forces=True
+constrain_bonds=True
 
-# Define PDB files to test our PDB writing ability
-openmm_pdb_file = 'test_1_1_openmm.pdb'
-rosetta_pdb_file = 'test_1_1_rosetta.pdb'
+# Particle properties
+mass = 100.0 * unit.amu
+masses = {'backbone_bead_masses': mass, 'sidechain_bead_masses': mass}
+bond_length = 1.0 * unit.angstrom
+bond_lengths = {'bb_bb_bond_length': bond_length,'bb_sc_bond_length': bond_length,'sc_sc_bond_length': bond_length}
+bond_force_constant = 0.0 * unit.kilocalorie_per_mole / unit.nanometer / unit.nanometer
+bond_force_constants = {'bb_bb_bond_k': bond_force_constant, 'bb_sc_bond_k': bond_force_constant, 'sc_sc_bond_k': bond_force_constant}
+sigma = 1.0 * bond_length
+sigmas = {'bb_bb_sigma': sigma,'sc_sc_sigma': sigma}
+epsilon = 0.2 * unit.kilocalorie_per_mole
+epsilons = {'bb_bb_eps': epsilon,'sc_sc_eps': epsilon}
+# Bond angle properties
+bond_angle_force_constant = 2 * unit.kilocalorie_per_mole / unit.radian / unit.radian
+bond_angle_force_constants = {'bb_bb_bb_angle_k': bond_angle_force_constant,'bb_bb_sc_angle_k': bond_angle_force_constant}
+equil_bond_angle = 120.0*(3.141/180.0)
+equil_bond_angles = {'bb_bb_bb_angle_0': equil_bond_angle,'bb_bb_sc_angle_0': equil_bond_angle}
+
+# Torsion properties
+torsion_force_constant = 3
+torsion_force_constants = {'bb_bb_bb_bb_torsion_k': torsion_force_constant,'sc_bb_bb_sc_torsion_k': 0.0,'bb_bb_bb_sc_torsion_k': 0.0,'sc_bb_bb_bb_torsion_k': 0.0}
+equil_torsion_angle = 0.0*(3.141/180.0)
+equil_torsion_angles = {'bb_bb_bb_bb_torsion_0': equil_torsion_angle,'sc_bb_bb_sc_torsion_0': 0.0,'bb_bb_bb_sc_torsion_0': 0.0,'sc_bb_bb_bb_torsion_0': 0.0}
+#Adjust the nonbonded exclusion rules and interaction weights to match the Rosetta scoring function
+rosetta_scoring = True
 
 # Build a coarse grained model
-cgmodel = basic_cgmodel(polymer_length=polymer_length,backbone_length=backbone_length,sidechain_length=sidechain_length,sidechain_positions=sidechain_positions,mass=mass,bond_length=bond_length,sigma=sigma,epsilon=epsilon)
-#write_pdbfile_without_topology(cgmodel,openmm_pdb_file)
-pyrosetta_sequence = ''.join([str('['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
+cgmodel = CGModel(polymer_length=polymer_length,backbone_lengths=backbone_lengths,sidechain_lengths=sidechain_lengths,sidechain_positions=sidechain_positions,masses=masses,sigmas=sigmas,epsilons=epsilons,bond_lengths=bond_lengths,bond_force_constants=bond_force_constants,bond_angle_force_constants=bond_angle_force_constants,torsion_force_constants=torsion_force_constants,equil_bond_angles=equil_bond_angles,equil_torsion_angles=equil_torsion_angles,include_nonbonded_forces=include_nonbonded_forces,include_bond_forces=include_bond_forces,include_bond_angle_forces=include_bond_angle_forces,include_torsion_forces=include_torsion_forces,constrain_bonds=constrain_bonds,rosetta_scoring=rosetta_scoring)
+
 # Compare OpenMM and PyRosetta energies
 # (This function is also where we initialize new residue/monomer
 #  types in the PyRosetta database.)
 compare_openmm_energy_pyrosetta_score(cgmodel)
-pose_from_sequence = pyrosetta.pose_from_sequence(pyrosetta_sequence,'coarse_grain')
 # Test our ability to write a PDB file using our pose and new residue type sets.
-pyrosetta.rosetta.core.io.pdb.dump_pdb(pose,rosetta_pdb_file)
-# Test our ability to read a pose from the PDB file we wrote
-pose_from_pdb = pyrosetta.pose_from_pdb(rosetta_pdb_file)
-# Define scorefunction terms
-pyrosetta_scorefxn = build_scorefxn(cgmodel)
-# Compare poses built from a PDB file and from the polymer sequence
-compare_pose_scores(pyrosetta_scorefxn,pose_from_pdb,pose_from_sequence,compare_pdb_sequence=True)
 
 exit()
 

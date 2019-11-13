@@ -1,0 +1,3 @@
+The nonbonded interaction list is: [[1, 5]]
+The distances between these particles are: [Quantity(value=0.34630766667805674, unit=nanometer)]The PyRosetta score is: -0.3695752690847255
+The OpenMM potential energy is: -0.02630398388229969 kcal/mol

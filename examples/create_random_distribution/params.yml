@@ -1,0 +1,36 @@
+angles:
+  "CG1 CG1 CG1":
+    - 0
+    - 0
+  "CG1 CG1 CG2":
+    - 0
+    - 0
+dihedrals:
+  "CG1 CG1 CG1 CG1":
+    - 0
+    - 0
+    - 0
+  "CG1 CG1 CG1 CG2":
+    - 0
+    - 0
+    - 0
+  "CG2 CG1 CG1 CG2":
+    - 0
+    - 0
+    - 0
+atoms:
+  "CG1":
+    - "X"
+    - 1
+    - 0.2
+  "CG2":
+    - "X"
+    - 1
+    - 0.2
+  "CG3":
+    - "X"
+    - 1
+    - 0.2
+
+  
+     
