@@ -225,10 +225,6 @@ def changeAngleParameters(param_dict):
         for param in angle_params_list:
             # print param line with specific formating
             atom_names = param[0].split()
-<<<<<<< HEAD
-            f.write("%-4.4s%4.3s%4.3s%10.4f%10.4f\n" % (atom_names[0], atom_names[1], atom_names[2], float(param[1]), float(param[2])))
-=======
             f.write("%-4.4s%4.3s%4.3s%10.4f%10.4f\n" %
                     (atom_names[0], atom_names[1], atom_names[2], float(param[1]), float(param[2])))
     cg_pyrosetta.builder.buildCGPyRosetta()
->>>>>>> 71112bd69634557d3d37866794a0f00e6ffdf80a
