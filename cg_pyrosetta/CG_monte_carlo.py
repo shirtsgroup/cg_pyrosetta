@@ -85,7 +85,7 @@ class CGMonteCarloScheduler:
             seq_mover_maker : object = None,
             energy_builder : object = None,
             pose_adapter : object = None,
-            param_file_object : object = None: 
+            param_file_object : object = None,
             ):
 
         self.seq_builder = seq_mover_maker

@@ -7,7 +7,7 @@ import cg_pyrosetta
 import pytest
 import sys
 
+
 def test_cg_pyrosetta_imported():
     """Sample test, will always pass so long as import statement worked"""
     assert "cg_pyrosetta" in sys.modules
-
