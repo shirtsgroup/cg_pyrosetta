@@ -1,4 +1,3 @@
-import pyrosetta
 import numpy as np
 import os
 import sys
@@ -7,6 +6,8 @@ import random
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
+
+import pyrosetta
 
 
 # Random Movers, these movers will randomly change an internal coordinate
