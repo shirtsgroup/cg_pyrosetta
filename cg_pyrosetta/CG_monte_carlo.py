@@ -83,7 +83,7 @@ class CGMonteCarlo:
         return(self.mc.lowest_score_pose())
 
 
-class CGMonteCarloManager:
+class CGMonteCarloAnnealer:
     """
     Docstring here
     """
