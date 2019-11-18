@@ -67,8 +67,9 @@ class CGMonteCarlo:
         if self._output:
             run = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
+                print("IN THE LOOP!")
                 run.apply(self.pose)
-                print("Step :", i)
+                print("Step :", (i+1)*self._out_freq)
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
         else:

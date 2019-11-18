@@ -1,5 +1,4 @@
 import numpy as np
-import pyrosetta
 import pytest
 from cg_pyrosetta.CG_monte_carlo import CGMonteCarlo, EnergyFunctionFactory
 import os
@@ -8,6 +7,8 @@ import warnings
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
+
+import pyrosetta
 
 
 @pytest.fixture
@@ -43,6 +44,16 @@ def cg_monte_carlo(pose, score_function, seq_mover):
         output=False,)
     return(mc_obj)
 
+@pytest.fixture
+def cg_monte_carlo_output(pose, score_function, seq_mover):
+    mc_obj = CGMonteCarlo(
+        pose=pose,
+        score=score_function,
+        seq_mover=seq_mover,
+        n_steps=30,
+        output=True,)
+    return(mc_obj)
+
 
 def test_kT_property(cg_monte_carlo):
     cg_monte_carlo.kT = 30
@@ -60,9 +71,11 @@ def test_run(cg_monte_carlo):
     cg_monte_carlo.run()
     assert(cg_monte_carlo.mc.total_trials() == 30)
 
-def test_run_output(cg_monte_carlo):
-    cg_monte_carlo._output = True
-    cg_monte_carlo.run()
+def test_run_output(cg_monte_carlo_output):
+    cg_monte_carlo_output._out_freq = 2
+    cg_monte_carlo_output.run()
+    assert(cg_monte_carlo_output.mc.total_trials() == 30)
+    
     
 
 
