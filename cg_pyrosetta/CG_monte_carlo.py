@@ -29,21 +29,23 @@ class CGMonteCarlo:
                  seq_mover: object = None,  # pyrosetta.rosetta.protocols.moves.SequenceMover, # sequence of moves between MC evaluations
                  n_steps: int = 1000000,
                  kT: float = 1,
-                 output: bool = True,):
+                 output: bool = True,
+                 out_freq: int = 500,):
 
         # initialize input values
         self.pose = pose
-        self.score = score
+        self._score = score
         self.seq_mover = seq_mover
         self._kT = kT
         self.n_steps = n_steps
-        self.output = output
+        self._output = output
+        self._out_freq = out_freq
 
         # Build MC Object
-        self.mc = pyrosetta.MonteCarlo(self.pose, self.score, self._kT)
+        self.mc = pyrosetta.MonteCarlo(self.pose, self._score, self._kT)
         self.mc_trial = pyrosetta.TrialMover(self.seq_mover, self.mc)
 
-        if self.output:
+        if self._output:
             self.pymol = pyrosetta.PyMOLMover()
             print("Initial Energy :", self.get_energy())
 
@@ -58,18 +60,20 @@ class CGMonteCarlo:
         self.mc_trial = pyrosetta.TrialMover(self.seq_mover, self.mc)
 
     def get_energy(self):
-        return(self.score(self.pose))
+        return(self._score(self.pose))
 
     # def __call__():
     def run(self):
-        run = pyrosetta.RepeatMover(self.mc_trial, 1)
-        for i in range(self.n_steps):
-            run.apply(self.pose)
-            if self.output:
-
+        if self._output:
+            run = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
+            for i in range(int(self.n_steps/self._out_freq)):
+                run.apply(self.pose)
                 print("Step :", i)
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
+        else:
+            run = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
+            run.apply(self.pose)
 
     def get_pose(self):
         return(self.pose)
@@ -78,7 +82,7 @@ class CGMonteCarlo:
         return(self.mc.lowest_score_pose())
 
 
-class CGMonteCarloScheduler:
+class CGMonteCarloManager:
     """
     Docstring here
     """
@@ -144,9 +148,9 @@ class SequenceMoverFactory:
 class EnergyFunctionFactory:
 
     def __init__(self):
-        methods = {}
+        self.methods = {}
         for method in dir(pyrosetta.rosetta.core.scoring):
-            methods[method] = eval('pyrosetta.rosetta.core.scoring.'+method)
+            self.methods[method] = eval('pyrosetta.rosetta.core.scoring.'+method)
 
     def build_energy_function(self, score_terms, term_weights):
         score = pyrosetta.ScoreFunction()
@@ -155,6 +159,6 @@ class EnergyFunctionFactory:
             if term in self.methods.keys():
                 score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), weight)
             else:
-                warnings.warn("Energy Term not implemented :"+term+"\n Skipping term")
+                warnings.warn("Energy Term not implemented :"+term+"\n Skipping term", UserWarning)
 
         return(score)
