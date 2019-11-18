@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 import pyrosetta
 
 
-
 # Random Movers, these movers will randomly change an internal coordinate
 # of a CG model
 class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
@@ -451,7 +450,7 @@ class setBackBoneBondLengths(CGSmallMover):
             atom_1_name = pose.residue(self.bb_atoms[i].rsd()).atom_name(self.bb_atoms[i].atomno()).rstrip()
             atom_2_name = pose.residue(self.bb_atoms[i+1].rsd()).atom_name(self.bb_atoms[i+1].atomno()).rstrip()
             self.bond_names.append(atom_1_name+" "+atom_2_name)
-        
+
     def apply(self, pose):
         """
         """

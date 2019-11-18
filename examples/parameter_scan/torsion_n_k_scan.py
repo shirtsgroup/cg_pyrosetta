@@ -36,7 +36,7 @@ def updateParameters(param_dict):
     
 
 def runAnnealingProcess(param_dict, rep, kts, k, p):
-    folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]X[CG31]')
+    folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm('X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]')
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
     # folding_object.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
     folding_object.add_folding_move('default', folding_object.pymol)

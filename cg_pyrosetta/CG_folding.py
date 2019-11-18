@@ -1,3 +1,4 @@
+import pyrosetta
 import numpy as np
 import cg_pyrosetta.CG_movers as CG_movers
 import os
@@ -6,7 +7,6 @@ import math
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-import pyrosetta
 pyrosetta.init()
 
 np.random.seed()

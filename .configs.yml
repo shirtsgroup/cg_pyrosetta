@@ -1,5 +1,2 @@
-<<<<<<< HEAD
-clean_pyrosetta_path:  '/home/gmeek/software/pyrosetta'
-=======
-clean_pyrosetta_path:  '/home/tfobe/Research/Software/PyRosetta4.Release.python36.ubuntu.release-231/'
->>>>>>> 71112bd69634557d3d37866794a0f00e6ffdf80a
+clean_pyrosetta_path:  '/home/tfobe/Research/Software/PyRosetta4.Release.python36.ubuntu.release'
+
