@@ -164,9 +164,9 @@ compare_openmm_energy_pyrosetta_score(cgmodel,pose=pose,mm=mm)
 
 # Perform cgopenmm simulation
 temperature = 1.0 * unit.kelvin
-total_simulaton_time = 100.0 * unit.picosecond
+total_simulation_time = 100.0 * unit.picosecond
 simulation_time_step = 5.0 * unit.femtosecond
-run_simulation(cgmodel,os.getcwd(),total_simulaton_time,simulation_time_step,temperature,5,output_pdb="simulation.pdb",output_data="simulation.dat")
+run_simulation(cgmodel,os.getcwd(),total_simulation_time,simulation_time_step,temperature,5,output_pdb="simulation.pdb",output_data="simulation.dat")
 plot_simulation_results("simulation.dat",os.getcwd(),simulation_time_step,total_simulation_time)
 
 exit()

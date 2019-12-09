@@ -55,20 +55,20 @@ def get_param_dict_from_cgopenmm_cgmodel(cgmodel):
     particle_list = cgmodel.get_particle_list()
     mm_param_dict = {}
     for particle_index in range(len(particle_list)):
-          particle = particle_list[particle_index]
-          lj_wdepth = cgmodel.get_epsilon(particle_index)
-          lj_radius = cgmodel.get_sigma(particle_index)*(2.0**(1/6))
-          lj_3b_wdepth = lj_wdepth
-          lj_3b_radius = lj_radius
-          if 'X' in particle:
-           particle_name = particle.replace('X','BB')
-          if 'A' in particle:
+        particle = particle_list[particle_index]
+        lj_wdepth = cgmodel.get_epsilon(particle_index)
+        lj_radius = cgmodel.get_sigma(particle_index)*(2.0**(1/6))
+        lj_3b_wdepth = lj_wdepth
+        lj_3b_radius = lj_radius
+        if 'X' in particle:
+            particle_name = particle.replace('X','BB')
+        if 'A' in particle:
            particle_name = particle.replace('A','SC')
-          if 'X' in particle_name or 'A' in particle_name:
+        if 'X' in particle_name or 'A' in particle_name:
            print("ERROR: the particle names are not being re-assigned correctly for cg_pyrosetta")
            exit()
 
-          mm_param_dict.update({'name':particle_name,'lj_wdepth':lj_wdepth,'lj_radius':lj_radius,'lj_3b_wdepth':lj_3b_wdepth,'lj_3b_radius':lj_3b_radius})
+        mm_param_dict.update({'name':particle_name,'lj_wdepth':lj_wdepth,'lj_radius':lj_radius,'lj_3b_wdepth':lj_3b_wdepth,'lj_3b_radius':lj_3b_radius})
 
     return(mm_param_dict)
 
@@ -85,6 +85,8 @@ def assign_mm_atom_properties_with_cgopenmm_cgmodel(cgmodel):
         for new_atom in new_mm_atom_data:
           new = True
           for existing_atom in existing_mm_atom_data:
+            print(existing_atom)
+            print(new_atom)
             if existing_atom['name'] == new_atom['name']:
               new = False
               mm_atoms_to_replace.update({'name':new_atom['name'],'lj_wdepth':new_atom['lj_wdepth'],'lj_radius':new_atom['lj_radius'],'lj_3b_wdepth':new_atom['lj_3b_wdepth'],'lj_3b_radius':new_atom['lj_3b_radius']})

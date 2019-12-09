@@ -37,7 +37,19 @@ def build_cgmodel(rosetta_scoring):
  exclusions = True
 
  # Get positions from a local PDB file written by PyRosetta, and modified (by hand) to have a geometry where the nonbonded interactions are easy to evaluate
- cgmodel = CGModel(polymer_length=polymer_length,backbone_lengths=backbone_lengths,sidechain_lengths=sidechain_lengths,sidechain_positions=sidechain_positions,masses=masses,sigmas=sigmas,epsilons=epsilons,bond_lengths=bond_lengths,include_nonbonded_forces=include_nonbonded_forces,include_bond_forces=include_bond_forces,include_bond_angle_forces=include_bond_angle_forces,include_torsion_forces=include_torsion_forces,rosetta_scoring=rosetta_scoring,exclusions=exclusions,constrain_bonds=constrain_bonds)
+ cgmodel = CGModel(polymer_length=polymer_length,
+                   backbone_lengths=backbone_lengths,
+                   sidechain_lengths=sidechain_lengths,
+                   sidechain_positions=sidechain_positions,
+                   masses=masses,sigmas=sigmas,epsilons=epsilons,
+                   bond_lengths=bond_lengths,
+                   include_nonbonded_forces=include_nonbonded_forces,
+                   include_bond_forces=include_bond_forces,
+                   include_bond_angle_forces=include_bond_angle_forces,
+                   include_torsion_forces=include_torsion_forces,
+                   rosetta_scoring=rosetta_scoring,
+                   exclusions=exclusions,
+                   constrain_bonds=constrain_bonds)
  pyrosetta_sequence = ''.join([str('X['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
  pose = pyrosetta.pose_from_sequence(pyrosetta_sequence)
  pose.dump_pdb("test_pyrosetta.pdb")
@@ -159,6 +171,6 @@ temperature = 300.0 * unit.kelvin
 total_simulaton_time = 100.0 * unit.picosecond
 simulation_time_step = 5.0 * unit.femtosecond
 run_simulation(cgmodel,os.getcwd(),total_simulaton_time,simulation_time_step,temperature,5,output_pdb="simulation.pdb",output_data="simulation.dat")
-plot_simulation_results("simulation.dat",os.getcwd(),simulation_time_step,total_simulation_time)
+plot_simulation_results("simulation.dat",os.getcwd(),simulation_time_step,total_simulaton_time)
 
 exit()
