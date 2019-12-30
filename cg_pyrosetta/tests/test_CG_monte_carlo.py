@@ -31,7 +31,9 @@ def score_function():
 def seq_mover():
     small = pyrosetta.rosetta.protocols.simple_moves.SmallMover()
     rep_small = pyrosetta.RepeatMover(small, 20)
-    return(rep_small)
+    seq_small = pyrosetta.SequenceMover()
+    seq_small.add_mover(rep_small)
+    return(seq_small)
 
 
 @pytest.fixture
@@ -75,9 +77,6 @@ def test_run_output(cg_monte_carlo_output):
     cg_monte_carlo_output._out_freq = 2
     cg_monte_carlo_output.run()
     assert(cg_monte_carlo_output.mc.total_trials() == 30)
-    
-    
-
 
 def test_energy_function_factory(e_function_factory, pose):
     sf = e_function_factory.build_energy_function(["fa_atr", "fa_rep"], [1, 1])
