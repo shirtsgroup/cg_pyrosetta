@@ -7,6 +7,7 @@
 # 5) n_steps
 # 6) output_freq?
 import numpy as np
+import copy
 from abc import ABC, abstractmethod
 import os
 import sys
@@ -85,15 +86,15 @@ class CGMonteCarlo:
     # def __call__():
     def run(self):
         if self._output:
-            run = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
+            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
-                run.apply(self.pose)
+                rep_mover.apply(self.pose)
                 print("Step :", (i+1)*self._out_freq)
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
         else:
-            run = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
-            run.apply(self.pose)
+            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
+            rep_mover.apply(self.pose)
 
     def get_pose(self):
         return(self.pose)
@@ -118,30 +119,45 @@ class CGMonteCarloAnnealer:
         self.score_function = score_function
         self.pose = pose
         self.param_file_object = param_file_object
-
+        self.convergence_criterea = param_file_object.annealer_criteron
         self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
-                                       self.seq_mover, param_dict['n_steps'],
-                                       param_dict['kT_i'], 
+                                       self.seq_mover, self.param_file_object.n_inner,
+                                       param_file_object.t_init, 
                                        )
-
-        # ^^^^^^^^
-        # These will hold the set of instructions the scheduler will have to
-        # follow
-
-    def _get_score_function(self):
-        pass
-
-    def _get_seq_mover(self):
-        pass
-
-    def _build_MC_job(self):
-        pass
+        self.kt_anneals = copy.deepcopy(param_file_object.t_anneals)
 
     def run_schedule(self):
-        pass
+        for kt in self.kt_anneals:
+            self._cg_mc_sim.kT = kt
+            while not self.convergence_criterea(self._cg_mc_sim):
+                self._cg_mc_sim.run()
+            kt_anneals = kt_anneals[1:]
+            
+    def _get_score_function(self):
+        return self.score_function
 
-    def _add_to_schedule():
-        pass
+    def _get_seq_mover(self):
+        return self.seq_mover
+
+    def _add_to_schedule(self, kT):
+        self.kt_anneals.append(kT)
+
+        
+
+class Repeat10Convergence():
+    """
+    convergence object 
+    """
+    def __init__(self):
+        self.counter = 0
+
+    def __call__(self, mc_sim):
+        if self.counter < 10:
+            self.counter += 1
+            return False
+        else:
+            return True
+
 
 
 # class PoseAdapter(ABC):
@@ -158,11 +174,10 @@ class CGMonteCarloAnnealerParameters:
         self.t_init = t_init
         self.anneal_rate = anneal_rate
         self.n_anneals = n_anneals
-        self.annealer_criteron = None # Need a new object for this, unclear
+        self.annealer_criteron = annealer_criteron # Need a new object for this, unclear
         
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
-
 
 
 
@@ -177,11 +192,11 @@ class SequenceMoverFactory:
             'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover,
         }
 
-    def build_seq_mover(self, pose, mover_list, freq_list):
+    def build_seq_mover(self, pose, mover_freq_map):
         seq_mover = pyrosetta.SequenceMover()
-        for mover, freq in zip(mover_list, freq_list):
+        for mover in mover_freq_map.keys():
             if mover in self.methods.keys():
-                seq_mover.add_mover(pyrosetta.RepeatMover(self.methods[mover](pose), freq))
+                seq_mover.add_mover(pyrosetta.RepeatMover(self.methods[mover](pose), mover_freq_map[mover]))
             else:
                 warnings.warn("Unimplemented Mover : "+mover+"\n Skipping mover", UserWarning)
 
@@ -195,12 +210,12 @@ class EnergyFunctionFactory:
         for method in dir(pyrosetta.rosetta.core.scoring):
             self.methods[method] = eval('pyrosetta.rosetta.core.scoring.'+method)
 
-    def build_energy_function(self, score_terms, term_weights):
+    def build_energy_function(self, score_term_weight_map):
         score = pyrosetta.ScoreFunction()
 
-        for term, weight in zip(score_terms, term_weights):
+        for term in score_term_weight_map.keys():
             if term in self.methods.keys():
-                score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), weight)
+                score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), score_term_weight_map[term])
             else:
                 warnings.warn("Energy Term not implemented :"+term+"\n Skipping term", UserWarning)
 

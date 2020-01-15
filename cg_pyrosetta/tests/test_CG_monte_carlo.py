@@ -10,6 +10,9 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
 
+pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                    "--extra_mm_params_dir mm_atom_type_sets")
+
 
 @pytest.fixture
 def pose():
@@ -79,9 +82,9 @@ def test_run_output(cg_monte_carlo_output):
     assert(cg_monte_carlo_output.mc.total_trials() == 30)
 
 def test_energy_function_factory(e_function_factory, pose):
-    sf = e_function_factory.build_energy_function(["fa_atr", "fa_rep"], [1, 1])
+    sf = e_function_factory.build_energy_function({"fa_atr":1, "fa_rep":1})
     assert np.isclose(sf(pose), 5.416006218055426)
 
 def test_energy_function_factory_invalid_e_term(e_function_factory):
     with pytest.warns(UserWarning):
-        e_function_factory.build_energy_function(["not_score_term"], [1])
+        e_function_factory.build_energy_function({"not_score_term":1})
