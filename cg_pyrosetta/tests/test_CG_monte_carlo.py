@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from cg_pyrosetta.CG_monte_carlo import CGMonteCarlo, EnergyFunctionFactory
+from cg_pyrosetta.CG_monte_carlo import CGMonteCarlo, EnergyFunctionFactory, SequenceMoverFactory
 import os
 import sys
 import warnings
@@ -88,3 +88,9 @@ def test_energy_function_factory(e_function_factory, pose):
 def test_energy_function_factory_invalid_e_term(e_function_factory):
     with pytest.warns(UserWarning):
         e_function_factory.build_energy_function({"not_score_term":1})
+
+
+def test_sequence_mover_factory(pose):
+    seq_mvr_fac = SequenceMoverFactory()
+    seq_mover = seq_mvr_fac.build_seq_mover(pose, {"small_dihe":1})
+    assert seq_mover.apply(pose) == None

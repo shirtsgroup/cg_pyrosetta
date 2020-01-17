@@ -86,6 +86,8 @@ class CGMonteCarlo:
     # def __call__():
     def run(self):
         if self._output:
+            # import pdb
+            # pdb.set_trace()
             rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
                 rep_mover.apply(self.pose)
@@ -131,7 +133,7 @@ class CGMonteCarloAnnealer:
             self._cg_mc_sim.kT = kt
             while not self.convergence_criterea(self._cg_mc_sim):
                 self._cg_mc_sim.run()
-            kt_anneals = kt_anneals[1:]
+            self.kt_anneals = self.kt_anneals[1:]
             
     def _get_score_function(self):
         return self.score_function
@@ -183,20 +185,22 @@ class CGMonteCarloAnnealerParameters:
 
 class SequenceMoverFactory:
 
-    def __init__(self):
+    def __init__(self, pose):
         self.methods = {
-            'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover,
-            'small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover,
-            'shear_dihe': cg_pyrosetta.CG_movers.CGShearMover,
-            'sc_small_dihe': cg_pyrosetta.CG_movers.CGSmallSCMover,
-            'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover,
+            'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover(pose),
+            'small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
+            'shear_dihe': cg_pyrosetta.CG_movers.CGShearMover(pose),
+            'sc_small_dihe': cg_pyrosetta.CG_movers.CGSmallSCMover(pose),
+            'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
         }
 
-    def build_seq_mover(self, pose, mover_freq_map):
+    def build_seq_mover(self, mover_freq_map):
         seq_mover = pyrosetta.SequenceMover()
-        for mover in mover_freq_map.keys():
+        movers = [pyrosetta.RepeatMover(self.methods[mover], mover_freq_map[mover]) for mover in  mover_freq_map.keys()]
+        for i, mover in enumerate(mover_freq_map.keys()):
             if mover in self.methods.keys():
-                seq_mover.add_mover(pyrosetta.RepeatMover(self.methods[mover](pose), mover_freq_map[mover]))
+                seq_mover.add_mover(movers[i])
+                print(seq_mover)
             else:
                 warnings.warn("Unimplemented Mover : "+mover+"\n Skipping mover", UserWarning)
 

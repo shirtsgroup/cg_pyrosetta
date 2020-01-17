@@ -4,7 +4,7 @@ cgpy.pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_
                     "--extra_mm_params_dir mm_atom_type_sets")
 
 params = cgpy.CG_monte_carlo.\
-    CGMonteCarloAnnealerParameters(n_inner=500,
+    CGMonteCarloAnnealerParameters(n_inner=50000,
                                    t_init=100,
                                    anneal_rate=0.9,
                                    n_anneals=50,
@@ -22,8 +22,9 @@ energy_function = cgpy.CG_monte_carlo.\
 
 pose = cgpy.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
 
-sequence_mover = cgpy.CG_monte_carlo.\
-    SequenceMoverFactory().build_seq_mover(pose,
+sequence_mover_fct = cgpy.CG_monte_carlo.SequenceMoverFactory(pose)
+
+sequence_mover = sequence_mover_fct.build_seq_mover(
                                            {
                                                "small_dihe": 10,
                                                "small_angle": 5,
@@ -31,6 +32,8 @@ sequence_mover = cgpy.CG_monte_carlo.\
                                            }
                                            )
 print(sequence_mover)
+
+sequence_mover.apply(pose)
 
 cg_annealer = cgpy.CG_monte_carlo.CGMonteCarloAnnealer(
     seq_mover=sequence_mover,
