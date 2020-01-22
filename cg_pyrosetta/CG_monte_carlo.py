@@ -91,7 +91,7 @@ class CGMonteCarlo:
             rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
                 rep_mover.apply(self.pose)
-                print("Step :", (i+1)*self._out_freq)
+                print("Step :", self.mc.total_trials())
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
         else:
@@ -124,14 +124,19 @@ class CGMonteCarloAnnealer:
         self.convergence_criterea = param_file_object.annealer_criteron
         self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
                                        self.seq_mover, self.param_file_object.n_inner,
-                                       param_file_object.t_init, 
+                                       param_file_object.t_init,
+                                       traj_out = param_file_object.traj_out,
+                                       output=param_file_object.mc_output, 
+                                       out_freq = param_file_object.traj_freq,
                                        )
         self.kt_anneals = copy.deepcopy(param_file_object.t_anneals)
 
     def run_schedule(self):
         for kt in self.kt_anneals:
+            print("Current kT = ", kt)
             self._cg_mc_sim.kT = kt
-            while not self.convergence_criterea(self._cg_mc_sim):
+            criteron = self.convergence_criterea()
+            while not criteron(self._cg_mc_sim):
                 self._cg_mc_sim.run()
             self.kt_anneals = self.kt_anneals[1:]
             
@@ -171,13 +176,16 @@ class CGMonteCarloAnnealerParameters:
     """
     Data object for storing how a MC simualtion will be run
     """
-    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron):
+    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, traj_freq):
         self.n_inner = n_inner
         self.t_init = t_init
         self.anneal_rate = anneal_rate
         self.n_anneals = n_anneals
         self.annealer_criteron = annealer_criteron # Need a new object for this, unclear
-        
+        self.traj_out = traj_out
+        self.mc_output = mc_output
+        self.mc_traj = mc_traj
+        self.traj_freq = traj_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
 
@@ -185,7 +193,7 @@ class CGMonteCarloAnnealerParameters:
 
 class SequenceMoverFactory:
 
-    def __init__(self, pose):
+    def __init__(self, pose, extra_movers_dict = None):
         self.methods = {
             'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover(pose),
             'small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
@@ -193,6 +201,9 @@ class SequenceMoverFactory:
             'sc_small_dihe': cg_pyrosetta.CG_movers.CGSmallSCMover(pose),
             'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
         }
+        if extra_movers_dict:
+            self.methods.update(extra_movers_dict)
+            
 
     def build_seq_mover(self, mover_freq_map):
         seq_mover = pyrosetta.SequenceMover()
@@ -200,7 +211,6 @@ class SequenceMoverFactory:
         for i, mover in enumerate(mover_freq_map.keys()):
             if mover in self.methods.keys():
                 seq_mover.add_mover(movers[i])
-                print(seq_mover)
             else:
                 warnings.warn("Unimplemented Mover : "+mover+"\n Skipping mover", UserWarning)
 
