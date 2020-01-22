@@ -458,9 +458,17 @@ class setBackBoneBondLengths(CGSmallMover):
         for bond_atoms, bond_name in zip(self.bb_bonds, self.bond_names):
             print(bond_name)
             print(self.bond_length_dict.keys())
+            rev_bond_name = bond_name.split(" ")
+            rev_bond_name.reverse()
+            rev_bond_name = " ".join(rev_bond_name)
             if bond_name in self.bond_length_dict.keys():
                 print(self.bond_length_dict[bond_name])
                 print("Changing", bond_name, "to a length of:", self.bond_length_dict[bond_name])
                 conf.set_bond_length(bond_atoms[0], bond_atoms[1], self.bond_length_dict[bond_name])
+            elif rev_bond_name in self.bond_length_dict.keys():
+                print(self.bond_length_dict[rev_bond_name])
+                print("Changing", rev_bond_name, "to a length of:", self.bond_length_dict[rev_bond_name])
+                conf.set_bond_length(bond_atoms[1], bond_atoms[0], self.bond_length_dict[rev_bond_name])
+                
             else:
                 continue

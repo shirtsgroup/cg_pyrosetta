@@ -7,16 +7,19 @@
 # 5) n_steps
 # 6) output_freq?
 import numpy as np
+import copy
 from abc import ABC, abstractmethod
-from cg_pyrosetta import CG_movers
 import os
 import sys
 import warnings
+import cg_pyrosetta.CG_movers
+
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
+
 
 class CGMonteCarlo:
     """
@@ -30,6 +33,8 @@ class CGMonteCarlo:
                  n_steps: int = 1000000,
                  kT: float = 1,
                  output: bool = True,
+                 traj: bool = True,
+                 traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
         # initialize input values
@@ -39,6 +44,7 @@ class CGMonteCarlo:
         self._kT = kT
         self.n_steps = n_steps
         self._output = output
+        self._traj = traj
         self._out_freq = out_freq
 
         # Build MC Object
@@ -48,7 +54,22 @@ class CGMonteCarlo:
         if self._output:
             self.pymol = pyrosetta.PyMOLMover()
             print("Initial Energy :", self.get_energy())
+        if self._traj:
+            self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
+            self.traj_writer.file_name(traj_out)
+            self.traj_writer.stride(self._out_freq)
+            self.seq_mover.add_mover(self.traj_writer)
 
+    @property
+    def out_freq(self):
+        return(self._out_freq)
+
+    @out_freq.setter
+    def out_freq(self, new_out_freq):
+        self._out_freq = new_out_freq
+        if self._traj:
+            self.seq_mover.stride(self._out_freq)
+    
     @property
     def kT(self):
         return(self._kT)
@@ -65,16 +86,17 @@ class CGMonteCarlo:
     # def __call__():
     def run(self):
         if self._output:
-            run = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
+            # import pdb
+            # pdb.set_trace()
+            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
-                print("IN THE LOOP!")
-                run.apply(self.pose)
-                print("Step :", (i+1)*self._out_freq)
+                rep_mover.apply(self.pose)
+                print("Step :", self.mc.total_trials())
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
         else:
-            run = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
-            run.apply(self.pose)
+            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
+            rep_mover.apply(self.pose)
 
     def get_pose(self):
         return(self.pose)
@@ -89,34 +111,60 @@ class CGMonteCarloAnnealer:
     """
 
     def __init__(self,
-                 seq_mover_maker: object = None,
-                 energy_builder: object = None,
-                 pose_adapter: object = None,
+                 seq_mover: object = None,
+                 score_function: object = None,
+                 pose: object = None,
                  param_file_object: object = None,
                  ):
 
-        self.seq_builder = seq_mover_maker
-        self.energy_builder = energy_builder
-        self.pose = pose_adapter.get_pose()
+        self.seq_mover = seq_mover
+        self.score_function = score_function
+        self.pose = pose
         self.param_file_object = param_file_object
-        # ^^^^^^^^
-        # These will hold the set of instructions the scheduler will have to
-        # follow
+        self.convergence_criterea = param_file_object.annealer_criteron
+        self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
+                                       self.seq_mover, self.param_file_object.n_inner,
+                                       param_file_object.t_init,
+                                       traj_out = param_file_object.traj_out,
+                                       output=param_file_object.mc_output, 
+                                       out_freq = param_file_object.traj_freq,
+                                       )
+        self.kt_anneals = copy.deepcopy(param_file_object.t_anneals)
 
-    def _get_score_function():
-        pass
+    def run_schedule(self):
+        for kt in self.kt_anneals:
+            print("Current kT = ", kt)
+            self._cg_mc_sim.kT = kt
+            criteron = self.convergence_criterea()
+            while not criteron(self._cg_mc_sim):
+                self._cg_mc_sim.run()
+            self.kt_anneals = self.kt_anneals[1:]
+            
+    def _get_score_function(self):
+        return self.score_function
 
-    def _get_seq_mover():
-        pass
+    def _get_seq_mover(self):
+        return self.seq_mover
 
-    def _build_MC_job():
-        pass
+    def _add_to_schedule(self, kT):
+        self.kt_anneals.append(kT)
 
-    def run_schedule():
-        pass
+        
 
-    def _add_to_schedule():
-        pass
+class Repeat10Convergence():
+    """
+    convergence object 
+    """
+    def __init__(self):
+        self.counter = 0
+
+    def __call__(self, mc_sim):
+        if self.counter < 10:
+            self.counter += 1
+            return False
+        else:
+            return True
+
 
 
 # class PoseAdapter(ABC):
@@ -124,22 +172,45 @@ class CGMonteCarloAnnealer:
 #     def get_pose(self):
 #         pass
 
+class CGMonteCarloAnnealerParameters:
+    """
+    Data object for storing how a MC simualtion will be run
+    """
+    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, traj_freq):
+        self.n_inner = n_inner
+        self.t_init = t_init
+        self.anneal_rate = anneal_rate
+        self.n_anneals = n_anneals
+        self.annealer_criteron = annealer_criteron # Need a new object for this, unclear
+        self.traj_out = traj_out
+        self.mc_output = mc_output
+        self.mc_traj = mc_traj
+        self.traj_freq = traj_freq
+        # list of annealing temps
+        self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
+
+
+
 class SequenceMoverFactory:
 
-    def __init__(self):
+    def __init__(self, pose, extra_movers_dict = None):
         self.methods = {
-            'small_dihe': CG_movers.CGSmallMover,
-            'small_angle': CG_movers.CGSmallAngleMover,
-            'shear_dihe': CG_movers.CGShearMover,
-            'sc_small_dihe': CG_movers.CGSmallSCMover,
-            'sc_small_angle': CG_movers.CGSmallAngleMover,
+            'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover(pose),
+            'small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
+            'shear_dihe': cg_pyrosetta.CG_movers.CGShearMover(pose),
+            'sc_small_dihe': cg_pyrosetta.CG_movers.CGSmallSCMover(pose),
+            'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
         }
+        if extra_movers_dict:
+            self.methods.update(extra_movers_dict)
+            
 
-    def build_seq_mover(self, pose, mover_list, freq_list):
+    def build_seq_mover(self, mover_freq_map):
         seq_mover = pyrosetta.SequenceMover()
-        for mover, freq in zip(mover_list, freq_list):
+        movers = [pyrosetta.RepeatMover(self.methods[mover], mover_freq_map[mover]) for mover in  mover_freq_map.keys()]
+        for i, mover in enumerate(mover_freq_map.keys()):
             if mover in self.methods.keys():
-                seq_mover.add_mover(pyrosetta.RepeatMover(self.methods[mover](pose), freq))
+                seq_mover.add_mover(movers[i])
             else:
                 warnings.warn("Unimplemented Mover : "+mover+"\n Skipping mover", UserWarning)
 
@@ -153,12 +224,12 @@ class EnergyFunctionFactory:
         for method in dir(pyrosetta.rosetta.core.scoring):
             self.methods[method] = eval('pyrosetta.rosetta.core.scoring.'+method)
 
-    def build_energy_function(self, score_terms, term_weights):
+    def build_energy_function(self, score_term_weight_map):
         score = pyrosetta.ScoreFunction()
 
-        for term, weight in zip(score_terms, term_weights):
+        for term in score_term_weight_map.keys():
             if term in self.methods.keys():
-                score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), weight)
+                score.set_weight(eval('pyrosetta.rosetta.core.scoring.'+term), score_term_weight_map[term])
             else:
                 warnings.warn("Energy Term not implemented :"+term+"\n Skipping term", UserWarning)
 

@@ -1,5 +1,5 @@
-import pyrosetta
 import numpy as np
+import cg_pyrosetta
 import cg_pyrosetta.CG_movers as CG_movers
 import os
 import sys
@@ -7,8 +7,11 @@ import math
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-pyrosetta.init()
 
+import pyrosetta
+
+pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                    "--extra_mm_params_dir mm_atom_type_sets")
 np.random.seed()
 
 
@@ -79,8 +82,8 @@ class CGFoldingAlgorithm():
         self.mini.min_type('lbfgs_armijo_nonmonotone')
         self.movemap = pyrosetta.MoveMap()
         self.mini.score_function(self.scorefxn)
-        # for atom in self.small_angle.bb_atoms:
-        #     self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True)
+        for atom in self.small_angle.bb_atoms:
+             self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True)
         self.movemap.set_bb_true_range(1, self.pose.size())
         self.mini.movemap(self.movemap)
 

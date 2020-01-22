@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from cg_pyrosetta.CG_monte_carlo import CGMonteCarlo, EnergyFunctionFactory
+from cg_pyrosetta.CG_monte_carlo import CGMonteCarlo, EnergyFunctionFactory, SequenceMoverFactory
 import os
 import sys
 import warnings
@@ -9,6 +9,9 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
+
+pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                    "--extra_mm_params_dir mm_atom_type_sets")
 
 
 @pytest.fixture
@@ -31,7 +34,9 @@ def score_function():
 def seq_mover():
     small = pyrosetta.rosetta.protocols.simple_moves.SmallMover()
     rep_small = pyrosetta.RepeatMover(small, 20)
-    return(rep_small)
+    seq_small = pyrosetta.SequenceMover()
+    seq_small.add_mover(rep_small)
+    return(seq_small)
 
 
 @pytest.fixture
@@ -75,14 +80,17 @@ def test_run_output(cg_monte_carlo_output):
     cg_monte_carlo_output._out_freq = 2
     cg_monte_carlo_output.run()
     assert(cg_monte_carlo_output.mc.total_trials() == 30)
-    
-    
-
 
 def test_energy_function_factory(e_function_factory, pose):
-    sf = e_function_factory.build_energy_function(["fa_atr", "fa_rep"], [1, 1])
+    sf = e_function_factory.build_energy_function({"fa_atr":1, "fa_rep":1})
     assert np.isclose(sf(pose), 5.416006218055426)
 
 def test_energy_function_factory_invalid_e_term(e_function_factory):
     with pytest.warns(UserWarning):
-        e_function_factory.build_energy_function(["not_score_term"], [1])
+        e_function_factory.build_energy_function({"not_score_term":1})
+
+
+def test_sequence_mover_factory(pose):
+    seq_mvr_fac = SequenceMoverFactory()
+    seq_mover = seq_mvr_fac.build_seq_mover(pose, {"small_dihe":1})
+    assert seq_mover.apply(pose) == None
