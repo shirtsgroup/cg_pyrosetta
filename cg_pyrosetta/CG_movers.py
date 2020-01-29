@@ -326,6 +326,143 @@ class CGSmallAngleMover(CGSmallMover):
         self.conf.set_bond_angle(self.angles[angle_start][0], self.angles[angle_start]
                                  [1], self.angles[angle_start][2], new)
 
+class newCGSmallAngleMover():
+    """
+    Implementing a small angle mover for moving all angles within a CG model
+    """
+    def __init__(self, pose, angle = 10):
+        self.pose = pose
+        self.angle = angle
+        self.conf = pose.conformation()
+        self.bond_angles = []
+        self.atoms = [pyrosetta.AtomID(1, 1)]
+        for atom_1 in self.atoms:
+            print("Working on", atom_1)
+            for atom_2 in self.get_neighbors(atom_1):
+                if self.is_new_atom(atom_2):
+                    self.atoms.append(atom_2)
+                for atom_3 in self.get_neighbors(atom_2):
+                    print("Angle Candidate:", atom_1, atom_2, atom_3)
+                    if [atom_1.rsd(), atom_1.atomno()] == [atom_3.rsd(), atom_3.atomno()]:
+                        continue
+                    if pose.has_dof(self.conf.atom_tree().bond_angle_dof_id(atom_1, atom_2, atom_3, 0)):
+                        if self.is_new_angle([atom_1, atom_2, atom_3]):
+                            self.bond_angles.append([atom_1, atom_2, atom_3])
+                            print("Adding Bond Angle!")
+                            print("A1:", atom_1)
+                            print("A2:", atom_2)
+                            print("A3:", atom_3)
+                        else:
+                            continue
+            
+
+    def is_new_angle(self, angle):
+        for old_angle in self.bond_angles:
+            if old_angle[0].rsd() == angle[0].rsd() and \
+                old_angle[0].atomno() == angle[0].atomno() and \
+                old_angle[1].rsd() == angle[1].rsd() and \
+                old_angle[1].atomno() == angle[1].atomno() and \
+                old_angle[2].rsd() == angle[2].rsd() and \
+                old_angle[2].atomno() == angle[2].atomno():
+                return(False)
+            if old_angle[0].rsd() == angle[2].rsd() and \
+                old_angle[0].atomno() == angle[2].atomno() and \
+                old_angle[1].rsd() == angle[1].rsd() and \
+                old_angle[1].atomno() == angle[1].atomno() and \
+                old_angle[2].rsd() == angle[0].rsd() and \
+                old_angle[2].atomno() == angle[0].atomno():
+                return(False)
+        return(True)
+    def is_new_atom(self, atom):
+        if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
+            return(False)
+        else:
+            return(True)
+    
+    def get_neighbors(self, atom):
+        return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
+
+    def apply(self, pose):
+        d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
+        angle_i = np.random.randint(0, len(self.bond_angles))  # has to be able to move only bb atoms
+        old = self.conf.bond_angle(*self.bond_angles[angle_i])
+        new = old + d_angle
+        # print('Changing Torsion',angle_start, 'from', old, 'to', new)
+        self.conf.set_bond_angle(*self.bond_angles[angle_i], new)
+
+class newCGSmallMover():
+    """
+    Implementing a small angle mover for moving all angles within a CG model
+    """
+    def __init__(self, pose, angle = 180):
+        self.pose = pose
+        self.angle = angle
+        self.conf = pose.conformation()
+        self.torsions = []
+        self.atoms = [pyrosetta.AtomID(1, 1)]
+        for atom_1 in self.atoms:
+            print("Working on", atom_1)
+            for atom_2 in self.get_neighbors(atom_1):
+                if self.is_new_atom(atom_2):
+                    self.atoms.append(atom_2)
+                for atom_3 in self.get_neighbors(atom_2):
+                    if [atom_1.rsd(), atom_1.atomno()] == [atom_3.rsd(), atom_3.atomno()]:
+                        continue
+                    for atom_4 in self.get_neighbors(atom_3):
+                        if [atom_2.rsd(), atom_2.atomno()] == [atom_4.rsd(), atom_4.atomno()]:
+                            continue
+                        print("Angle Candidate:", atom_1, atom_2, atom_3, atom_4)
+                        if pose.has_dof(self.conf.atom_tree().torsion_angle_dof_id(atom_1, atom_2, atom_3, atom_4, 0)):
+                            if self.is_new_torsion([atom_1, atom_2, atom_3, atom_4]):
+                                self.torsions.append([atom_1, atom_2, atom_3, atom_4])
+                                print("Adding Torsion Angle!")
+                                print("A1:", atom_1)
+                                print("A2:", atom_2)
+                                print("A3:", atom_3)
+                                print("A4:", atom_4)
+                            else:
+                                continue
+            
+
+    def is_new_torsion(self, torsion):
+        for old_torsion in self.torsions:
+            if old_torsion[0].rsd() == torsion[0].rsd() and \
+                old_torsion[0].atomno() == torsion[0].atomno() and \
+                old_torsion[1].rsd() == torsion[1].rsd() and \
+                old_torsion[1].atomno() == torsion[1].atomno() and \
+                old_torsion[2].rsd() == torsion[2].rsd() and \
+                old_torsion[2].atomno() == torsion[2].atomno() and \
+                old_torsion[3].atomno() == torsion[3].atomno() and \
+                old_torsion[3].rsd() == torsion[3].rsd():
+                return(False)
+            if old_torsion[0].rsd() == torsion[3].rsd() and \
+                old_torsion[0].atomno() == torsion[3].atomno() and \
+                old_torsion[1].rsd() == torsion[2].rsd() and \
+                old_torsion[1].atomno() == torsion[2].atomno() and \
+                old_torsion[2].rsd() == torsion[1].rsd() and \
+                old_torsion[2].atomno() == torsion[1].atomno() and \
+                old_torsion[3].atomno() == torsion[0].atomno() and \
+                old_torsion[3].rsd() == torsion[0].rsd():
+                return(False)
+        return(True)
+    def is_new_atom(self, atom):
+        if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
+            return(False)
+        else:
+            return(True)
+    
+    def get_neighbors(self, atom):
+        return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
+
+    def apply(self, pose):
+        d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
+        angle_i = np.random.randint(0, len(self.torsions))  # has to be able to move only bb atoms
+        old = self.conf.torsion_angle(*self.torsions[angle_i])
+        new = old + d_angle
+        # print('Changing Torsion',angle_start, 'from', old, 'to', new)
+        self.conf.set_torsion_angle(*self.torsions[angle_i], new)
+
+
 
 # Set Movers, these movers are used to uniformly change internal coordinates
 # for a CG model. ex. change all bb dihedral angles to a value.

@@ -25,6 +25,8 @@ import cg_pyrosetta.change_parameters
 import cg_pyrosetta.CG_monte_carlo
 import pyrosetta
 
+# pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+#                    "--extra_mm_params_dir mm_atom_type_sets")
 # Handle versioneer
 from ._version import get_versions
 versions = get_versions()
