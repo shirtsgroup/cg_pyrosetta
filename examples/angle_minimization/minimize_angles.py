@@ -6,6 +6,8 @@ import cg_pyrosetta
 import pyrosetta
 
 
+cg_pyrosetta.pyrosetta.init("-extra_mm_params_dir mm_atom_type_sets")
+
 # Build models
 polyA = pyrosetta.pose_from_sequence('AAAAAAAA')
 polyCG = pyrosetta.pose_from_sequence('X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]')

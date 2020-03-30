@@ -326,11 +326,12 @@ class CGSmallAngleMover(CGSmallMover):
         self.conf.set_bond_angle(self.angles[angle_start][0], self.angles[angle_start]
                                  [1], self.angles[angle_start][2], new)
 
-class newCGSmallAngleMover():
+class newCGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Implementing a small angle mover for moving all angles within a CG model
     """
     def __init__(self, pose, angle = 10):
+        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.angle = angle
         self.conf = pose.conformation()
@@ -390,11 +391,12 @@ class newCGSmallAngleMover():
         # print('Changing Torsion',angle_start, 'from', old, 'to', new)
         self.conf.set_bond_angle(*self.bond_angles[angle_i], new)
 
-class newCGSmallMover():
+class newCGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Implementing a small angle mover for moving all angles within a CG model
     """
     def __init__(self, pose, angle = 180):
+        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.angle = angle
         self.conf = pose.conformation()
