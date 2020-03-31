@@ -30,7 +30,7 @@ def main():
 
     # Pose to be folded
     pose = cgpy.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cgpy.CG_movers.setBackBoneBondLengths(pose, {"BB1 BB2":2, "BB2 BB3":2, "BB3 BB1":2})
+    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":2, "BB2 BB3":2, "BB3 BB1":2})
     change_lengths.apply(pose)
     print(energy_function(pose))
     # exit()
