@@ -195,8 +195,8 @@ class SequenceMoverFactory:
 
     def __init__(self, pose, extra_movers_dict = None):
         self.methods = {
-            'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover(pose),
-            'small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
+            'small_dihe': cg_pyrosetta.CG_movers.newCGSmallMover(pose),
+            'small_angle': cg_pyrosetta.CG_movers.newCGSmallAngleMover(pose),
             'shear_dihe': cg_pyrosetta.CG_movers.CGShearMover(pose),
             'sc_small_dihe': cg_pyrosetta.CG_movers.CGSmallSCMover(pose),
             'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),

@@ -10,8 +10,8 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
 
-pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
-                    "--extra_mm_params_dir mm_atom_type_sets")
+# pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+#                    "--extra_mm_params_dir mm_atom_type_sets")
 np.random.seed()
 
 
