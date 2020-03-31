@@ -10,8 +10,9 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 import pyrosetta
 
 
-# Random Movers, these movers will randomly change an internal coordinate
-# of a CG model
+# General Movers
+# Torsion, Bondangle and Bondlength movers that have all posible DOFs
+# in a 
 
 class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
@@ -145,12 +146,66 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
         # print('Changing Torsion',angle_start, 'from', old, 'to', new)
         self.conf.set_torsion_angle(*self.torsions[angle_i], new)
 
+class CGBondLengthMover(pyrosetta.rosetta.protocols.moves.Mover):
+    """
+    Implementing a small angle mover for moving all angles within a CG model
+    """
+    def __init__(self, pose, d_bond = 0.1):
+        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
+        self.pose = pose
+        self.d_bond = d_bond
+        self.conf = pose.conformation()
+        self.bond_lengths = []
+        self.atoms = [pyrosetta.AtomID(1, 1)]
+        for atom_1 in self.atoms:
+            print("Working on", atom_1)
+            for atom_2 in self.get_neighbors(atom_1):
+                if self.is_new_atom(atom_2):
+                    self.atoms.append(atom_2)
+                print("Bondlength Candidate:", atom_1, atom_2)
+                if pose.has_dof(self.conf.atom_tree().bond_length_dof_id(atom_1, atom_2, 0)):
+                    if self.is_new_bond([atom_1, atom_2]):
+                        self.bond_lengths.append([atom_1, atom_2])
+                        print("Adding Bond!")
+                        print("A1:", atom_1)
+                        print("A2:", atom_2)
+                    else:
+                        continue
+            
 
+    def is_new_bond(self, bond):
+        for old_bond in self.bond_lengths:
+            if old_bond[0].rsd() == bond[0].rsd() and \
+                old_bond[0].atomno() == bond[0].atomno() and \
+                old_bond[1].rsd() == bond[1].rsd() and \
+                old_bond[1].atomno() == bond[1].atomno():
+                return(False)
+            if old_bond[0].rsd() == bond[1].rsd() and \
+                old_bond[0].atomno() == bond[1].atomno() and \
+                old_bond[1].rsd() == bond[0].rsd() and \
+                old_bond[1].atomno() == bond[0].atomno():
+                return(False)
+        return(True)
+    def is_new_atom(self, atom):
+        if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
+            return(False)
+        else:
+            return(True)
+    
+    def get_neighbors(self, atom):
+        return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
+
+    def apply(self, pose):
+        d_bond = (np.random.rand()-0.5)*self.d_bond
+        bond_i = np.random.randint(0, len(self.bond_lengths))  # has to be able to move only bb atoms
+        old = self.conf.bond_angle(*self.bond_lengths[bond_i])
+        new = old + d_bond
+        # print('Changing Torsion',angle_start, 'from', old, 'to', new)
+        self.conf.set_bond_length(*self.bond_lengths[bond_i], new)
 
 # Set Movers, these movers are used to uniformly change internal coordinates
 # for a CG model. ex. change all bb dihedral angles to a value.
-#                     randomize all bb dihedral angles
-
+# randomize all bb dihedral angles
 class randomizeAngles(CGSmallAngleMover):
     """
     Generalized CG model dihedral randomizer. Used for random initial starting configurations
@@ -193,7 +248,6 @@ class randomizeAngles(CGSmallAngleMover):
             # print("Position :", i, ":", angle)
             self.conf.set_bond_angle(self.angles[i][0], self.angles[i][1], self.angles[i][2], angle)
 
-
 class randomizeTorsions(CGSmallMover):
     """
     Generalized CG model dihedral randomizer. Used for random initial starting configurations
@@ -235,7 +289,7 @@ class randomizeTorsions(CGSmallMover):
             # print("Position :", i, ":", angle)
             self.conf.set_torsion_angle(self.dihes[i][0], self.dihes[i][1], self.dihes[i][2], self.dihes[i][3], angle)
 
-class setBondLengths(CGSmallMover):
+class setBondLengths(CGBondLengthMover):
     def __init__(self, pose, bond_length_dict):
         """
         Build setBackBone Mover for CG models
@@ -258,9 +312,8 @@ class setBondLengths(CGSmallMover):
         """
         CGSmallMover.__init__(self, pose)
         self.bond_length_dict = bond_length_dict
-        self.bb_bonds = []
         self.bond_names = []
-        for i in range(len(self.bb_atoms)-1):
+        for i in range(len(self.bond_lengths)-1):
             self.bb_bonds.append([self.bb_atoms[i], self.bb_atoms[i+1]])
             atom_1_name = pose.residue(self.bb_atoms[i].rsd()).atom_name(self.bb_atoms[i].atomno()).rstrip()
             atom_2_name = pose.residue(self.bb_atoms[i+1].rsd()).atom_name(self.bb_atoms[i+1].atomno()).rstrip()
@@ -268,9 +321,10 @@ class setBondLengths(CGSmallMover):
 
     def apply(self, pose):
         """
+        Apply bondlength changer to desired pose
         """
         conf = pose.conformation()
-        for bond_atoms, bond_name in zip(self.bb_bonds, self.bond_names):
+        for bond_atoms, bond_name in zip(self.bond_lengths, self.bond_names):
             print(bond_name)
             print(self.bond_length_dict.keys())
             rev_bond_name = bond_name.split(" ")
@@ -287,3 +341,45 @@ class setBondLengths(CGSmallMover):
                 
             else:
                 continue
+
+# Backbone/Sidechain specific movers
+
+class CGBBSmallMover(CGSmallMover):
+    def __init__(self, pose, angle = 180):
+        self.super().__init__(pose, angle)
+        for torsion in self.torsions:
+            is_bb = []
+            for atom in torsion:
+                is_bb.append(self.conf.atom_is_backbone_norefold(atom))
+            if not all(is_bb):
+                self.torsions.remove(torsion)
+
+class CGSCSmallMover(CGSmallMover):
+    def __init__(self, pose, angle = 180):
+        self.super().__init__(pose, angle)
+        for torsion in self.torsions:
+            is_sc = []
+            for atom in torsion:
+                is_sc.append(not self.conf.atom_is_backbone_norefold(atom))
+            if not any(is_sc):
+                self.torsions.remove(torsion)
+
+class CGBBSmallAngleMover(CGSmallAngleMover):
+    def __init__(self, pose, angle = 10):
+        self.super().__init__(pose, angle)
+        for angle in self.bond_angles:
+            is_bb = []
+            for atom in angle:
+                is_bb.append(self.conf.atom_is_backbone_norefold(atom))
+            if not all(is_bb):
+                self.bond_angles.remove(angle)
+
+class CGSCSmallAngleMover(CGSmallAngleMover):
+    def __init__(self, pose, angle = 10):
+        self.super().__init__(pose, angle)
+        for angle in self.bond_angles:
+            is_sc = []
+            for atom in angle:
+                is_sc.append(not self.conf.atom_is_backbone_norefold(atom))
+            if not any(is_sc):
+                self.bond_angles.remove(angle)

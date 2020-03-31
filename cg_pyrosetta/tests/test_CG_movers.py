@@ -129,7 +129,7 @@ def test_randomizeBBAngles():
 
 def test_setBBBL():
     pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-    set_bbbl = cg_pyrosetta.CG_movers.setBackBoneBondLengths(pose,
+    set_bbbl = cg_pyrosetta.CG_movers.setBondLengths(pose,
                                                              {
                                                               "BB1 BB2": 20.3,
                                                               "BB2 BB3": 20.3,
@@ -142,7 +142,7 @@ def test_setBBBL():
 
 def test_setBBBL_variable_bb():
     pose = cg_pyrosetta.pyrosetta.pose_from_sequence('X[CG31]'*10)
-    set_bbbl = cg_pyrosetta.CG_movers.setBackBoneBondLengths(pose, {"BB1 BB2": 2.3, "BB3 BB1": 3.3})
+    set_bbbl = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2": 2.3, "BB3 BB1": 3.3})
     set_bbbl.apply(pose)
     assert pose.conformation().bond_length(cg_pyrosetta.pyrosetta.AtomID(2, 1),
                                            cg_pyrosetta.pyrosetta.AtomID(3, 1),
@@ -152,11 +152,11 @@ def test_setBBBL_variable_bb():
 def test_setBBAngles():
     pass
 
-def test_newCGSmallAngleMover():
+def test_CGSmallAngleMover():
     pymol = pyrosetta.PyMOLMover()
     pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
     conf = pose.conformation()
-    small_mover = cg_pyrosetta.CG_movers.newCGSmallAngleMover(pose)
+    small_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(pose)
     # print(small_mover.bond_angles)
     assert len(small_mover.bond_angles) != 0
     pymol.apply(pose)
