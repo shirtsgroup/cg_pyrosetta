@@ -2,8 +2,9 @@ import cg_pyrosetta as cgpy
 
 def main():
     # Initialize CG_PyRosetta with extra mm_types
-    cgpy.pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
-                        "--extra_mm_params_dir mm_atom_type_sets")
+    cgpy.pyrosetta.init("-add_atom_type_set_parameters fa_standard atom_properties.txt " +
+                        "-add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                        "-extra_mm_params_dir mm_atom_type_sets")
     # cgpy.pyrosetta.init()
     # CG MC Annealer Parameters
     params = cgpy.CG_monte_carlo.\

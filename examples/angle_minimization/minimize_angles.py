@@ -2,12 +2,13 @@
 # minimization issue we've been dealing with
 
 
-import cg_pyrosetta
+import cg_pyrosetta as cgpy
 import pyrosetta
 
 
-cg_pyrosetta.pyrosetta.init("-extra_mm_params_dir mm_atom_type_sets")
-
+cgpy.pyrosetta.init("-add_atom_type_set_parameters fa_standard mm_atom_type_sets/atom_properties.txt " +
+                    "-add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                    "-extra_mm_params_dir mm_atom_type_sets")
 # Build models
 polyA = pyrosetta.pose_from_sequence('AAAAAAAA')
 polyCG = pyrosetta.pose_from_sequence('X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]')

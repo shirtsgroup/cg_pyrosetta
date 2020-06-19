@@ -217,6 +217,7 @@ class SequenceMoverFactory:
         return(seq_mover)
 
 
+
 class EnergyFunctionFactory:
 
     def __init__(self):
