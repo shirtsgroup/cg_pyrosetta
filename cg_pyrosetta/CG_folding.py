@@ -48,8 +48,8 @@ class CGFoldingAlgorithm():
         self.pymol = pyrosetta.PyMOLMover()
         self.pymol.apply(self.pose)
 
-        randomizer = CG_movers.randomizeBackBone(self.pose)
-        randomizer.apply(self.pose)
+        # randomizer = CG_movers.randomizeBackBone(self.pose)
+        # randomizer.apply(self.pose)
 
         self.pymol.apply(self.pose)
         # Building PDBTrajWriter object, used for writing multiple structures
@@ -74,7 +74,7 @@ class CGFoldingAlgorithm():
 
         # Build standard CG 1-1 movers
         self.small = CG_movers.CGSmallMover(self.pose)
-        self.shear = CG_movers.CGShearMover(self.pose)
+        # self.shear = CG_movers.CGShearMover(self.pose)
         self.small_angle = CG_movers.CGSmallAngleMover(self.pose)
 
         # Build minimization movers
@@ -82,8 +82,8 @@ class CGFoldingAlgorithm():
         self.mini.min_type('lbfgs_armijo_nonmonotone')
         self.movemap = pyrosetta.MoveMap()
         self.mini.score_function(self.scorefxn)
-        for atom in self.small_angle.bb_atoms:
-             self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True)
+        # for atom in self.small_angle.bb_atoms:
+        #      self.movemap.set(pyrosetta.rosetta.core.id.DOF_ID(atom , pyrosetta.rosetta.core.id.THETA), True)
         self.movemap.set_bb_true_range(1, self.pose.size())
         self.mini.movemap(self.movemap)
 
@@ -97,7 +97,7 @@ class CGFoldingAlgorithm():
         # Adding a default mover
         self.build_fold_alg('default')
         self.add_folding_move('default', pyrosetta.RepeatMover(self.small, 10))
-        self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
+        # self.add_folding_move('default', pyrosetta.RepeatMover(self.shear, 10))
         self.add_folding_move('default', pyrosetta.RepeatMover(self.mini, 10))
 
         # If writing a trajectory file or pymol visualization is desired uncomment these lines
