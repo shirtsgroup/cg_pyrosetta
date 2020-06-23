@@ -115,4 +115,3 @@ __pycache__/*
 *.tga
 *.cif
 *.swp
-cg_pyrosetta/data/*
