@@ -67,8 +67,8 @@ for rep in range(5):
         # folding_object.add_folding_move('AngleMC', pyrosetta.RepeatMover(folding_object.shear, 5))
 
         # Adding an angle mover to this folding algorithm
-        small_sc_mover = cg_pyrosetta.CG_movers.CGSmallSCMover(folding_object.pose)
-        small_sc_mover.angle = 180
+        # small_sc_mover = cg_pyrosetta.CG_movers.CGSmallSCMover(folding_object.pose)
+        # small_sc_mover.angle = 180
 
         # repeat_sc_mover = pyrosetta.RepeatMover(small_sc_mover, 5)
         # folding_object.add_folding_move('AngleMC', repeat_sc_mover)
