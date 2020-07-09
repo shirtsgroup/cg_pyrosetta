@@ -67,7 +67,7 @@ class CGFoldingAlgorithm():
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_twist, 1)
         self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_bend, 1)
-        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1) segfaults beware!
+        # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_rep, 1) # segfaults beware!
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_inter_atr, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_rep, 1)
         # self.scorefxn.set_weight(pyrosetta.rosetta.core.scoring.mm_lj_intra_atr, 1)

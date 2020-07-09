@@ -18,7 +18,7 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Implementing a small angle mover for moving all angles within a CG model
     """
-    def __init__(self, pose, angle = 10):
+    def __init__(self, pose, angle = 5):
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.angle = angle
@@ -148,7 +148,7 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
 class CGBondLengthMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
-    Implementing a small angle mover for moving all angles within a CG model
+    Implementing a small mover for perturbing bondlengths moving all angles within a CG model
     """
     def __init__(self, pose, d_bond = 0.1):
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
@@ -158,17 +158,12 @@ class CGBondLengthMover(pyrosetta.rosetta.protocols.moves.Mover):
         self.bond_lengths = []
         self.atoms = [pyrosetta.AtomID(1, 1)]
         for atom_1 in self.atoms:
-            print("Working on", atom_1)
             for atom_2 in self.get_neighbors(atom_1):
                 if self.is_new_atom(atom_2):
                     self.atoms.append(atom_2)
-                print("Bondlength Candidate:", atom_1, atom_2)
-                if pose.has_dof(self.conf.atom_tree().bond_length_dof_id(atom_1, atom_2, 0)):
+                if pose.has_dof(self.conf.atom_tree().bond_length_dof_id(atom_1, atom_2)):
                     if self.is_new_bond([atom_1, atom_2]):
                         self.bond_lengths.append([atom_1, atom_2])
-                        print("Adding Bond!")
-                        print("A1:", atom_1)
-                        print("A2:", atom_2)
                     else:
                         continue
             
@@ -310,13 +305,12 @@ class setBondLengths(CGBondLengthMover):
         >>>randomizer.apply(pose)
 
         """
-        CGSmallMover.__init__(self, pose)
+        CGBondLengthMover.__init__(self, pose)
         self.bond_length_dict = bond_length_dict
         self.bond_names = []
-        for i in range(len(self.bond_lengths)-1):
-            self.bb_bonds.append([self.bb_atoms[i], self.bb_atoms[i+1]])
-            atom_1_name = pose.residue(self.bb_atoms[i].rsd()).atom_name(self.bb_atoms[i].atomno()).rstrip()
-            atom_2_name = pose.residue(self.bb_atoms[i+1].rsd()).atom_name(self.bb_atoms[i+1].atomno()).rstrip()
+        for i in range(len(self.bond_lengths)):
+            atom_1_name = pose.residue(self.bond_lengths[i][0].rsd()).atom_name(self.bond_lengths[i][0].atomno()).rstrip()
+            atom_2_name = pose.residue(self.bond_lengths[i][1].rsd()).atom_name(self.bond_lengths[i][1].atomno()).rstrip()
             self.bond_names.append(atom_1_name+" "+atom_2_name)
 
     def apply(self, pose):
@@ -346,7 +340,7 @@ class setBondLengths(CGBondLengthMover):
 
 class CGBBSmallMover(CGSmallMover):
     def __init__(self, pose, angle = 180):
-        self.super().__init__(pose, angle)
+        super().__init__(pose, angle)
         for torsion in self.torsions:
             is_bb = []
             for atom in torsion:
@@ -356,7 +350,7 @@ class CGBBSmallMover(CGSmallMover):
 
 class CGSCSmallMover(CGSmallMover):
     def __init__(self, pose, angle = 180):
-        self.super().__init__(pose, angle)
+        super().__init__(pose, angle)
         for torsion in self.torsions:
             is_sc = []
             for atom in torsion:
@@ -366,7 +360,7 @@ class CGSCSmallMover(CGSmallMover):
 
 class CGBBSmallAngleMover(CGSmallAngleMover):
     def __init__(self, pose, angle = 10):
-        self.super().__init__(pose, angle)
+        super().__init__(pose, angle)
         for angle in self.bond_angles:
             is_bb = []
             for atom in angle:
@@ -376,7 +370,7 @@ class CGBBSmallAngleMover(CGSmallAngleMover):
 
 class CGSCSmallAngleMover(CGSmallAngleMover):
     def __init__(self, pose, angle = 10):
-        self.super().__init__(pose, angle)
+        super().__init__(pose, angle)
         for angle in self.bond_angles:
             is_sc = []
             for atom in angle:
