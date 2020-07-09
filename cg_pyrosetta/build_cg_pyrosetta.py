@@ -48,13 +48,13 @@ class PyRosettaBuilder():
         # if not os.path.exists(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models')):
         #     os.mkdir(os.path.join(self.pyrosetta_path,'pyrosetta','database','chemical','mm_atom_type_sets','cg_models'))
 
-        self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
+        # self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
         self.turnOffExtras()
         self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
-        self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
+        # self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
         self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header=True)
-        self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
-        self.addMMAngleTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
+        # self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
+        # self.addMMAngleTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
 
     def unBuildCGPyRosetta(self, path):
         """

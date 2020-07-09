@@ -28,6 +28,9 @@ cg_pyrosetta.change_parameters.changeAtomParameters(
     }
 )
 
+
+
+
 # Setup CGFoldingAlgorithm object
 
 sequence = "X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]"
@@ -38,6 +41,9 @@ cg_folding_object = cg_pyrosetta.CG_folding.CGFoldingAlgorithm(sequence)
 # Create CG Movers
 cg_small = cg_pyrosetta.CG_movers.CGSmallMover(cg_folding_object.pose)
 cg_small.angle = 180
+
+# set_bl_mover = cg_pyrosetta.CG_movers.setBondLengths(cg_folding_object.pose, {"BB1 BB2":2.0})
+#set_bl_mover.apply(cg_folding_object.pose)
 
 mini = pyrosetta.rosetta.protocols.minimization_packing.MinMover()
 movemap = pyrosetta.MoveMap()

@@ -7,7 +7,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
 
 
-def changeAtomParameters(param_dict):
+def changeAtomParameters(param_dict, path = None):
     """
     function to change atom parameters on the fly
 
@@ -26,9 +26,11 @@ def changeAtomParameters(param_dict):
     cg_pyrosetta.change_parameters.changeAtomParameters(params)
 
     """
-
-    with open(os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt'), 'r') as f:
-        atom_lines = f.readlines()
+    if path is None:
+        with open(os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt'), 'r') as f:
+            atom_lines = f.readlines()
+    else:
+        with open(path)
 
     atom_params_list = [line.rstrip('\n').split() for line in atom_lines[1:]]
     prev_atoms = [atom_list[0] for atom_list in atom_params_list]
@@ -181,7 +183,7 @@ def changeAngleParameters(param_dict):
     Examples
     --------
 
-    params = {'CG1':['X', 1.0, 0.2, 1.0, 3.5, 23.7]}
+    params = {'CG1 CG1 CG1':[10, 120]}
     cg_pyrosetta.change_parameters.changeAtomParameters(params)
 
     """

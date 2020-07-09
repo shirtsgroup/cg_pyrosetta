@@ -1,0 +1,4 @@
+# ANGLES
+# !atom types     Ktheta    Theta0   Kub     S0
+CG1  CG1 CG1    10.0000   105.0000
+CG2  CG1 CG1     3.0000   105.0000

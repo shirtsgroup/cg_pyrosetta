@@ -2,15 +2,15 @@ import cg_pyrosetta as cgpy
 
 def main():
     # Initialize CG_PyRosetta with extra mm_types
-    cgpy.pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
-                        "--extra_mm_params_dir mm_atom_type_sets")
+    cgpy.pyrosetta.init("--add_atom_types fa_standard atom_properties.txt --add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
+                        "--extra_mm_params_dir mm_atom_type_sets -mute all")
     # cgpy.pyrosetta.init()
     # CG MC Annealer Parameters
     params = cgpy.CG_monte_carlo.\
         CGMonteCarloAnnealerParameters(n_inner=500,
-                                    t_init=100,
+                                    t_init=5,
                                     anneal_rate=0.9,
-                                    n_anneals=50,
+                                    n_anneals=20,
                                     annealer_criteron=cgpy.CG_monte_carlo.Repeat10Convergence,
                                     traj_out = "testing.pdb",
                                     mc_output = True,
@@ -25,12 +25,15 @@ def main():
                 "mm_bend": 1,
                 "fa_atr": 1,
                 "fa_rep": 1,
+                "fa_intra_rep":1,
+                "fa_intra_atr":1
+
             }
         )
 
     # Pose to be folded
     pose = cgpy.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":2, "BB2 BB3":2, "BB3 BB1":2})
+    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":1, "BB2 BB3":1, "BB3 BB1":1})
     change_lengths.apply(pose)
     print(energy_function(pose))
     # exit()
@@ -65,8 +68,8 @@ def main():
     sequence_mover_fct = cgpy.CG_monte_carlo.SequenceMoverFactory(pose, {"mini":mini})
     sequence_mover = sequence_mover_fct.build_seq_mover(
                                             {
-                                                "small_dihe": 10,
-                                                "small_angle": 5,
+                                                "small_dihe": 1,
+                                                "small_angle": 1,
                                                 # "sc_small_angle": 5,
                                                 "mini": 50
                                             }
