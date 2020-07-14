@@ -7,7 +7,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
 
 
-def changeAtomParameters(param_dict, path = None):
+def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path = None):
     """
     function to change atom parameters on the fly
 
@@ -26,11 +26,15 @@ def changeAtomParameters(param_dict, path = None):
     cg_pyrosetta.change_parameters.changeAtomParameters(params)
 
     """
-    if path is None:
-        with open(os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt'), 'r') as f:
-            atom_lines = f.readlines()
-    else:
-        with open(path)
+    if atom_types_path is None:
+        atom_types_path = os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt')
+    
+    if mm_atom_types_path is None:
+        mm_atom_types_path = os.path.join(data_path, 'mm_atom_type_sets', 'mm_atom_properties.txt'),
+
+
+    with open(atom_types_path, 'r') as f:
+        atom_lines = f.readlines()
 
     atom_params_list = [line.rstrip('\n').split() for line in atom_lines[1:]]
     prev_atoms = [atom_list[0] for atom_list in atom_params_list]
@@ -78,7 +82,7 @@ def changeAtomParameters(param_dict, path = None):
             atom_params_list.append(new_entry)
 
     # Rewrite parameters to atom_properties.txt file
-    with open(os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt'), 'w') as f:
+    with open(atom_types_path, 'w') as f:
         # write header
         f.write('NAME  ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME\n')
 
@@ -88,7 +92,7 @@ def changeAtomParameters(param_dict, path = None):
             f.write("%s%6.1s%10.4f%10.4f%10.4f%10.4f%10.4f\n" % (param[0], param[1], float(
                 param[2]), float(param[3]), float(param[4]), float(param[5]), float(param[6])))
 
-    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_atom_properties.txt'), 'w') as f:
+    with open(mm_atom_types_path, 'w') as f:
         # write header
         f.write('NAME    LJ_WDEPTH   LJ_RADIUS   LJ_3B_WDEPTH    LJ_3B_RADIUS\n')
 
@@ -97,10 +101,10 @@ def changeAtomParameters(param_dict, path = None):
             # print param line with specific formating
             f.write("%s%10.4f%10.4f%10.4f%10.4f\n" %
                     (param[0], -float(param[3]), float(param[2]), -float(param[3]), float(param[2])))
-    cg_pyrosetta.builder.buildCGPyRosetta()
+    # cg_pyrosetta.builder.buildCGPyRosetta()
 
 
-def changeTorsionParameters(param_dict):
+def changeTorsionParameters(param_dict, torsion_file = None):
     """
     function to change torsion parameters on the fly
 
@@ -120,7 +124,11 @@ def changeTorsionParameters(param_dict):
 
     """
 
-    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_torsion_params.txt'), 'r') as f:
+    if torsion_file is None:
+        torsion_file = os.path.join(data_path, 'mm_atom_type_sets', 'mm_torsion_params.txt')
+
+
+    with open(torsion_file, 'r') as f:
         torsion_lines = f.readlines()
 
     # Build torsion params list [name_of_torsion k_constant periodicity phase_shift]
@@ -155,7 +163,7 @@ def changeTorsionParameters(param_dict):
             torsion_params_list.append(new_entry)
 
     # Rewrite parameters to atom_properties.txt file
-    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_torsion_params.txt'), 'w') as f:
+    with open(torsion_file, 'w') as f:
         # write header
         f.write('# CG torsion parameters\n')
 
@@ -165,10 +173,10 @@ def changeTorsionParameters(param_dict):
             atom_names = param[0].split()
             f.write("%s %s %s %s %.4f %.1i %.4f\n" % (
                 atom_names[0], atom_names[1], atom_names[2], atom_names[3], float(param[1]), int(param[2]), float(param[3])))
-    cg_pyrosetta.builder.buildCGPyRosetta()
+    # cg_pyrosetta.builder.buildCGPyRosetta()
 
 
-def changeAngleParameters(param_dict):
+def changeAngleParameters(param_dict, angle_file = None):
     """
     function to change angle parameters (mm_bend)on the fly
 
@@ -184,11 +192,14 @@ def changeAngleParameters(param_dict):
     --------
 
     params = {'CG1 CG1 CG1':[10, 120]}
-    cg_pyrosetta.change_parameters.changeAtomParameters(params)
+     cg_pyrosetta.change_parameters.changeAtomParameters(params)
 
     """
 
-    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt'), 'r') as f:
+    if angle_file is None:
+        angle_file = os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt')
+
+    with open(angle_file, 'r') as f:
         angle_lines = f.readlines()
 
     # Build torsion params list [name_of_torsion k_constant periodicity phase_shift]
@@ -200,7 +211,6 @@ def changeAngleParameters(param_dict):
 
     prev_angles = [angle[0] for angle in angle_params_list]
     names = param_dict.keys()
-    print(prev_angles)
     for name in names:
 
         # extract LJ parameters and atom name
@@ -220,7 +230,7 @@ def changeAngleParameters(param_dict):
             angle_params_list.append(new_entry)
 
     # Rewrite parameters to atom_properties.txt file
-    with open(os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt'), 'w') as f:
+    with open(angle_file, 'w') as f:
         # write header
         f.write('ANGLES\n')
         f.write('!atom types     Ktheta    Theta0   Kub     S0\n')
@@ -231,4 +241,5 @@ def changeAngleParameters(param_dict):
             atom_names = param[0].split()
             f.write("%-4.4s%4.3s%4.3s%10.4f%10.4f\n" %
                     (atom_names[0], atom_names[1], atom_names[2], float(param[1]), float(param[2])))
-    cg_pyrosetta.builder.buildCGPyRosetta()
+    
+    # cg_pyrosetta.builder.buildCGPyRosetta()

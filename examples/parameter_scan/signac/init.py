@@ -11,5 +11,5 @@ bbb_angles = np.linspace(45, 135, 10)
 for bb_l in bb_lengths:
     for bbb_angle in bbb_angles:
         job = project.open_job({'bb_length' : bb_l, 'bbb_angle' : bbb_angle})
-        sh.copytree("parameters", job.workspace())
+        sh.copytree("parameters", os.path.join(job.workspace(), "parameters"))
         job.init()
