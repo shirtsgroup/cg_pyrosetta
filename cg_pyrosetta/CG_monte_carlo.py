@@ -86,8 +86,6 @@ class CGMonteCarlo:
     # def __call__():
     def run(self):
         if self._output:
-            # import pdb
-            # pdb.set_trace()
             rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
             for i in range(int(self.n_steps/self._out_freq)):
                 rep_mover.apply(self.pose)
@@ -200,7 +198,7 @@ class SequenceMoverFactory:
             'shear_dihe': NotImplementedError(),
             'sc_small_dihe': NotImplementedError(),
             'sc_small_angle': cg_pyrosetta.CG_movers.CGSmallAngleMover(pose),
-            'pymol' : cg_pyrosetta.pyrosetta.PyMOLMove(),
+            'pymol' : cg_pyrosetta.pyrosetta.PyMOLMover(),
         }
         if extra_movers_dict:
             self.methods.update(extra_movers_dict)
