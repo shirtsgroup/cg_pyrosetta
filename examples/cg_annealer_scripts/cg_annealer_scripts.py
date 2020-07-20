@@ -1,8 +1,11 @@
 import cg_pyrosetta as cgpy
 
 def main():
-    import pdb
-    pdb.set_trace()
+
+    cgpy.change_parameters.changeAtomParameters({"CG1" : ['X', 1.5, 0.2]},
+                                    atom_types_path="atom_properties.txt",
+                                    mm_atom_types_path = "mm_atom_type_sets/mm_atom_properties.txt")
+
     # Initialize CG_PyRosetta with extra mm_types
     cgpy.pyrosetta.init("--add_atom_types fa_standard atom_properties.txt --add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
                         "--extra_mm_params_dir mm_atom_type_sets")
@@ -27,28 +30,22 @@ def main():
                 "mm_bend": 1,
                 "fa_atr": 1,
                 "fa_rep": 1,
-                "fa_intra_rep":1,
-                "fa_intra_atr":1
-
+                "fa_intra_rep": 1,
+                "fa_intra_atr": 1
             }
         )
 
     # Pose to be folded
     pose = cgpy.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":1, "BB2 BB3":1, "BB3 BB1":1})
+    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":2, "BB2 BB3":2, "BB3 BB1":2})
     change_lengths.apply(pose)
     print(energy_function(pose))
     # exit()
-    # Build Minimizer
 
+    # Build Minimizer
     mini = cgpy.pyrosetta.rosetta.protocols.minimization_packing.MinMover()
     mini.min_type('lbfgs_armijo_nonmonotone')
     mini.score_function(energy_function)
-
-    # Build Cartesian Minimizer
-
-    # cart_mini = cgpy.pyrosetta.rosetta.core.optimization.CartesianMinimizer()
-    # cart_mmap = cgpy.pyrosetta.rosetta.core.optimization.CartesianMap()
 
     # MoveMap for Minimizer
     movemap = cgpy.pyrosetta.MoveMap()
@@ -71,11 +68,13 @@ def main():
     sequence_mover = sequence_mover_fct.build_seq_mover(
                                             {
                                                 "small_dihe": 1,
-                                                "small_angle": 1,
-                                                # "sc_small_angle": 5,
+                                                "small_angle": 10,
+                                                "pymol" : 1,
                                                 "mini": 50
                                             }
                                             )
+
+    exit()
 
     # Initialize Annealer
     cg_annealer = cgpy.CG_monte_carlo.CGMonteCarloAnnealer(

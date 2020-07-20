@@ -26,21 +26,21 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
         self.bond_angles = []
         self.atoms = [pyrosetta.AtomID(1, 1)]
         for atom_1 in self.atoms:
-            print("Working on", atom_1)
+            # print("Working on", atom_1)
             for atom_2 in self.get_neighbors(atom_1):
                 if self.is_new_atom(atom_2):
                     self.atoms.append(atom_2)
                 for atom_3 in self.get_neighbors(atom_2):
-                    print("Angle Candidate:", atom_1, atom_2, atom_3)
+                    # print("Angle Candidate:", atom_1, atom_2, atom_3)
                     if [atom_1.rsd(), atom_1.atomno()] == [atom_3.rsd(), atom_3.atomno()]:
                         continue
                     if pose.has_dof(self.conf.atom_tree().bond_angle_dof_id(atom_1, atom_2, atom_3, 0)):
                         if self.is_new_angle([atom_1, atom_2, atom_3]):
                             self.bond_angles.append([atom_1, atom_2, atom_3])
-                            print("Adding Bond Angle!")
-                            print("A1:", atom_1)
-                            print("A2:", atom_2)
-                            print("A3:", atom_3)
+                            # print("Adding Bond Angle!")
+                            # print("A1:", atom_1)
+                            # print("A2:", atom_2)
+                            # print("A3:", atom_3)
                         else:
                             continue
             
@@ -91,7 +91,7 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
         self.torsions = []
         self.atoms = [pyrosetta.AtomID(1, 1)]
         for atom_1 in self.atoms:
-            print("Working on", atom_1)
+            # print("Working on", atom_1)
             for atom_2 in self.get_neighbors(atom_1):
                 if self.is_new_atom(atom_2):
                     self.atoms.append(atom_2)
@@ -319,18 +319,18 @@ class setBondLengths(CGBondLengthMover):
         """
         conf = pose.conformation()
         for bond_atoms, bond_name in zip(self.bond_lengths, self.bond_names):
-            print(bond_name)
-            print(self.bond_length_dict.keys())
+            # print(bond_name)
+            # print(self.bond_length_dict.keys())
             rev_bond_name = bond_name.split(" ")
             rev_bond_name.reverse()
             rev_bond_name = " ".join(rev_bond_name)
             if bond_name in self.bond_length_dict.keys():
-                print(self.bond_length_dict[bond_name])
-                print("Changing", bond_name, "to a length of:", self.bond_length_dict[bond_name])
+                # print(self.bond_length_dict[bond_name])
+                # print("Changing", bond_name, "to a length of:", self.bond_length_dict[bond_name])
                 conf.set_bond_length(bond_atoms[0], bond_atoms[1], self.bond_length_dict[bond_name])
             elif rev_bond_name in self.bond_length_dict.keys():
-                print(self.bond_length_dict[rev_bond_name])
-                print("Changing", rev_bond_name, "to a length of:", self.bond_length_dict[rev_bond_name])
+                # print(self.bond_length_dict[rev_bond_name])
+                # print("Changing", rev_bond_name, "to a length of:", self.bond_length_dict[rev_bond_name])
                 conf.set_bond_length(bond_atoms[1], bond_atoms[0], self.bond_length_dict[rev_bond_name])
                 
             else:
