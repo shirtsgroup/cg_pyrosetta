@@ -1,13 +1,22 @@
 import signac
 import cg_pyrosetta
+import os
 import flow
 from flow import FlowProject
 
-flow.status_parallelization = "none"
+# flow.status_parallelization = "none"
 
 @FlowProject.label
+def parameters_are_set(job):
+    return job.isfile("job_status.txt")
+
+@FlowProject.operation
+@FlowProject.post(parameters_are_set)
 def set_parameters(job):
+
+    os.chdir(job.ws)
     # set parameters
+    print("Changing parameters in", os.path.abspath(""))
     cg_pyrosetta.change_parameters.changeAngleParameters(
         {
          'CG1 CG1 CG1' : [1500, job.sp.bbb_angle],
@@ -16,11 +25,15 @@ def set_parameters(job):
         angle_file= "parameters/mm_atom_type_sets/mm_bond_angle_params.txt"
     )
 
+    with open(job.fn("job_status.txt"), "w") as f:
+        f.write("parameters set\n")
+
+
 @FlowProject.operation
-@FlowProject.label
-@FlowProject.pre(set_parameters)
+@FlowProject.pre(parameters_are_set)
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
+    os.chdir(job.ws)
     cg_pyrosetta.pyrosetta.init(
                       "--add_atom_types fa_standard parameters/atom_properties.txt " +
                       "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
@@ -33,7 +46,7 @@ def run_mc_simulation(job):
                                        anneal_rate = 0.9,
                                        n_anneals = 30,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
-                                       traj_out = "mc-min_traj.pdb",
+                                       traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
                                        mc_traj = True,
                                        traj_freq = 250, 
@@ -67,8 +80,8 @@ def run_mc_simulation(job):
     movemap.set(cg_pyrosetta.pyrosetta.rosetta.core.id.THETA, True)
     movemap.set(cg_pyrosetta.pyrosetta.rosetta.core.id.PHI, True)
 
-    print("Using the following MoveMap:")
-    print(movemap)
+    # print("Using the following MoveMap:")
+    # print(movemap)
 
     mini.movemap(movemap)
 
@@ -92,16 +105,16 @@ def run_mc_simulation(job):
     # Run Annealer
     cg_annealer.run_schedule()
     min_pose = cg_annealer._cg_mc_sim.get_minimum_energy_pose()
-    min_pose.dump_pdb("minimum.pdb")
-    
-@FlowProject.operation
-@FlowProject.pre.isfile("minimum.pdb")
-def low_temperature_mc(job):
-
-    pose = cg_pyrosetta.pyrosetta.pose_from_file("minimum.pdb")
-
-    # temporary output
-    print(pose)
+    min_pose.dump_pdb(job.fn("minimum.pdb"))
+#     
+# @FlowProject.operation
+# @FlowProject.pre.isfile("minimum.pdb")
+# def low_temperature_mc(job):
+# 
+#     pose = cg_pyrosetta.pyrosetta.pose_from_file(job.fn("minimum.pdb"))
+# 
+#     # temporary output
+#     print(pose)
 
 
 if __name__ == '__main__':

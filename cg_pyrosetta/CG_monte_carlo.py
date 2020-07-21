@@ -208,6 +208,7 @@ class SequenceMoverFactory:
         seq_mover = pyrosetta.SequenceMover()
         movers = [pyrosetta.RepeatMover(self.methods[mover], mover_freq_map[mover]) for mover in  mover_freq_map.keys()]
         for i, mover in enumerate(mover_freq_map.keys()):
+            print(mover)
             if mover in self.methods.keys():
                 seq_mover.add_mover(movers[i])
             else:

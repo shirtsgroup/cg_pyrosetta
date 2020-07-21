@@ -30,7 +30,7 @@ def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path 
         atom_types_path = os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt')
     
     if mm_atom_types_path is None:
-        mm_atom_types_path = os.path.join(data_path, 'mm_atom_type_sets', 'mm_atom_properties.txt'),
+        mm_atom_types_path = os.path.join(data_path, 'mm_atom_type_sets', 'mm_atom_properties.txt')
 
 
     with open(atom_types_path, 'r') as f:
