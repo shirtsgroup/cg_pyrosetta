@@ -20,8 +20,46 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
 
+@ABC
+class Subject:
+    def __init__(self):
+        self._observers = []
 
-class CGMonteCarlo:
+    def registerObserver(self, observer):
+        self._observers.append(observer)
+
+    def removeObserver(self, observer):
+        self._observers.remove(observer)
+
+    def notifyObservers(self):
+        for observer in self._observers:
+            observer.update()
+
+@ABC
+class Observer:
+    @abstractmethod
+    def update(self):
+        pass
+
+class MinEnergyConfigObserver(Observer):
+    def __init__(self, subject):
+        self.structures = []
+        self.energies = []
+        self.subject = subject
+
+    def update(self):
+        self.energies.append(self.subject.get_energy())
+        self.structures.append(self.subject.pose.clone())
+
+    
+
+
+    
+
+    
+
+
+class CGMonteCarlo(Subject):
     """
     Docstring here
     """
@@ -37,6 +75,8 @@ class CGMonteCarlo:
                  traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
+        # super().__init__()
+
         # initialize input values
         self.pose = pose
         self._score = score
@@ -46,6 +86,9 @@ class CGMonteCarlo:
         self._output = output
         self._traj = traj
         self._out_freq = out_freq
+
+        if self._output is False:
+            self._out_freq = n_steps
 
         # Build MC Object
         self.mc = pyrosetta.MonteCarlo(self.pose, self._score, self._kT)
@@ -85,16 +128,14 @@ class CGMonteCarlo:
 
     # def __call__():
     def run(self):
-        if self._output:
-            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
-            for i in range(int(self.n_steps/self._out_freq)):
-                rep_mover.apply(self.pose)
+        rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
+        for _ in range(int(self.n_steps/self._out_freq)):
+            rep_mover.apply(self.pose)
+            if self._output is True:
                 print("Step :", self.mc.total_trials())
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
-        else:
-            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
-            rep_mover.apply(self.pose)
+            self.notifyObservers()
 
     def get_pose(self):
         return(self.pose)
@@ -186,8 +227,6 @@ class CGMonteCarloAnnealerParameters:
         self.traj_freq = traj_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
-
-
 
 class SequenceMoverFactory:
 
