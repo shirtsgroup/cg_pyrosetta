@@ -91,6 +91,8 @@ def main():
     min_pose = cg_annealer._cg_mc_sim.get_minimum_energy_pose()
     cg_annealer._cg_mc_sim.pymol.apply(min_pose)
 
+    
+    # Extract all structures
     print("There are a total of", len(min_energy_confs.structures), "structures")
     print("Energies:")
 
@@ -101,6 +103,13 @@ def main():
     for i in range(len(min_energy_confs.energies)):
         print("Structure:", i, "Energy:", min_energy_confs.energies[i])
         min_energy_confs.structures[i].dump_pdb("structures/structure_" + str(i) + ".pdb")
+
+    # Extract bottom 20 structures
+    sorted_structures = [pose for _, pose in sorted(zip(min_energy_confs.energies, min_energy_confs.structures))]
+    if not os.path.exists("50_min_structures"):
+        os.mkdir("50_min_structures")
+    for i, p in enumerate(sorted_structures[:50]):
+        p.dump_pdb("50_min_structures/structure_" + str(i) + ".pdb")
 
 
 
