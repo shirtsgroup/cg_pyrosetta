@@ -20,8 +20,7 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
 
-@ABC
-class Subject:
+class Subject(ABC):
     def __init__(self):
         self._observers = []
 
@@ -35,8 +34,7 @@ class Subject:
         for observer in self._observers:
             observer.update()
 
-@ABC
-class Observer:
+class Observer(ABC):
     @abstractmethod
     def update(self):
         pass
@@ -50,14 +48,6 @@ class MinEnergyConfigObserver(Observer):
     def update(self):
         self.energies.append(self.subject.get_energy())
         self.structures.append(self.subject.pose.clone())
-
-    
-
-
-    
-
-    
-
 
 class CGMonteCarlo(Subject):
     """
@@ -75,7 +65,7 @@ class CGMonteCarlo(Subject):
                  traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
-        # super().__init__()
+        super().__init__()
 
         # initialize input values
         self.pose = pose
@@ -178,6 +168,9 @@ class CGMonteCarloAnnealer:
             while not criteron(self._cg_mc_sim):
                 self._cg_mc_sim.run()
             self.kt_anneals = self.kt_anneals[1:]
+
+    def get_mc_sim(self):
+        return self._cg_mc_sim
             
     def _get_score_function(self):
         return self.score_function
@@ -187,6 +180,14 @@ class CGMonteCarloAnnealer:
 
     def _add_to_schedule(self, kT):
         self.kt_anneals.append(kT)
+
+    def registerObserver(self, observer):
+        self._cg_mc_sim.registerObserver(observer)
+
+    def removeObserver(self, observer):
+        self._cg_mc_sim.removeObserver(observer)
+
+
 
         
 
