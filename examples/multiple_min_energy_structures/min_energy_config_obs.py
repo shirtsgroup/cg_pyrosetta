@@ -13,15 +13,15 @@ def main():
     # cgpy.pyrosetta.init()
     # CG MC Annealer Parameters
     params = cgpy.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner=50,
+        CGMonteCarloAnnealerParameters(n_inner=1000,
                                     t_init=5,
                                     anneal_rate=0.9,
-                                    n_anneals=10,
+                                    n_anneals=30,
                                     annealer_criteron=cgpy.CG_monte_carlo.Repeat10Convergence,
                                     traj_out = "testing.pdb",
                                     mc_output = True,
                                     mc_traj = False,
-                                    traj_freq = 10,
+                                    out_freq = 100,
                                     )
     # Energy Function
     energy_function = cgpy.CG_monte_carlo.\
@@ -38,7 +38,7 @@ def main():
 
     # Pose to be folded
     pose = cgpy.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":2, "BB2 BB3":2, "BB3 BB1":2})
+    change_lengths = cgpy.CG_movers.setBondLengths(pose, {"BB1 BB2":1, "BB2 BB3":1, "BB3 BB1":1})
     change_lengths.apply(pose)
     print(energy_function(pose))
     # exit()
@@ -70,7 +70,7 @@ def main():
                                             {
                                                 "small_dihe": 1,
                                                 "small_angle": 1,
-                                                "mini": 5
+                                                "mini": 20
                                             }
                                             )
 
