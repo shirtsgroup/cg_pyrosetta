@@ -37,19 +37,20 @@ def run_mc_simulation(job):
     cg_pyrosetta.pyrosetta.init(
                       "--add_atom_types fa_standard parameters/atom_properties.txt " +
                       "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
-                      "--extra_mm_params_dir parameters/mm_atom_type_sets"
+                      "--extra_mm_params_dir parameters/mm_atom_type_sets " +
+                      "--mute all"
                       )
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 1000,
+        CGMonteCarloAnnealerParameters(n_inner = 100,
                                        t_init = 5,
                                        anneal_rate = 0.9,
-                                       n_anneals = 30,
+                                       n_anneals = 3,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
                                        traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
                                        mc_traj = True,
-                                       traj_freq = 250, 
+                                       out_freq = 50, 
     )
 
     # Build Energy Function
@@ -91,7 +92,7 @@ def run_mc_simulation(job):
         {
             "small_dihe" : 1,
             "small_angle" : 1,
-            "mini" : 50,
+            "mini" : 10,
         }
     )
 
@@ -102,9 +103,15 @@ def run_mc_simulation(job):
         param_file_object = annealer_params
     )
 
+    # Setup Configuration/Energy observer for saving minimum energy structures
+    min_energy_confs = cg_pyrosetta.CG_monte_carlo.MinEnergyConfigObserver(cg_annealer.get_mc_sim())
+    cg_annealer.registerObserver(min_energy_confs)
+
     # Run Annealer
     cg_annealer.run_schedule()
     min_pose = cg_annealer._cg_mc_sim.get_minimum_energy_pose()
+    print("Writing structure to:")
+    print(job.fn("minimum.pdb"))
     min_pose.dump_pdb(job.fn("minimum.pdb"))
     
 @FlowProject.operation

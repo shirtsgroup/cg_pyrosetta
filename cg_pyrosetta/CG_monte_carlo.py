@@ -20,8 +20,36 @@ sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
 
 import pyrosetta
 
+class Subject(ABC):
+    def __init__(self):
+        self._observers = []
 
-class CGMonteCarlo:
+    def registerObserver(self, observer):
+        self._observers.append(observer)
+
+    def removeObserver(self, observer):
+        self._observers.remove(observer)
+
+    def notifyObservers(self):
+        for observer in self._observers:
+            observer.update()
+
+class Observer(ABC):
+    @abstractmethod
+    def update(self):
+        pass
+
+class MinEnergyConfigObserver(Observer):
+    def __init__(self, subject):
+        self.structures = []
+        self.energies = []
+        self.subject = subject
+
+    def update(self):
+        self.energies.append(self.subject.get_energy())
+        self.structures.append(self.subject.pose.clone())
+
+class CGMonteCarlo(Subject):
     """
     Docstring here
     """
@@ -37,6 +65,8 @@ class CGMonteCarlo:
                  traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
+        super().__init__()
+
         # initialize input values
         self.pose = pose
         self._score = score
@@ -46,6 +76,9 @@ class CGMonteCarlo:
         self._output = output
         self._traj = traj
         self._out_freq = out_freq
+
+        if self._output is False:
+            self._out_freq = n_steps
 
         # Build MC Object
         self.mc = pyrosetta.MonteCarlo(self.pose, self._score, self._kT)
@@ -85,16 +118,14 @@ class CGMonteCarlo:
 
     # def __call__():
     def run(self):
-        if self._output:
-            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
-            for i in range(int(self.n_steps/self._out_freq)):
-                rep_mover.apply(self.pose)
+        rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
+        for _ in range(int(self.n_steps/self._out_freq)):
+            rep_mover.apply(self.pose)
+            if self._output is True:
                 print("Step :", self.mc.total_trials())
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
-        else:
-            rep_mover = pyrosetta.RepeatMover(self.mc_trial, self.n_steps)
-            rep_mover.apply(self.pose)
+            self.notifyObservers()
 
     def get_pose(self):
         return(self.pose)
@@ -125,7 +156,7 @@ class CGMonteCarloAnnealer:
                                        param_file_object.t_init,
                                        traj_out = param_file_object.traj_out,
                                        output=param_file_object.mc_output, 
-                                       out_freq = param_file_object.traj_freq,
+                                       out_freq = param_file_object.out_freq,
                                        )
         self.kt_anneals = copy.deepcopy(param_file_object.t_anneals)
 
@@ -137,6 +168,9 @@ class CGMonteCarloAnnealer:
             while not criteron(self._cg_mc_sim):
                 self._cg_mc_sim.run()
             self.kt_anneals = self.kt_anneals[1:]
+
+    def get_mc_sim(self):
+        return self._cg_mc_sim
             
     def _get_score_function(self):
         return self.score_function
@@ -146,6 +180,14 @@ class CGMonteCarloAnnealer:
 
     def _add_to_schedule(self, kT):
         self.kt_anneals.append(kT)
+
+    def registerObserver(self, observer):
+        self._cg_mc_sim.registerObserver(observer)
+
+    def removeObserver(self, observer):
+        self._cg_mc_sim.removeObserver(observer)
+
+
 
         
 
@@ -174,7 +216,7 @@ class CGMonteCarloAnnealerParameters:
     """
     Data object for storing how a MC simualtion will be run
     """
-    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, traj_freq):
+    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, out_freq):
         self.n_inner = n_inner
         self.t_init = t_init
         self.anneal_rate = anneal_rate
@@ -183,11 +225,9 @@ class CGMonteCarloAnnealerParameters:
         self.traj_out = traj_out
         self.mc_output = mc_output
         self.mc_traj = mc_traj
-        self.traj_freq = traj_freq
+        self.out_freq = out_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
-
-
 
 class SequenceMoverFactory:
 
