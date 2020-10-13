@@ -38,6 +38,7 @@ def run_mc_simulation(job):
                       "--add_atom_types fa_standard parameters/atom_properties.txt " +
                       "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
                       "--extra_mm_params_dir parameters/mm_atom_type_sets " +
+                      "--extra_res_fa "
                       "--mute all"
                       )
     # Build Annealer Parameters

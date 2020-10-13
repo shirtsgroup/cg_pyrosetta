@@ -16,9 +16,6 @@ configs_file = open(os.path.join(current_path, '../.configs.yml'), 'r')
 configs = yaml.safe_load(configs_file)
 clean_pyrosetta_path = configs['clean_pyrosetta_path']
 
-builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
-builder.buildCGPyRosetta()
-
 import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
 import cg_pyrosetta.change_parameters
