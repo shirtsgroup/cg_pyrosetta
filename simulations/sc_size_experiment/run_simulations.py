@@ -17,12 +17,12 @@ def set_parameters(job):
     os.chdir(job.ws)
     # set parameters
     print("Changing parameters in", os.path.abspath(""))
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.change_parameters.changeAtomParameters(
         {
-         'CG1 CG1 CG1' : [15, job.sp.bbb_angle],
-         'CG2 CG1 CG1' : [15, (360 - job.sp.bbb_angle)/2]
+         'CG2' : ['X', job.sp.sc_size, 0.2],
         },
-        angle_file= "parameters/mm_atom_type_sets/mm_bond_angle_params.txt"
+        atom_types_path = "parameters/atom_properties.txt",
+        mm_atom_types_path = "parameters/mm_atom_type_sets/mm_atom_properties.txt"
     )
 
     with open(job.fn("job_status.txt"), "w") as f:
@@ -38,20 +38,20 @@ def run_mc_simulation(job):
                       "--add_atom_types fa_standard parameters/atom_properties.txt " +
                       "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
                       "--extra_mm_params_dir parameters/mm_atom_type_sets " +
-                      "--extra_res_fa CG11x3.params "
+                      "--extra_res_fa "
                       "--mute all"
                       )
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 100,
+        CGMonteCarloAnnealerParameters(n_inner = 1000,
                                        t_init = 5,
                                        anneal_rate = 0.9,
-                                       n_anneals = 3,
+                                       n_anneals = 30,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
                                        traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
                                        mc_traj = True,
-                                       out_freq = 50, 
+                                       out_freq = 250, 
     )
 
     # Build Energy Function
@@ -68,7 +68,7 @@ def run_mc_simulation(job):
 
     # Pose to be folded
     pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bb_length, "BB2 BB3":job.sp.bb_length, "BB3 BB1":job.sp.bb_length})
+    change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 SC1":job.sp.sc_size, "BB2 SC2":job.sp.sc_size, "BB3 SC3":job.sp.sc_size})
     change_lengths.apply(pose)
 
     # Build Minimizer

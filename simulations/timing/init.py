@@ -12,4 +12,5 @@ for bb_l in bb_lengths:
     for bbb_angle in bbb_angles:
         job = project.open_job({'bb_length' : bb_l, 'bbb_angle' : bbb_angle})
         sh.copytree("parameters", os.path.join(job.workspace(), "parameters"))
+        sh.copy("CG11x3.params", os.path.join(job.workspace(), "CG11x3.params"))
         job.init()
