@@ -52,7 +52,7 @@ class PyRosettaBuilder():
         self.turnOffExtras()
         # self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
         # self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
-        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'), header=True)
+        self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'))
         # self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
         # self.addMMAngleTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
 
@@ -315,7 +315,7 @@ class PyRosettaBuilder():
                 if residue.endswith('.params'):
                     rtf.write(os.path.join(rel_path, residue)+'\n')
 
-    def addPatches(self, path, header=False):
+    def addPatches(self, path):
         """
         Method for adding new patches to a PyRosetta4 build
 
@@ -325,8 +325,7 @@ class PyRosettaBuilder():
             object running addPatches
         path : str
             string indicating dir where patch.txt files are
-        header : Bool
-            whether to include a header denoting custom patches
+
 
         """
         rel_path = os.path.relpath(path, os.path.join(self.pyrosetta_path, 'pyrosetta',
@@ -334,19 +333,23 @@ class PyRosettaBuilder():
 
         with open(os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets', 'fa_standard', 'patches.txt'), 'r') as atom_file:
             original_file = atom_file.readlines()
-            original_file = original_file[:199]  # should get this number when building PyRosetta.modified
-        # This cuts off the Dihedral portion of the parameter file, but this is fine since we read in dihedrals separately.
+        # This cuts off the Dihedral portion of the parameter file, but this is fine since we read in dihedrals separately
 
+        if '### custom patches residues\n' in original_file:
+            header_line = original_file.index('### custom patches residues\n')
+            original_file = original_file[:header_line]
+            
         with open(os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets', 'fa_standard', 'patches.txt'), 'w') as atom_file:
             atom_file.writelines(original_file)
 
-        with open(os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets', 'fa_standard', 'patches.txt'), 'a') as rtf:
 
-            if header:
-                rtf.write('### custom patches residues\n')
+        with open(os.path.join(self.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets', 'fa_standard', 'patches.txt'), 'a') as rtf:
+            rtf.write('### custom patches residues\n')
             # writting custom lines first
             for patch in os.listdir(path):
                 rtf.write(os.path.join(rel_path, patch)+'\n')
+
+
 
 
 def add_import_path(path):
@@ -355,6 +358,9 @@ def add_import_path(path):
     """
     import sys
     sys.path.insert(0, path)
+
+def get_residue_commandline_option():
+    pass    
 
 
 def main():

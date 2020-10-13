@@ -10,6 +10,7 @@ import os
 import yaml
 
 current_path = os.path.dirname(os.path.abspath(__file__))
+print(current_path)
 pyrosetta_path = os.path.join(current_path, '../PyRosetta4.modified')
 data_path    = os.path.join(current_path, 'data')
 configs_file = open(os.path.join(current_path, '../.configs.yml'), 'r')
@@ -20,10 +21,19 @@ import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
 import cg_pyrosetta.change_parameters
 import cg_pyrosetta.CG_monte_carlo
+from cg_pyrosetta.utils import init
 import pyrosetta
 
 # pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
 #                    "--extra_mm_params_dir mm_atom_type_sets")
+
+cmd_line_options_defaults = {"--add_atom_types" : "fa_standard parameters/atom_properties.txt",
+                      "--add_mm_atom_type_set_parameters" : "fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt ",
+                      "--extra_mm_params_dir" : "parameters/mm_atom_type_sets",
+                      "--mute" : "all",
+                      "--extra_res_fa" : [os.path.abspath(a) for a in os.listdir(os.path.join(current_path, "data", "residue_type_sets"))],
+                      }
+
 # Handle versioneer
 from ._version import get_versions
 versions = get_versions()
