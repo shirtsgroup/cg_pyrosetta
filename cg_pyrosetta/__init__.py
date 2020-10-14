@@ -25,14 +25,22 @@ from cg_pyrosetta.utils import init
 import pyrosetta
 
 # pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
-#                    "--extra_mm_params_dir mm_atom_type_sets")
+# "--extra_mm_params_dir mm_atom_type_sets")
+
+extra_residue_files = [os.path.abspath(os.path.join(current_path, "data", "residue_type_sets", a)) \
+    for a in os.listdir(os.path.join(current_path, "data", "residue_type_sets"))]
+
+for filename in extra_residue_files:
+    if ".params" not in filename:
+        extra_residue_files.remove(filename)
+
 
 cmd_line_options_defaults = {"--add_atom_types" : "fa_standard parameters/atom_properties.txt",
-                      "--add_mm_atom_type_set_parameters" : "fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt ",
-                      "--extra_mm_params_dir" : "parameters/mm_atom_type_sets",
-                      "--mute" : "all",
-                      "--extra_res_fa" : [os.path.abspath(a) for a in os.listdir(os.path.join(current_path, "data", "residue_type_sets"))],
-                      }
+"--add_mm_atom_type_set_parameters" : "fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt ",
+"--extra_mm_params_dir" : "parameters/mm_atom_type_sets",
+"--mute" : "all",
+"--extra_res_fa" : extra_residue_files,
+}
 
 # Handle versioneer
 from ._version import get_versions
