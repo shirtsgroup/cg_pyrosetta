@@ -6,7 +6,6 @@ import sys
 import os
 from setuptools import setup, find_packages
 import versioneer
-import cg_pyrosetta.build_cg_pyrosetta
 import yaml
 short_description = __doc__.split("\n")
 
@@ -20,7 +19,9 @@ fresh_pyrosetta_path = configs['clean_pyrosetta_path']
 pyrosetta_path = os.path.abspath('PyRosetta4.modified')
 input_path = os.path.abspath('cg_pyrosetta/data')
 
-builder = cg_pyrosetta.build_cg_pyrosetta.PyRosettaBuilder(fresh_pyrosetta_path ,pyrosetta_path, input_path)
+from cg_pyrosetta.build_cg_pyrosetta import PyRosettaBuilder
+
+builder = PyRosettaBuilder(fresh_pyrosetta_path ,pyrosetta_path, input_path)
 builder.buildCGPyRosetta()
 
 
