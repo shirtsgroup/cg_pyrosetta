@@ -1,27 +1,27 @@
 import cg_pyrosetta as cgpy
 import os
+import pickle
 
 def main():
 
     cgpy.change_parameters.changeAtomParameters({"CG1" : ['X', 1.5, 0.2]},
-                                    atom_types_path="atom_properties.txt",
-                                    mm_atom_types_path = "mm_atom_type_sets/mm_atom_properties.txt")
+                                    atom_types_path="parameters/atom_properties.txt",
+                                    mm_atom_types_path = "parameters/mm_atom_type_sets/mm_atom_properties.txt")
 
     # Initialize CG_PyRosetta with extra mm_types
-    cgpy.pyrosetta.init("--add_atom_types fa_standard atom_properties.txt --add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
-                        "--extra_mm_params_dir mm_atom_type_sets --mute all")
+    cgpy.init()
     # cgpy.pyrosetta.init()
     # CG MC Annealer Parameters
     params = cgpy.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner=1000,
+        CGMonteCarloAnnealerParameters(n_inner=100,
                                     t_init=5,
                                     anneal_rate=0.9,
-                                    n_anneals=30,
+                                    n_anneals=3,
                                     annealer_criteron=cgpy.CG_monte_carlo.Repeat10Convergence,
                                     traj_out = "testing.pdb",
                                     mc_output = True,
                                     mc_traj = False,
-                                    out_freq = 100,
+                                    out_freq = 10,
                                     )
     # Energy Function
     energy_function = cgpy.CG_monte_carlo.\
@@ -111,6 +111,9 @@ def main():
     for i, p in enumerate(sorted_structures[:50]):
         p.dump_pdb("50_min_structures/structure_" + str(i) + ".pdb")
 
+    # Save output config object
+    with open("min_energy_configs.pkl", "wb") as f:
+        pickle.dump(min_energy_confs, f, pickle.HIGHEST_PROTOCOL)
 
 
 
