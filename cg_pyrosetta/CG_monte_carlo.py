@@ -39,6 +39,52 @@ class Observer(ABC):
     def update(self):
         pass
 
+
+
+class EnergyObserver(Observer):
+    def __init__(self, subject, write_file = True, file_name = "energies.txt"):
+        self.energies = []
+        self.subject = subject
+        self.write_file = write_file
+        self.file_name = file_name
+
+    def update(self):
+        energy = self.subject.get_energy()
+        self.energies.append(energy)
+        if self.write_file is True:
+            if os.path.isfile(self.file_name):
+                with open(self.file_name, 'a') as f:
+                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(energy) + "\n")
+            else:
+                with open(self.file_name, 'w') as f:
+                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(energy) + "\n")
+
+
+
+class StructureObserver(Observer):
+    def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_base = "pose"):
+        self.structures = []
+        self.subject = subject
+        self.write_file = write_file
+        self.file_name = file_name
+        self.pdb_base = pdb_base
+
+    def update(self):
+        structure = self.subject.pose.clone()
+        self.structures.append(structure)
+        structure.dump_pdb(self.pdb_base+"_"+str(len(self.structures)) + ".pdb")
+        if self.write_file is True:
+            if os.path.isfile(self.file_name):
+                with open(self.file_name, 'a') as f:
+                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+            else:
+                with open(self.file_name, 'w') as f:
+                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+
 class MinEnergyConfigObserver(Observer):
     def __init__(self, subject):
         self.structures = []
@@ -48,6 +94,7 @@ class MinEnergyConfigObserver(Observer):
     def update(self):
         self.energies.append(self.subject.get_energy())
         self.structures.append(self.subject.pose.clone())
+
 
 class CGMonteCarlo(Subject):
     """
@@ -189,9 +236,11 @@ class CGMonteCarloAnnealer:
 
 
 
-        
+class Convergence(ABC):
+    def __call__(self, mc_sim):
+        pass
 
-class Repeat10Convergence():
+class Repeat10Convergence(Convergence):
     """
     convergence object 
     """
@@ -204,6 +253,21 @@ class Repeat10Convergence():
             return False
         else:
             return True
+
+class Repeat1Convergence(Convergence):
+    """
+    convergence object 
+    """
+    def __init__(self):
+        self.counter = 0
+
+    def __call__(self, mc_sim):
+        if self.counter < 1:
+            self.counter += 1
+            return False
+        else:
+            return True
+
 
 
 
