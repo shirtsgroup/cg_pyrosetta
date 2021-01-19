@@ -30,24 +30,19 @@ def set_parameters(job):
 
 
 @FlowProject.operation
+@flow.directives(fork=True)
 @FlowProject.pre(parameters_are_set)
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
     os.chdir(job.ws)
-    cg_pyrosetta.pyrosetta.init(
-                      "--add_atom_types fa_standard parameters/atom_properties.txt " +
-                      "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
-                      "--extra_mm_params_dir parameters/mm_atom_type_sets " +
-                      "--extra_res_fa "
-                      "--mute all"
-                      )
+    cg_pyrosetta.init()
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
         CGMonteCarloAnnealerParameters(n_inner = 1000,
-                                       t_init = 5,
+                                       t_init = 10,
                                        anneal_rate = 0.9,
-                                       n_anneals = 30,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
+                                       n_anneals = 50,
+                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat1Convergence,
                                        traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
                                        mc_traj = True,
@@ -105,8 +100,10 @@ def run_mc_simulation(job):
     )
 
     # Setup Configuration/Energy observer for saving minimum energy structures
-    min_energy_confs = cg_pyrosetta.CG_monte_carlo.MinEnergyConfigObserver(cg_annealer.get_mc_sim())
-    cg_annealer.registerObserver(min_energy_confs)
+    struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
+    energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
+    cg_annealer.registerObserver(struct_obs)
+    cg_annealer.registerObserver(energy_obs)
 
     # Run Annealer
     cg_annealer.run_schedule()
