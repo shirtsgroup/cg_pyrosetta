@@ -8,17 +8,17 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model",
-                        required=True,
+                        required=False,
                         help="Type of model that you would like to generate \
                              random distribution of structures and energy for",
                         type=str,
-                        default="CG11",
+                        default="CG11x3",
                         )
     parser.add_argument("--mer",
                         required=False,
                         help = "Number of monomers for this model",
                         type = int,
-                        default = 15,
+                        default = 5,
                         )
     parser.add_argument("--kt",
                         required=True,
@@ -67,16 +67,19 @@ def main():
     params = yaml.load(param_file)
     print(params)
 
-    for param_type in params:
-        if param_type == "atoms":
-            cg_pyrosetta.change_parameters.changeAtomParameters(params["atoms"])
-        if param_type == "dihedrals":
-            cg_pyrosetta.change_parameters.changeTorsionParameters(params["dihedrals"])
-        if param_type == "angles":
-            cg_pyrosetta.change_parameters.changeAngleParameters(params["angles"])
-        else:
-            print("Input YAML file had a key for", param_type+".", "This key is not a valid parameter type for this model.", file=sys.stderr)
-            print("Ignoring", param_type, "and continuing!", file=sys.stderr)
+    # for param_type in params:
+    #     if param_type == "atoms":
+    #         cg_pyrosetta.change_parameters.changeAtomParameters(params["atoms"])
+    #     if param_type == "dihedrals":
+    #         cg_pyrosetta.change_parameters.changeTorsionParameters(params["dihedrals"])
+    #     if param_type == "angles":
+    #         cg_pyrosetta.change_parameters.changeAngleParameters(params["angles"])
+    #     else:
+    #         print("Input YAML file had a key for", param_type+".", "This key is not a valid parameter type for this model.", file=sys.stderr)
+    #         print("Ignoring", param_type, "and continuing!", file=sys.stderr)
+    
+    cg_pyrosetta.init()
+    
     # Build sequence for folder object
     monomer = "X["+args.model+"]"
     sequence = monomer*args.mer
@@ -91,7 +94,6 @@ def main():
     # Build MC algorithm to get unfolded ensemble
     folder.build_fold_alg('no_min')
     folder.add_folding_move('no_min', pyrosetta.RepeatMover(folder.small, 10))
-    folder.add_folding_move('no_min', pyrosetta.RepeatMover(folder.shear, 10))
     folder.add_folding_move('no_min', folder.PDB_writer)
 
     # Set kT
