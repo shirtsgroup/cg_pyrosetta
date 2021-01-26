@@ -64,26 +64,31 @@ class EnergyObserver(Observer):
 
 
 class StructureObserver(Observer):
-    def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_base = "pose"):
+    def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_file = "trajectory.pdb"):
         self.structures = []
         self.subject = subject
         self.write_file = write_file
         self.file_name = file_name
-        self.pdb_base = pdb_base
+        if self.write_file:
+            self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
+            self.traj_writer.file_name(pdb_file)
+            self.traj_writer.stride(1)
+
 
     def update(self):
         structure = self.subject.pose.clone()
         self.structures.append(structure)
-        structure.dump_pdb(self.pdb_base+"_"+str(len(self.structures)) + ".pdb")
         if self.write_file is True:
+            self.traj_writer.apply(structure)
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
                     f.write(str(self.subject.mc.total_trials()) + ",")
-                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+                    f.write(str(len(self.structures)) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
+                    f.write("TimeStep,Frame\n")
                     f.write(str(self.subject.mc.total_trials()) + ",")
-                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+                    f.write(str(len(self.structures)) + "\n")
 
 class MinEnergyConfigObserver(Observer):
     def __init__(self, subject):
