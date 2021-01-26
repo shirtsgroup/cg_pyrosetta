@@ -87,7 +87,7 @@ def run_mc_simulation(job):
         {
             "small_dihe" : 1,
             "small_angle" : 1,
-            "mini" : 10,
+            "mini" : 1,
         }
     )
 

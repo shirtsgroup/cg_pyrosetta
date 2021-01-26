@@ -5,8 +5,8 @@ import shutil as sh
 
 project = signac.get_project()
 
-bb_lengths = np.linspace(0.5, 5, 10)
-bbb_angles = np.linspace(45, 135, 10)
+bb_lengths = np.linspace(0.5, 5, 1)
+bbb_angles = np.linspace(45, 135, 1)
 
 for bb_l in bb_lengths:
     for bbb_angle in bbb_angles:
