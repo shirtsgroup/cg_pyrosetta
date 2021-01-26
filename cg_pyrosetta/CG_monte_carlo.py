@@ -196,7 +196,6 @@ class CGMonteCarloAnnealer:
         self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
                                        self.seq_mover, self.param_file_object.n_inner,
                                        param_file_object.t_init,
-                                       traj_out = param_file_object.traj_out,
                                        output=param_file_object.mc_output, 
                                        out_freq = param_file_object.out_freq,
                                        )
@@ -275,7 +274,7 @@ class CGMonteCarloAnnealerParameters:
     """
     Data object for storing how a MC simualtion will be run
     """
-    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, out_freq):
+    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, out_freq):
         self.n_inner = n_inner
         self.t_init = t_init
         self.anneal_rate = anneal_rate
@@ -283,7 +282,6 @@ class CGMonteCarloAnnealerParameters:
         self.annealer_criteron = annealer_criteron # Need a new object for this, unclear
         self.traj_out = traj_out
         self.mc_output = mc_output
-        self.mc_traj = mc_traj
         self.out_freq = out_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
