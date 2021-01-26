@@ -113,8 +113,6 @@ class CGMonteCarlo(Subject):
                  n_steps: int = 1000000,
                  kT: float = 1,
                  output: bool = True,
-                 traj: bool = True,
-                 traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
         super().__init__()
@@ -126,7 +124,6 @@ class CGMonteCarlo(Subject):
         self._kT = kT
         self.n_steps = n_steps
         self._output = output
-        self._traj = traj
         self._out_freq = out_freq
 
         if self._output is False:
@@ -139,11 +136,6 @@ class CGMonteCarlo(Subject):
         if self._output:
             self.pymol = pyrosetta.PyMOLMover()
             print("Initial Energy :", self.get_energy())
-        if self._traj:
-            self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
-            self.traj_writer.file_name(traj_out)
-            self.traj_writer.stride(self._out_freq)
-            self.seq_mover.add_mover(self.traj_writer)
 
     @property
     def out_freq(self):
@@ -152,8 +144,6 @@ class CGMonteCarlo(Subject):
     @out_freq.setter
     def out_freq(self, new_out_freq):
         self._out_freq = new_out_freq
-        if self._traj:
-            self.seq_mover.stride(self._out_freq)
     
     @property
     def kT(self):
