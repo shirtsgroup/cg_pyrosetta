@@ -47,6 +47,8 @@ class EnergyObserver(Observer):
         self.subject = subject
         self.write_file = write_file
         self.file_name = file_name
+        if os.path.isfile(file_name):
+            os.remove(file_name)
 
     def update(self):
         energy = self.subject.get_energy()
@@ -70,6 +72,10 @@ class StructureObserver(Observer):
         self.write_file = write_file
         self.file_name = file_name
         if self.write_file:
+            if os.path.isfile(pdb_file):
+                os.remove(pdb_file)
+            if os.path.isfile(file_name):
+                os.remove(file_name)
             self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
             self.traj_writer.file_name(pdb_file)
             self.traj_writer.stride(1)
@@ -90,6 +96,7 @@ class StructureObserver(Observer):
                     f.write(str(self.subject.mc.total_trials()) + ",")
                     f.write(str(len(self.structures)) + "\n")
 
+#old
 class MinEnergyConfigObserver(Observer):
     def __init__(self, subject):
         self.structures = []
