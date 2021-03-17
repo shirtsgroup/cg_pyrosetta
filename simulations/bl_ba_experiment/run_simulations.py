@@ -69,7 +69,8 @@ def run_mc_simulation(job):
 
     # Pose to be folded
     pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bond_length, "BB2 BB3":job.sp.bond_length, "BB3 BB1":job.sp.bond_length})
+    change_lengths_1 = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bond_length, "BB2 BB3":job.sp.bond_length, "BB3 BB1":job.sp.bond_length})
+    change_lengths_1.apply(pose)
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 SC1":job.sp.bond_length, "BB2 SC2":job.sp.bond_length, "BB3 SC3":job.sp.bond_length})
     change_lengths.apply(pose)
 
@@ -96,6 +97,7 @@ def run_mc_simulation(job):
             "small_dihe" : 1,
             "small_angle" : 1,
             "mini" : 1,
+            "pymol" : 1,
         }
     )
 
