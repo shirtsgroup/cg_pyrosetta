@@ -43,10 +43,8 @@ def run_mc_simulation(job):
                                        anneal_rate = 0.9,
                                        n_anneals = 50,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
-                                       traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
-                                       mc_traj = True,
-                                       out_freq = 250, 
+                                       out_freq = 500,
     )
 
     # Build Energy Function
