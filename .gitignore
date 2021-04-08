@@ -117,4 +117,3 @@ __pycache__/*
 *.swp
 *.txt
 *.vmd
-cg_pyrosetta/data/*

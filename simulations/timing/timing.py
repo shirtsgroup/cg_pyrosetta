@@ -42,7 +42,7 @@ times = []
 for _ in range(25): # Should make this a variable that can change
     t1 = time.time()
 
-    subprocess.run(["python", "project.py", "run", "-n", "1", "-o", "run_mc_simulation"])
+    subprocess.run(["python", "project.py", "run", "-n", "1", "-o", "run_mc_simulation", "--debug"])
 
     t2 = time.time()
     delta_t = t2 - t1
