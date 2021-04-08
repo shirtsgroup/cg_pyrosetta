@@ -19,7 +19,7 @@ def set_parameters(job):
     print("Changing parameters in", os.path.abspath(""))
     cg_pyrosetta.change_parameters.changeAngleParameters(
         {
-         'CG1 CG1 CG1' : [15, job.sp.bbb_angle],
+         'CG1 CG2 CG3' : [15, job.sp.bbb_angle],
          'CG2 CG1 CG1' : [15, (360 - job.sp.bbb_angle)/2]
         },
         angle_file= "parameters/mm_atom_type_sets/mm_bond_angle_params.txt"
@@ -42,9 +42,7 @@ def run_mc_simulation(job):
                                        anneal_rate = 0.9,
                                        n_anneals = 3,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
-                                       traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
-                                       mc_traj = True,
                                        out_freq = 50, 
     )
 
@@ -61,7 +59,7 @@ def run_mc_simulation(job):
     )
 
     # Pose to be folded
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG21x2:CGLower]X[CG21x2]X[CG21x2]X[CG21x2]X[CG21x2:CGUpper]")
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bb_length, "BB2 BB3":job.sp.bb_length, "BB3 BB1":job.sp.bb_length})
     change_lengths.apply(pose)
 
@@ -87,7 +85,7 @@ def run_mc_simulation(job):
         {
             "small_dihe" : 1,
             "small_angle" : 1,
-            "mini" : 10,
+            "mini" : 1,
         }
     )
 
@@ -99,8 +97,11 @@ def run_mc_simulation(job):
     )
 
     # Setup Configuration/Energy observer for saving minimum energy structures
-    min_energy_confs = cg_pyrosetta.CG_monte_carlo.MinEnergyConfigObserver(cg_annealer.get_mc_sim())
-    cg_annealer.registerObserver(min_energy_confs)
+    struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
+    energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
+    cg_annealer.registerObserver(struct_obs)
+    cg_annealer.registerObserver(energy_obs)
+
 
     # Run Annealer
     cg_annealer.run_schedule()

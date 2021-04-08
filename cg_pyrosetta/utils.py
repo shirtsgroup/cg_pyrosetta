@@ -15,3 +15,4 @@ def init(**kwargs):
 
     print(init_string)
     cg_pyrosetta.pyrosetta.init(init_string)
+
