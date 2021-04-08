@@ -42,9 +42,7 @@ def run_mc_simulation(job):
                                        anneal_rate = 0.9,
                                        n_anneals = 3,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
-                                       traj_out = job.fn("mc-min_traj.pdb"),
                                        mc_output = True,
-                                       mc_traj = True,
                                        out_freq = 50, 
     )
 
@@ -87,7 +85,7 @@ def run_mc_simulation(job):
         {
             "small_dihe" : 1,
             "small_angle" : 1,
-            "mini" : 10,
+            "mini" : 1,
         }
     )
 
@@ -99,8 +97,11 @@ def run_mc_simulation(job):
     )
 
     # Setup Configuration/Energy observer for saving minimum energy structures
-    min_energy_confs = cg_pyrosetta.CG_monte_carlo.MinEnergyConfigObserver(cg_annealer.get_mc_sim())
-    cg_annealer.registerObserver(min_energy_confs)
+    struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
+    energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
+    cg_annealer.registerObserver(struct_obs)
+    cg_annealer.registerObserver(energy_obs)
+
 
     # Run Annealer
     cg_annealer.run_schedule()

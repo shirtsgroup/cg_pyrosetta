@@ -47,6 +47,8 @@ class EnergyObserver(Observer):
         self.subject = subject
         self.write_file = write_file
         self.file_name = file_name
+        if os.path.isfile(file_name):
+            os.remove(file_name)
 
     def update(self):
         energy = self.subject.get_energy()
@@ -64,27 +66,37 @@ class EnergyObserver(Observer):
 
 
 class StructureObserver(Observer):
-    def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_base = "pose"):
+    def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_file = "trajectory.pdb"):
         self.structures = []
         self.subject = subject
         self.write_file = write_file
         self.file_name = file_name
-        self.pdb_base = pdb_base
+        if self.write_file:
+            if os.path.isfile(pdb_file):
+                os.remove(pdb_file)
+            if os.path.isfile(file_name):
+                os.remove(file_name)
+            self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
+            self.traj_writer.file_name(pdb_file)
+            self.traj_writer.stride(1)
+
 
     def update(self):
         structure = self.subject.pose.clone()
         self.structures.append(structure)
-        structure.dump_pdb(self.pdb_base+"_"+str(len(self.structures)) + ".pdb")
         if self.write_file is True:
+            self.traj_writer.apply(structure)
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
                     f.write(str(self.subject.mc.total_trials()) + ",")
-                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+                    f.write(str(len(self.structures)) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
+                    f.write("TimeStep,Frame\n")
                     f.write(str(self.subject.mc.total_trials()) + ",")
-                    f.write(self.pdb_base+"_"+str(len(self.structures)) + ".pdb" + "\n")
+                    f.write(str(len(self.structures)) + "\n")
 
+#old
 class MinEnergyConfigObserver(Observer):
     def __init__(self, subject):
         self.structures = []
@@ -108,8 +120,6 @@ class CGMonteCarlo(Subject):
                  n_steps: int = 1000000,
                  kT: float = 1,
                  output: bool = True,
-                 traj: bool = True,
-                 traj_out: str = "cgmc_traj.pdb",
                  out_freq: int = 500,):
 
         super().__init__()
@@ -121,7 +131,6 @@ class CGMonteCarlo(Subject):
         self._kT = kT
         self.n_steps = n_steps
         self._output = output
-        self._traj = traj
         self._out_freq = out_freq
 
         if self._output is False:
@@ -134,11 +143,6 @@ class CGMonteCarlo(Subject):
         if self._output:
             self.pymol = pyrosetta.PyMOLMover()
             print("Initial Energy :", self.get_energy())
-        if self._traj:
-            self.traj_writer = pyrosetta.rosetta.protocols.canonical_sampling.PDBTrajectoryRecorder()
-            self.traj_writer.file_name(traj_out)
-            self.traj_writer.stride(self._out_freq)
-            self.seq_mover.add_mover(self.traj_writer)
 
     @property
     def out_freq(self):
@@ -147,8 +151,6 @@ class CGMonteCarlo(Subject):
     @out_freq.setter
     def out_freq(self, new_out_freq):
         self._out_freq = new_out_freq
-        if self._traj:
-            self.seq_mover.stride(self._out_freq)
     
     @property
     def kT(self):
@@ -201,7 +203,6 @@ class CGMonteCarloAnnealer:
         self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
                                        self.seq_mover, self.param_file_object.n_inner,
                                        param_file_object.t_init,
-                                       traj_out = param_file_object.traj_out,
                                        output=param_file_object.mc_output, 
                                        out_freq = param_file_object.out_freq,
                                        )
@@ -280,15 +281,13 @@ class CGMonteCarloAnnealerParameters:
     """
     Data object for storing how a MC simualtion will be run
     """
-    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, traj_out, mc_output, mc_traj, out_freq):
+    def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, mc_output, out_freq):
         self.n_inner = n_inner
         self.t_init = t_init
         self.anneal_rate = anneal_rate
         self.n_anneals = n_anneals
         self.annealer_criteron = annealer_criteron # Need a new object for this, unclear
-        self.traj_out = traj_out
         self.mc_output = mc_output
-        self.mc_traj = mc_traj
         self.out_freq = out_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]

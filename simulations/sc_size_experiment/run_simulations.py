@@ -30,6 +30,7 @@ def set_parameters(job):
 
 
 @FlowProject.operation
+@flow.directives(fork=True)
 @FlowProject.pre(parameters_are_set)
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
@@ -38,14 +39,12 @@ def run_mc_simulation(job):
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
         CGMonteCarloAnnealerParameters(n_inner = 1000,
-                                       t_init = 5,
+                                       t_init = 10,
                                        anneal_rate = 0.9,
-                                       n_anneals = 3,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat1Convergence,
-                                       traj_out = job.fn("mc-min_traj.pdb"),
+                                       n_anneals = 50,
+                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
                                        mc_output = True,
-                                       mc_traj = True,
-                                       out_freq = 250, 
+                                       out_freq = 500,
     )
 
     # Build Energy Function
@@ -87,7 +86,7 @@ def run_mc_simulation(job):
         {
             "small_dihe" : 1,
             "small_angle" : 1,
-            "mini" : 10,
+            "mini" : 1,
         }
     )
 
