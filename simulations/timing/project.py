@@ -59,7 +59,7 @@ def run_mc_simulation(job):
     )
 
     # Pose to be folded
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG13x3:CGLower]X[CG13x3]X[CG13x3]X[CG13x3]X[CG13x3:CGUpper]")
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bb_length, "BB2 BB3":job.sp.bb_length, "BB3 BB1":job.sp.bb_length})
     change_lengths.apply(pose)
 
@@ -97,11 +97,8 @@ def run_mc_simulation(job):
     )
 
     # Setup Configuration/Energy observer for saving minimum energy structures
-    struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
-    energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
-    cg_annealer.registerObserver(struct_obs)
-    cg_annealer.registerObserver(energy_obs)
-
+    min_energy_confs = cg_pyrosetta.CG_monte_carlo.MinEnergyConfigObserver(cg_annealer.get_mc_sim())
+    cg_annealer.registerObserver(min_energy_confs)
 
     # Run Annealer
     cg_annealer.run_schedule()

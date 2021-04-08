@@ -53,6 +53,7 @@ for _ in range(25): # Should make this a variable that can change
 print("Average 3000 step simulation took", np.mean(times), "seconds")
 print("with a standard devation of", np.std(times))
 print("Simulation runs", 3000/np.mean(times), "steps/second")
+out_file.write("Average Simulation : " + str(delta_t) + " seconds\n")
 out_file.write("Rate : " + str(3000/np.mean(times)) + " steps/seconds\n")
 
 out_file.close()
