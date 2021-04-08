@@ -5,7 +5,7 @@ import shutil as sh
 
 project = signac.get_project()
 
-bond_lengths = np.linspace(0.5, 4, 10)
+bond_lengths = np.linspace(1, 4, 10)
 bond_angles = np.linspace(45, 135, 10)
 reps = 100
 
