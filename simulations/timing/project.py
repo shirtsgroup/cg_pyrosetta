@@ -59,7 +59,7 @@ def run_mc_simulation(job):
     )
 
     # Pose to be folded
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG21x2:CGLower]X[CG21x2]X[CG21x2]X[CG21x2]X[CG21x2:CGUpper]")
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG31:CGLower]X[CG31]X[CG31]X[CG31]X[CG31:CGUpper]")
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bb_length, "BB2 BB3":job.sp.bb_length, "BB3 BB1":job.sp.bb_length})
     change_lengths.apply(pose)
 
