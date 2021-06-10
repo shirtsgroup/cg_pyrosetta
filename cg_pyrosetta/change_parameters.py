@@ -104,7 +104,7 @@ def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path 
     # cg_pyrosetta.builder.buildCGPyRosetta()
 
 
-def changeTorsionParameters(param_dict, torsion_file = None):
+def changeTorsionParameters(param_dict, torsion_file = None, mode = "single"):
     """
     function to change torsion parameters on the fly
 
@@ -115,6 +115,10 @@ def changeTorsionParameters(param_dict, torsion_file = None):
         Dictionary containing name of torsion and list of specific parameters for
         that atom type. (Parameters are expected in the following order
         ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME)
+    torsion_file : string
+        Path to file to change. If left blank will default to data files within CG PyRosetta package
+    mode : string
+        whether to insert single or multiple instances of torsion parameters (to create complex torsion patterns)
 
     Examples
     --------
