@@ -1,0 +1,7 @@
+project = CG21x2_benchmarking
+workspace_dir = workspace
+schema_version = 1
+[General]
+[hosts]
+[flow]
+import_packaged_environments = off

@@ -1,0 +1,9 @@
+project = benchmarking2021
+workspace_dir = workspace
+schema_version = 1
+ComputeEnvironment = DefaultSlurmEnvironment
+[General]
+[hosts]
+[flow]
+import_packaged_enviroments = off
+import_packaged_environments = off
