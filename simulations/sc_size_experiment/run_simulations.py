@@ -42,7 +42,7 @@ def run_mc_simulation(job):
                                        t_init = 10,
                                        anneal_rate = 0.9,
                                        n_anneals = 50,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
+                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence(),
                                        mc_output = True,
                                        out_freq = 500,
     )
