@@ -106,7 +106,7 @@ class KTObserver(Observer):
             os.remove(file_name)
 
     def update(self):
-        kt = self.subject.subject._cg_mc_sim.kT
+        kt = self.subject.kT
         self.kts.append(kt)
         if self.write_file is True:
             if os.path.isfile(self.file_name):
@@ -198,7 +198,10 @@ class CGMonteCarlo(Subject):
             self.notifyObservers()
 
     def get_accept_ratio(self, reset = True):
-        acc_ratio = self.mc.accept_counter() / self.mc.trial_counter()
+        print(dir(self.mc))
+        self.mc.show_counters()
+        print(self.mc.mc_accepted_string())
+        acc_ratio = self.mc.mc_accepted_string() / self.mc.total_trials()
         if reset:
             self.mc.reset_counters()
         return acc_ratio
@@ -278,14 +281,14 @@ class CGMonteCarloDynamicAnnealer:
         self.pose = pose
         self.dynamic_params = dynamic_param_file_object
         self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
-                                       self.seq_mover, self.param_file_object.n_inner,
-                                       param_file_object.t_init,
-                                       output=param_file_object.mc_output, 
-                                       out_freq = param_file_object.out_freq,
+                                       self.seq_mover, self.dynamic_params.n_inner,
+                                       dynamic_param_file_object.t_init,
+                                       output=dynamic_param_file_object.mc_output, 
+                                       out_freq = dynamic_param_file_object.out_freq,
                                        )
 
     def run_annealing(self):
-        for i in self.param_file_object.n_cycles:
+        for i in range(self.dynamic_params.n_cycles):
             print("Current kT: ", self._cg_mc_sim.kT)
             self._cg_mc_sim.run()
             self.adjust_kt()

@@ -3,7 +3,8 @@ import cg_pyrosetta
 def init(**kwargs):
     if kwargs is not None:
         for key in kwargs.keys():
-            cg_pyrosetta.cmd_line_options_defaults[key] = kwargs[key]
+            rosetta_key = "--" + key
+            cg_pyrosetta.cmd_line_options_defaults[rosetta_key] = kwargs[key]
     
     init_string = ""
     for key in cg_pyrosetta.cmd_line_options_defaults.keys():
