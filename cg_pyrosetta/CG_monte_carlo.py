@@ -198,10 +198,7 @@ class CGMonteCarlo(Subject):
             self.notifyObservers()
 
     def get_accept_ratio(self, reset = True):
-        print(dir(self.mc))
-        self.mc.show_counters()
-        print(self.mc.mc_accepted_string())
-        acc_ratio = self.mc.mc_accepted_string() / self.mc.total_trials()
+        acc_ratio = self.mc_trial.acceptance_rate()
         if reset:
             self.mc.reset_counters()
         return acc_ratio
@@ -296,8 +293,8 @@ class CGMonteCarloDynamicAnnealer:
 
     def adjust_kt(self):
         acc_ratio = self._cg_mc_sim.get_accept_ratio(reset = True)
-        print("Cycle acceptance ratio: " + acc_ratio)
-        print("Target acceptance ratio: " + self.dynamic_params.target_ratio)
+        print("Cycle acceptance ratio: " + str(acc_ratio))
+        print("Target acceptance ratio: " + str(self.dynamic_params.target_ratio))
         if acc_ratio > self.dynamic_params.target_ratio + self.dynamic_params.ratio_tolerance:
             self._cg_mc_sim.kT *= self.dynamic_params.anneal_rate
         if acc_ratio < self.dynamic_params.target_ratio - self.dynamic_params.ratio_tolerance:

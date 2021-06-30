@@ -30,7 +30,7 @@ def set_parameters(job):
 
 
 @FlowProject.operation
-@flow.directives(fork=False)
+@flow.directives(fork=True)
 @FlowProject.pre(parameters_are_set)
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
@@ -39,14 +39,14 @@ def run_mc_simulation(job):
                       mute = "core.optimization")
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloDynamicAnnealerParameters(n_inner = 1000,
+        CGMonteCarloDynamicAnnealerParameters(n_inner = 10000,
                                        t_init = 10,
                                        anneal_rate = 0.9,
                                        max_anneal_cycles = 50,
                                        target_ratio = 0.05,
                                        ratio_tolerance = 0.025,
                                        mc_output = True,
-                                       out_freq = 50,
+                                       out_freq = 500,
     )
 
     # Build Energy Function
