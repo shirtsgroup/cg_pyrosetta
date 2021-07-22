@@ -56,11 +56,11 @@ class EnergyObserver(Observer):
         if self.write_file is True:
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(energy) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(energy) + "\n")
 
 
@@ -88,12 +88,12 @@ class StructureObserver(Observer):
             self.traj_writer.apply(structure)
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(len(self.structures)) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
                     f.write("TimeStep,Frame\n")
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(len(self.structures)) + "\n")
 
 class KTObserver(Observer):
@@ -111,12 +111,34 @@ class KTObserver(Observer):
         if self.write_file is True:
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(kt) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(kt) + "\n")
+
+class AcceptanceRatioObserver(Observer):
+    def __init__(self, subject, write_file = True, file_name = "acc_ratio.txt"):
+        self.acc_ratios = []
+        self.subject = subject
+        self.write_file = write_file
+        self.file_name = file_name
+        if os.path.isfile(file_name):
+            os.remove(file_name)
+
+    def update(self):
+        acc_ratio = self.subject.get_accept_ratio(reset = False)
+        if self.write_file is True:
+            if os.path.isfile(self.file_name):
+                with open(self.file_name, 'a') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(acc_ratio) + "\n")
+            else:
+                with open(self.file_name, 'w') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(acc_ratio) + "\n")
+
 #old
 class MinEnergyConfigObserver(Observer):
     def __init__(self, subject):
@@ -153,6 +175,7 @@ class CGMonteCarlo(Subject):
         self.n_steps = n_steps
         self._output = output
         self._out_freq = out_freq
+        self._total_trials = 0 # Could implement as a property
 
         if self._output is False:
             self._out_freq = n_steps
@@ -191,8 +214,9 @@ class CGMonteCarlo(Subject):
         rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
         for _ in range(int(self.n_steps/self._out_freq)):
             rep_mover.apply(self.pose)
+            self._total_trials += self._out_freq
             if self._output is True:
-                print("Step :", self.mc.total_trials())
+                print("Step :", self._total_trials)
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
             self.notifyObservers()
@@ -283,8 +307,22 @@ class CGMonteCarloDynamicAnnealer:
                                        output=dynamic_param_file_object.mc_output, 
                                        out_freq = dynamic_param_file_object.out_freq,
                                        )
+    
+    def estimate_starting_kt(self, base = 10):
+        """
+        Function to estimate a good starting kT value
+        """
+        energy = self._cg_mc_sim.get_energy()
+        if base == 1:
+            estimated_kt = energy
+        else:
+            estimate_kt = base ** np.floor(np.log(self._cg_mc_sim.get_energy()) / np.log(base))
+        print("Setting kT to", estimate_kt)
+        self._cg_mc_sim.kT = estimate_kt
 
     def run_annealing(self):
+        """
+        """
         for i in range(self.dynamic_params.n_cycles):
             print("Current kT: ", self._cg_mc_sim.kT)
             self._cg_mc_sim.run()
