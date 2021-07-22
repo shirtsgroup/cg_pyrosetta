@@ -117,3 +117,5 @@ __pycache__/*
 *.swp
 *.txt
 *.vmd
+*workspace*
+slurm-*.out
