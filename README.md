@@ -8,12 +8,11 @@ Coarse Grained PyRosetta
 -->
 ### Description
 
-An implementation of Pyrosetta with CG capabilities. This repository is currently underdevelopment. Current features include:
-
+An implementation of Pyrosetta with CG capabilities. CG PyRosetta can fold arbitrary CG models using a variety of MC minimization methods. In this repository we use the Python wrapper PyRosetta to build a framework to run CG folding simulations. Currently we have:
 - working 1-1, 2-1, 3-1, 1-2 and 1-3 models
-- working generalized backbone for these models (Shear, Small and Min)
+- working generalized movers for bond angles and torsions
 - working MC objects
-- working MC annealing folding objects.
+- working MC annealing folding objects
 - working torsion energies (mm_twist)
 
 ### Installation
