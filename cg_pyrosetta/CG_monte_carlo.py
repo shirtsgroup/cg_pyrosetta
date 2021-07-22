@@ -56,11 +56,11 @@ class EnergyObserver(Observer):
         if self.write_file is True:
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(energy) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(energy) + "\n")
 
 
@@ -88,13 +88,56 @@ class StructureObserver(Observer):
             self.traj_writer.apply(structure)
             if os.path.isfile(self.file_name):
                 with open(self.file_name, 'a') as f:
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(len(self.structures)) + "\n")
             else:
                 with open(self.file_name, 'w') as f:
                     f.write("TimeStep,Frame\n")
-                    f.write(str(self.subject.mc.total_trials()) + ",")
+                    f.write(str(self.subject._total_trials) + ",")
                     f.write(str(len(self.structures)) + "\n")
+
+class KTObserver(Observer):
+    def __init__(self, subject, write_file = True, file_name = "kt_schedule.txt"):
+        self.kts = []
+        self.subject = subject
+        self.write_file = write_file
+        self.file_name = file_name
+        if os.path.isfile(file_name):
+            os.remove(file_name)
+
+    def update(self):
+        kt = self.subject.kT
+        self.kts.append(kt)
+        if self.write_file is True:
+            if os.path.isfile(self.file_name):
+                with open(self.file_name, 'a') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(kt) + "\n")
+            else:
+                with open(self.file_name, 'w') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(kt) + "\n")
+
+class AcceptanceRatioObserver(Observer):
+    def __init__(self, subject, write_file = True, file_name = "acc_ratio.txt"):
+        self.acc_ratios = []
+        self.subject = subject
+        self.write_file = write_file
+        self.file_name = file_name
+        if os.path.isfile(file_name):
+            os.remove(file_name)
+
+    def update(self):
+        acc_ratio = self.subject.get_accept_ratio(reset = False)
+        if self.write_file is True:
+            if os.path.isfile(self.file_name):
+                with open(self.file_name, 'a') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(acc_ratio) + "\n")
+            else:
+                with open(self.file_name, 'w') as f:
+                    f.write(str(self.subject._total_trials) + ",")
+                    f.write(str(acc_ratio) + "\n")
 
 #old
 class MinEnergyConfigObserver(Observer):
@@ -132,6 +175,7 @@ class CGMonteCarlo(Subject):
         self.n_steps = n_steps
         self._output = output
         self._out_freq = out_freq
+        self._total_trials = 0 # Could implement as a property
 
         if self._output is False:
             self._out_freq = n_steps
@@ -170,11 +214,18 @@ class CGMonteCarlo(Subject):
         rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
         for _ in range(int(self.n_steps/self._out_freq)):
             rep_mover.apply(self.pose)
+            self._total_trials += self._out_freq
             if self._output is True:
-                print("Step :", self.mc.total_trials())
+                print("Step :", self._total_trials)
                 print("Energy : ", self.get_energy())
                 self.pymol.apply(self.pose)
             self.notifyObservers()
+
+    def get_accept_ratio(self, reset = True):
+        acc_ratio = self.mc_trial.acceptance_rate()
+        if reset:
+            self.mc.reset_counters()
+        return acc_ratio
 
     def get_pose(self):
         return(self.pose)
@@ -212,8 +263,7 @@ class CGMonteCarloAnnealer:
         for kt in self.kt_anneals:
             print("Current kT = ", kt)
             self._cg_mc_sim.kT = kt
-            criteron = self.convergence_criterea()
-            while not criteron(self._cg_mc_sim):
+            while not self.convergence_criteron(self._cg_mc_sim):
                 self._cg_mc_sim.run()
             self.kt_anneals = self.kt_anneals[1:]
 
@@ -235,7 +285,74 @@ class CGMonteCarloAnnealer:
     def removeObserver(self, observer):
         self._cg_mc_sim.removeObserver(observer)
 
+class CGMonteCarloDynamicAnnealer:
+    """
+    A MC annealing object that dynamically adjusts temperature according
+    to specific criteria objects
+    """
 
+    def __init__(self,
+                seq_mover: object = None,
+                score_function: object = None,
+                pose: object = None,
+                dynamic_param_file_object: object = None,
+                ):
+        self.seq_mover = seq_mover
+        self.score_function = score_function
+        self.pose = pose
+        self.dynamic_params = dynamic_param_file_object
+        self._cg_mc_sim = CGMonteCarlo(self.pose, self.score_function,
+                                       self.seq_mover, self.dynamic_params.n_inner,
+                                       dynamic_param_file_object.t_init,
+                                       output=dynamic_param_file_object.mc_output, 
+                                       out_freq = dynamic_param_file_object.out_freq,
+                                       )
+    
+    def estimate_starting_kt(self, base = 10):
+        """
+        Function to estimate a good starting kT value
+        """
+        energy = self._cg_mc_sim.get_energy()
+        if base == 1:
+            estimated_kt = energy
+        else:
+            estimate_kt = base ** np.floor(np.log(self._cg_mc_sim.get_energy()) / np.log(base))
+        print("Setting kT to", estimate_kt)
+        self._cg_mc_sim.kT = estimate_kt
+
+    def run_annealing(self):
+        """
+        """
+        for i in range(self.dynamic_params.n_cycles):
+            print("Current kT: ", self._cg_mc_sim.kT)
+            self._cg_mc_sim.run()
+            self.adjust_kt()
+        
+
+    def adjust_kt(self):
+        acc_ratio = self._cg_mc_sim.get_accept_ratio(reset = True)
+        print("Cycle acceptance ratio: " + str(acc_ratio))
+        print("Target acceptance ratio: " + str(self.dynamic_params.target_ratio))
+        if acc_ratio > self.dynamic_params.target_ratio + self.dynamic_params.ratio_tolerance:
+            self._cg_mc_sim.kT *= self.dynamic_params.anneal_rate
+        if acc_ratio < self.dynamic_params.target_ratio - self.dynamic_params.ratio_tolerance:
+            self._cg_mc_sim.kT /= self.dynamic_params.anneal_rate
+        
+    def get_mc_sim(self):
+        return self._cg_mc_sim
+            
+    def _get_score_function(self):
+        return self.score_function
+
+    def _get_seq_mover(self):
+        return self.seq_mover
+
+    def registerObserver(self, observer):
+        self._cg_mc_sim.registerObserver(observer)
+
+    def removeObserver(self, observer):
+        self._cg_mc_sim.removeObserver(observer)
+    
 
 class Convergence(ABC):
     def __call__(self, mc_sim):
@@ -254,6 +371,7 @@ class Repeat10Convergence(Convergence):
             return False
         else:
             return True
+
 
 class Repeat1Convergence(Convergence):
     """
@@ -279,7 +397,7 @@ class Repeat1Convergence(Convergence):
 
 class CGMonteCarloAnnealerParameters:
     """
-    Data object for storing how a MC simualtion will be run
+    Data object for storing how a fixed schedule MC annealing simulation will be run
     """
     def __init__(self, n_inner, t_init, anneal_rate, n_anneals, annealer_criteron, mc_output, out_freq):
         self.n_inner = n_inner
@@ -291,6 +409,21 @@ class CGMonteCarloAnnealerParameters:
         self.out_freq = out_freq
         # list of annealing temps
         self.t_anneals = [t_init*(anneal_rate)**n for n in range(n_anneals)]
+
+class CGMonteCarloDynamicAnnealerParameters:
+    """
+    Data object for storing how a fixed schedule MC annealing simulation will be run
+    """
+    def __init__(self, n_inner, t_init, anneal_rate, max_anneal_cycles, target_ratio, ratio_tolerance, mc_output, out_freq):
+        self.n_inner = n_inner
+        self.t_init = t_init
+        self.anneal_rate = anneal_rate
+        self.n_cycles = max_anneal_cycles
+        self.mc_output = mc_output
+        self.out_freq = out_freq
+        self.target_ratio = target_ratio
+        self.ratio_tolerance = ratio_tolerance
+        # list of annealing temps
 
 class SequenceMoverFactory:
 

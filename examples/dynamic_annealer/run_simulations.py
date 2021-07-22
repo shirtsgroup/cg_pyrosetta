@@ -35,14 +35,16 @@ def set_parameters(job):
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
     os.chdir(job.ws)
-    cg_pyrosetta.init()
+    cg_pyrosetta.init(extra_res_fa = "/ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/cg_pyrosetta/data/residue_type_sets/CG11x3.params",
+                      mute = "all")
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 1000,
+        CGMonteCarloDynamicAnnealerParameters(n_inner = 10000,
                                        t_init = 10,
                                        anneal_rate = 0.9,
-                                       n_anneals = 50,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence(),
+                                       max_anneal_cycles = 50,
+                                       target_ratio = 0.05,
+                                       ratio_tolerance = 0.025,
                                        mc_output = True,
                                        out_freq = 500,
     )
@@ -64,6 +66,7 @@ def run_mc_simulation(job):
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 SC1":job.sp.sc_size, "BB2 SC2":job.sp.sc_size, "BB3 SC3":job.sp.sc_size})
     change_lengths.apply(pose)
 
+
     # Build Minimizer
     mini = cg_pyrosetta.pyrosetta.rosetta.protocols.minimization_packing.MinMover()
     mini.min_type('lbfgs_armijo_nonmonotone')
@@ -83,6 +86,7 @@ def run_mc_simulation(job):
     # Build Sequence Mover for MC object
     sequence_mover_factory = cg_pyrosetta.CG_monte_carlo.SequenceMoverFactory(pose, {"mini" : mini})
     sequence_mover = sequence_mover_factory.build_seq_mover(
+        # Python 3.6> maintains dict insertion order
         {
             "small_dihe" : 1,
             "small_angle" : 1,
@@ -90,21 +94,30 @@ def run_mc_simulation(job):
         }
     )
 
-    cg_annealer = cg_pyrosetta.CG_monte_carlo.CGMonteCarloAnnealer(
+    # Randomize structure/minimize structure
+    for _ in range(1000):
+        sequence_mover.apply(pose)
+
+    cg_annealer = cg_pyrosetta.CG_monte_carlo.CGMonteCarloDynamicAnnealer(
         seq_mover=sequence_mover,
         score_function=energy_function,
         pose = pose,
-        param_file_object = annealer_params
+        dynamic_param_file_object = annealer_params
     )
+    cg_annealer.estimate_starting_kt()
 
     # Setup Configuration/Energy observer for saving minimum energy structures
     struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
     energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
+    kt_obs = cg_pyrosetta.CG_monte_carlo.KTObserver(cg_annealer.get_mc_sim())
+    acc_ratio_obs = cg_pyrosetta.CG_monte_carlo.AcceptanceRatioObserver(cg_annealer.get_mc_sim())
     cg_annealer.registerObserver(struct_obs)
     cg_annealer.registerObserver(energy_obs)
+    cg_annealer.registerObserver(kt_obs)
+    cg_annealer.registerObserver(acc_ratio_obs)
 
     # Run Annealer
-    cg_annealer.run_schedule()
+    cg_annealer.run_annealing()
     min_pose = cg_annealer._cg_mc_sim.get_minimum_energy_pose()
     print("Writing structure to:")
     print(job.fn("minimum.pdb"))

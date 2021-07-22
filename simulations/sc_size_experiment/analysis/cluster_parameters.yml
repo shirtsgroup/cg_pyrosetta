@@ -9,5 +9,5 @@ filter: true
 filter_ratio: 0.5
 output_cluster_traj: true
 core_points_only: false
-parallel : 2
+parallel : 3
 signac_dir : "/ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/simulations/sc_size_experiment"
