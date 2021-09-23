@@ -38,14 +38,16 @@ def run_mc_simulation(job):
     cg_pyrosetta.init()
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 1000,
+        CGMonteCarloDynamicAnnealerParameters(n_inner = 10000,
                                        t_init = 10,
                                        anneal_rate = 0.9,
-                                       n_anneals = 50,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence,
+                                       max_anneal_cycles = 50,
+                                       target_ratio = 0.05,
+                                       ratio_tolerance = 0.025,
                                        mc_output = True,
                                        out_freq = 500,
     )
+
 
     # Build Energy Function
     energy_function = cg_pyrosetta.CG_monte_carlo.EnergyFunctionFactory().build_energy_function(
@@ -85,98 +87,39 @@ def run_mc_simulation(job):
             "small_dihe" : 1,
             "small_angle" : 1,
             "mini" : 1,
-            "pymol" : 1,
         }
     )
 
-    cg_annealer = cg_pyrosetta.CG_monte_carlo.CGMonteCarloAnnealer(
+    # Randomize structure/minimize structure
+    for _ in range(1000):
+        sequence_mover.apply(pose)
+
+    cg_annealer = cg_pyrosetta.CG_monte_carlo.CGMonteCarloDynamicAnnealer(
         seq_mover=sequence_mover,
         score_function=energy_function,
         pose = pose,
-        param_file_object = annealer_params
+        dynamic_param_file_object = annealer_params
     )
+    cg_annealer.estimate_starting_kt(base=1, factor=2)
 
     # Setup Configuration/Energy observer for saving minimum energy structures
     struct_obs = cg_pyrosetta.CG_monte_carlo.StructureObserver(cg_annealer.get_mc_sim())
     energy_obs = cg_pyrosetta.CG_monte_carlo.EnergyObserver(cg_annealer.get_mc_sim())
+    kt_obs = cg_pyrosetta.CG_monte_carlo.KTObserver(cg_annealer.get_mc_sim())
+    acc_ratio_obs = cg_pyrosetta.CG_monte_carlo.AcceptanceRatioObserver(cg_annealer.get_mc_sim())
     cg_annealer.registerObserver(struct_obs)
     cg_annealer.registerObserver(energy_obs)
+    cg_annealer.registerObserver(kt_obs)
+    cg_annealer.registerObserver(acc_ratio_obs)
 
     # Run Annealer
-    cg_annealer.run_schedule()
+    cg_annealer.run_annealing()
     min_pose = cg_annealer._cg_mc_sim.get_minimum_energy_pose()
     print("Writing structure to:")
     print(job.fn("minimum.pdb"))
     min_pose.dump_pdb(job.fn("minimum.pdb"))
     
-@FlowProject.operation
-@FlowProject.pre.isfile("minimum.pdb")
-def low_temperature_mc(job):
-    os.chdir(job.ws)
-    cg_pyrosetta.pyrosetta.init(
-                      "--add_atom_types fa_standard parameters/atom_properties.txt " +
-                      "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
-                      "--extra_mm_params_dir parameters/mm_atom_type_sets"
-                      )
-    pose = cg_pyrosetta.pyrosetta.pose_from_file(job.fn("minimum.pdb"))
 
-    # temporary output
-    print(pose)
-
-@FlowProject.operation
-@FlowProject.pre.isfile("minimum.pdb")
-@FlowProject.post(lambda job: 'minimum_energy' in job.document)
-def store_minimum_energy(job):
-    
-    os.chdir(job.ws)
-    cg_pyrosetta.pyrosetta.init(
-                      "--add_atom_types fa_standard parameters/atom_properties.txt " +
-                      "--add_mm_atom_type_set_parameters fa_standard parameters/mm_atom_type_sets/mm_atom_properties.txt " +
-                      "--extra_mm_params_dir parameters/mm_atom_type_sets"
-                      )
-    # Build Energy Function
-    energy_function = cg_pyrosetta.CG_monte_carlo.EnergyFunctionFactory().build_energy_function(
-        {
-            "mm_twist" : 1,
-            "mm_bend" : 1,
-            "fa_atr" : 1,
-            "fa_rep" : 1,
-            "fa_intra_rep" : 1,
-            "fa_intra_atr" : 1,
-        }
-    )
-
-    pose = cg_pyrosetta.pyrosetta.pose_from_file("minimum.pdb")
-
-
-    # Pose to be folded
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
-    change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2":job.sp.bb_length, "BB2 BB3":job.sp.bb_length, "BB3 BB1":job.sp.bb_length})
-    change_lengths.apply(pose)
-
-    # Build Minimizer
-    mini = cg_pyrosetta.pyrosetta.rosetta.protocols.minimization_packing.MinMover()
-    mini.min_type('lbfgs_armijo_nonmonotone')
-    mini.score_function(energy_function)
-
-    for _ in range(10):
-        mini.apply(pose)
-
-    with open("minimum.pdb", "r") as fn:
-        for line in fn.readlines():
-            print(line)
-    
-    min_energy = energy_function(pose)
-
-    print(min_energy)
-
-    pose.dump_pdb("new_minimum.pdb")
-
-    with open("new_minimum.pdb", "r") as fn:
-        for line in fn.readlines():
-            print(line)
-
-    job.document.minimum_energy = min_energy
 
 
 # @FlowProject.operation

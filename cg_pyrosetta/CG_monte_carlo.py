@@ -263,7 +263,8 @@ class CGMonteCarloAnnealer:
         for kt in self.kt_anneals:
             print("Current kT = ", kt)
             self._cg_mc_sim.kT = kt
-            while not self.convergence_criteron(self._cg_mc_sim):
+            convergence_criterea = self.convergence_criterea()
+            while not convergence_criterea(self._cg_mc_sim):
                 self._cg_mc_sim.run()
             self.kt_anneals = self.kt_anneals[1:]
 
@@ -308,15 +309,16 @@ class CGMonteCarloDynamicAnnealer:
                                        out_freq = dynamic_param_file_object.out_freq,
                                        )
     
-    def estimate_starting_kt(self, base = 10):
+    def estimate_starting_kt(self, base = 10, factor = 1):
         """
-        Function to estimate a good starting kT value
+        Function to estimate a good starting kT value. A base of 1 will just
+        return the absolute value of the initial energy.
         """
         energy = self._cg_mc_sim.get_energy()
         if base == 1:
-            estimated_kt = energy
+            estimate_kt = factor * np.abs(energy)
         else:
-            estimate_kt = base ** np.floor(np.log(self._cg_mc_sim.get_energy()) / np.log(base))
+            estimate_kt = factor * base ** np.ceil(np.log(np.abs(self._cg_mc_sim.get_energy())) / np.log(base))
         print("Setting kT to", estimate_kt)
         self._cg_mc_sim.kT = estimate_kt
 
