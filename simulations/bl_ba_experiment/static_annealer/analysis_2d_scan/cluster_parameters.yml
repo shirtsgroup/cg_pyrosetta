@@ -1,0 +1,13 @@
+core_points_only: false
+eps: 0.1388888888888889
+filter: true
+filter_ratio: 1.0
+frame_end: -1
+frame_start: 680 
+frame_stride: 2
+min_samples: 50
+output_cluster_traj: true
+output_format: pdb
+parallel: 16
+plot_silhouette: true
+signac_dir: /ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/simulations/bl_ba_experiment/static_annealer

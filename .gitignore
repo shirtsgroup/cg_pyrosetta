@@ -110,7 +110,9 @@ test
 __pycache__/*
 .vscode/*
 *.png
-*.pdf # Ideally all images can be generated locally and shoulnd't have to be commited, unless they require SIGNIFICANT time to generate 
+*.pdf # Ideally all images can be generated locally and shoulnd't have to be commited, unless they require SIGNIFICANT time to generate
+*.jpg
+*.json
 *.npy
 *.tga
 *.cif
@@ -121,3 +123,4 @@ __pycache__/*
 slurm-*.out
 .*
 !/.gitignore
+view
