@@ -5,7 +5,7 @@ import shutil as sh
 
 project = signac.get_project()
 
-sc_sizes = np.linspace(0.5, 4, 10)
+sc_sizes = np.linspace(0.5, 4, 15)
 
 for sc_size in sc_sizes:
     for rep in range(100):

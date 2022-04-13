@@ -28,9 +28,8 @@ def set_parameters(job):
     with open(job.fn("job_status.txt"), "w") as f:
         f.write("parameters set\n")
 
-
 @FlowProject.operation
-@flow.directives(fork=False)
+@flow.directives(fork=True)
 @FlowProject.pre(parameters_are_set)
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):

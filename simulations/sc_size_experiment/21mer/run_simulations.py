@@ -35,14 +35,14 @@ def set_parameters(job):
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
     os.chdir(job.ws)
-    cg_pyrosetta.init()
+    cg_pyrosetta.init(extra_res_fa="/ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/cg_pyrosetta/data/residue_type_sets/CG11x3.params")
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 1000,
+        CGMonteCarloAnnealerParameters(n_inner = 14000,
                                        t_init = 10,
                                        anneal_rate = 0.9,
                                        n_anneals = 50,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence(),
+                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat1Convergence,
                                        mc_output = True,
                                        out_freq = 500,
     )
@@ -60,7 +60,7 @@ def run_mc_simulation(job):
     )
 
     # Pose to be folded
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]")
     change_lengths = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 SC1":job.sp.sc_size, "BB2 SC2":job.sp.sc_size, "BB3 SC3":job.sp.sc_size})
     change_lengths.apply(pose)
 

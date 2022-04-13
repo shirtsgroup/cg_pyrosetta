@@ -35,14 +35,14 @@ def set_parameters(job):
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
     os.chdir(job.ws)
-    cg_pyrosetta.init()
+    cg_pyrosetta.init(extra_res_fa="/ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/cg_pyrosetta/data/residue_type_sets/CG11x3.params")
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
-        CGMonteCarloAnnealerParameters(n_inner = 1000,
+        CGMonteCarloAnnealerParameters(n_inner = 10000,
                                        t_init = 10,
                                        anneal_rate = 0.9,
                                        n_anneals = 50,
-                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat10Convergence(),
+                                       annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat1Convergence,
                                        mc_output = True,
                                        out_freq = 500,
     )
