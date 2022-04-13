@@ -1,0 +1,8 @@
+project = 3bb_foldamer
+workspace_dir = workspace
+schema_version = 1
+ComputeEnvironment = DefaultSlurmEnvironment
+[General]
+[hosts]
+[flow]
+import_packaged_environments = off
