@@ -8,28 +8,26 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--medoid_ids",
+        "--file_paths",
         required = True,
         help = "id of medoids to mirror",
-        type = int,
+        type = str,
         nargs = '+'
-    )
-
-    parser.add_argument(
-        "--cluster_output_dir",
-        required = False,
-        default = "cluster_output"
     )
     
     return parser.parse_args()
 
 def main():
     args = parse_args()
-    for medoid_id in args.medoid_ids:
-        medoid = md.load(os.path.join(args.cluster_output_dir, "medoid_" + str(medoid_id) + ".pdb"))
+    for f in args.file_paths:
+        medoid = md.load(f)
         mirror = copy.deepcopy(medoid)
         mirror.xyz[0, :, 0] = -mirror.xyz[0, :, 0]
-        mirror.save(os.path.join(args.cluster_output_dir, "mirror_" + "medoid_" + str(medoid_id) + ".pdb"))
+        file_array = f.split("/")
+        if len(file_array) > 1:
+            mirror.save("/".join(file_array[:-1]) + "/mirror_" + file_array[-1])
+        else:
+            mirror.save("mirror_" + file_array[0])
 
 if __name__ == "__main__":
     main()

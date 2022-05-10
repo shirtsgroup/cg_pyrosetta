@@ -13,7 +13,7 @@ def main():
 
     # Extract metrics from list of lists
     all_data.pop(0)
-    labels = ["$SC$ = " + str(round(float(a[0]),3)) + "$\sigma_{B}$" for a in all_data][:11]
+    labels = ["$SC$ = " + str(round(float(a[0]),3)) + "$R^{min}_{B}$" for a in all_data][:11]
     avg_sil_score = np.array([float(a[4]) for a in all_data])[:11]
     min_z_scores = np.array([float(a[5]) for a in all_data])[:11]
     min_cluster_rmsd = np.array([float(a[7]) for a in all_data])[:11]

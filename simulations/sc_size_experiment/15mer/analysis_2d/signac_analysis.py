@@ -114,7 +114,7 @@ def matching_paramfile_statepoint(job):
 
 @flow.directives(fork=False)
 @FlowProject.operation
-@FlowProject.post.isfile("energy_trajectory.pdf")
+@FlowProject.post.isfile("energy_trajectory_10_10.pdf")
 @FlowProject.post.isfile("traj_files.pkl")
 @FlowProject.post.isfile("traj.h5")
 @FlowProject.post(energy_trajectory)
@@ -139,23 +139,25 @@ def get_energy_trajectory(job):
         all_energies.extend(energies.values[:, 1])
     all_energies = np.array(all_energies)
     
-    # Energy trajectory plot
-    fig, ax1 = plt.subplots(1,1,figsize = [10,10], dpi=600)
-    ax2 = ax1.twinx()
-    ax2.plot(out_steps, kts/0.2, 'r')
-    # ax2.set_xlim([0, 500000])
-    ax2.set_ylabel(r'Simulated Temperature ($\epsilon_{B}$)', color = 'r', fontsize=20)
-    plt.rcParams.update({'font.size' : 18})
-    for traj in energy_traj:
-        ax1.plot(energies.values[:,0], traj/0.2, alpha = 0.4, lw=2)
-        ax1.set_xlabel("Steps", fontsize=20)
-        ax1.set_ylabel(r'Energy ($\epsilon_{B}$)', fontsize=20)
-        ax1.set_title(r'$SC$ = ' + str(round(job.sp['sc_size'],4)) + r'$\sigma_{B}$', fontsize=20)
-        ax1.tick_params(axis = "both", labelsize=16)
-        ax2.tick_params(axis = "both", labelsize=16)
-    fig.savefig(job.fn("energy_trajectory.jpg"), bbox_inches="tight")
-    fig.savefig(job.fn("energy_trajectory.pdf"), bbox_inches="tight")
-    
+    aspect_ratios = [[10,10], [15,10]]
+    for ar in aspect_ratios:
+        # Energy trajectory plot
+        fig, ax1 = plt.subplots(1,1,figsize = ar, dpi=600)
+        ax2 = ax1.twinx()
+        ax2.plot(out_steps, kts/0.2, 'r')
+        # ax2.set_xlim([0, 500000])
+        ax2.set_ylabel(r'Simulated Temperature ($\epsilon_{B}$)', color = 'r', fontsize=20)
+        plt.rcParams.update({'font.size' : 18})
+        for traj in energy_traj:
+            ax1.plot(energies.values[:,0], traj/0.2, alpha = 0.4, lw=2)
+            ax1.set_xlabel("Steps", fontsize=20)
+            ax1.set_ylabel(r'Energy ($\epsilon_{B}$)', fontsize=20)
+            ax1.set_title(r'$SC$ = ' + str(round(job.sp['sc_size'],4)) + r'$R^{min}_{B}$', fontsize=20)
+            ax1.tick_params(axis = "both", labelsize=16)
+            ax2.tick_params(axis = "both", labelsize=16)
+        fig.savefig(job.fn("energy_trajectory_" + "_".join([str(i) for i in ar]) + ".jpg"), bbox_inches="tight")
+        fig.savefig(job.fn("energy_trajectory_" + "_".join([str(i) for i in ar]) + ".pdf"), bbox_inches="tight")
+        
     with open(job.fn('traj_files.pkl'),'wb') as fp:
         pickle.dump(traj_file_list, fp)
     job.stores['traj']['energy_traj'] = np.array(energy_traj)
@@ -380,11 +382,11 @@ def cluster_energy_rmsd_scatter(job):
         cluster_energies = all_energies[original_indices[cluster_indices]]
         # color = cm.tab10(float(i) / len(clusters))
         plt.scatter(rmsds_medoid_i*10, cluster_energies/0.2, s=10, alpha=0.7)
-        plt.xlabel(r'RMSD to Cluster Medoid ($\sigma_{B}$)', fontsize=20)
+        plt.xlabel(r'RMSD to Cluster Minimum ($R^{min}_{B}$)', fontsize=20)
         plt.ylabel(r'Cluster Energies ($\epsilon_{B}$)', fontsize=20)
         plt.xticks(fontsize=16)
         plt.yticks(fontsize=16)
-    plt.title("SC =" + str(round(job.sp.sc_size,3)) + r'$\sigma_{B}$', fontsize=20)
+    plt.title("SC =" + str(round(job.sp.sc_size,3)) + r'$R^{min}_{B}$', fontsize=20)
     plt.legend(["Cluster "+ str(a) for a in clusters], loc = "lower right", fontsize=16)
     plt.savefig(job.fn("rmsd_energy_scatter_plot.pdf"), bbox_inches="tight")
     plt.savefig(job.fn("rmsd_energy_scatter_plot.jpg"), bbox_inches="tight")
@@ -523,7 +525,6 @@ def energy_z_score_matrix(job):
 
 @flow.directives(fork=False)
 @FlowProject.pre.after(run_clustering)
-@FlowProject.post.isfile("helix_fitting/helix_fit_cluster_0_minimum.pdf")
 @FlowProject.post.isfile("helix_fitting.pkl")
 @FlowProject.pre(has_clusters)
 @FlowProject.operation
@@ -534,13 +535,18 @@ def fit_medoids_to_helices(job):
     medoid_files = [f for f in os.listdir(job.fn("cluster_output")) if "minimum" in f]
     helix_fitting_info = {}
     for medoid in medoid_files:
+        print("Working on", medoid)
         medoid_id = medoid.split(".")[0]
         helix_fitting_info[medoid_id] = {}
         structure = md.load(job.fn(os.path.join("cluster_output",medoid)))
         top = structure.topology
         bb_helix = structure.atom_slice(top.select("name BB1 BB2 BB3"))
         # Scale coordinates
-        bb_helix = 100*bb_helix.xyz[0]
+        bb_helix_whole = 100*bb_helix.xyz[0]
+        bb_helix = 100*bb_helix.xyz[0][2:-2] # fit just the internal residues
+        n_residues = bb_helix.shape[0]
+        print(bb_helix.shape)
+        print(bb_helix)
         entries = []
         RMSEs = []        
         for i in range(20):
@@ -548,27 +554,46 @@ def fit_medoids_to_helices(job):
             radius, w, phi, z_tot, rotation, center, normal, sse_helix, sse_cylinder = analyze_foldamers.parameters.helical_fitting_2.fit_helix_to_points(bb_helix, x0)
             RMSE_tot = np.sqrt(sse_cylinder/bb_helix.shape[0]) + np.sqrt(sse_helix/bb_helix.shape[0])
             entries.append([radius, w, phi, z_tot, rotation, center, normal, sse_helix, sse_cylinder])
-            RMSEs.append(RMSE_tot)
-        
+            RMSEs.append(RMSE_tot)        
+
+        # Pick helix fit that gives the lowest cylinder and helix RMSE
         i_min = RMSEs.index(np.min(RMSEs))
+        radius, w, phi, z_tot, rotation, center, normal, sse_helix, sse_cylinder = entries[i_min]
+        
+        # Print helix parameters
+        print("Helix Prarameters")
+        print("Radius:", radius/100)
+        print("Omega:", w)
+        print("Phi:", phi)
+        print("Rotation Matrix:\n", rotation)
+        print("Center:\n", center)
+        print("Normal:\n", normal)
+        print("Helix SSE:", sse_helix)
+        print("Cylinder SSE:", sse_cylinder)
+
+
+        # Calculate residues per turn
+        total_rotation = z_tot*np.abs(w)/2/np.pi
+        print("Total Rotation:", total_rotation)
+        print("Residues per turn", (n_residues-1)/total_rotation)
 
         # Save fitting output to dictionary
-        radius, w, phi, z_tot, rotation, center, normal, sse_helix, sse_cylinder = entries[i_min]
-        helix_fitting_info[medoid_id]["radius"] = radius
+        helix_fitting_info[medoid_id]["radius"] = radius/100
         helix_fitting_info[medoid_id]["w"] = w
         helix_fitting_info[medoid_id]["phi"] = phi
         helix_fitting_info[medoid_id]["z_tot"] = z_tot
         helix_fitting_info[medoid_id]["rotation"] = rotation
         helix_fitting_info[medoid_id]["center"] = center
         helix_fitting_info[medoid_id]["normal"] = normal
+        helix_fitting_info[medoid_id]["residues_per_turn"] = (n_residues-1)/total_rotation
         helix_fitting_info[medoid_id]["rmse_cylinder"] = np.sqrt(sse_cylinder/bb_helix.shape[0])
         helix_fitting_info[medoid_id]["rmse_helix"] = np.sqrt(sse_helix/bb_helix.shape[0])
         
         # Plot figure
         fig = plt.figure()
         ax = fig.gca(projection='3d')
-        ax.scatter3D(bb_helix[:, 0], bb_helix[:, 1], bb_helix[:, 2], s=125)
-        ax.plot3D(bb_helix[:, 0], bb_helix[:, 1], bb_helix[:, 2])
+        ax.scatter3D(bb_helix_whole[:, 0], bb_helix_whole[:, 1], bb_helix_whole[:, 2], s=125)
+        ax.plot3D(bb_helix_whole[:, 0], bb_helix_whole[:, 1], bb_helix_whole[:, 2])
 
         # Plot fitted helix
         t = np.linspace(0, z_tot, 100)
@@ -594,9 +619,8 @@ def fit_medoids_to_helices(job):
         ax.plot3D(projected_points[:, 0], projected_points[:, 1], projected_points[:, 2], "black")
         plt.savefig(job.fn("helix_fitting/helix_fit_" + medoid_id +".pdf"), dpi=500)
         plt.savefig(job.fn("helix_fitting/helix_fit_" + medoid_id +".png"), dpi=500)
-        plt.close()
         
-        plot_values = [bb_helix[:, 0], bb_helix[:, 1], bb_helix[:, 2],
+        plot_values = [bb_helix_whole[:, 0], bb_helix_whole[:, 1], bb_helix_whole[:, 2],
                        fitted_helix[:, 0], fitted_helix[:, 1], fitted_helix[:, 2],
                        point[0], point[1], point[2],
                        np.array([0, normal[0]])+point[0], np.array([0, normal[1]])+point[1], np.array([0, normal[2]])+point[2],
