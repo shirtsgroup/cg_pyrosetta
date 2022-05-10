@@ -4,6 +4,7 @@ import numpy as np
 import sklearn
 from sklearn.preprocessing import normalize
 import os
+import shutil as sh
 import pickle
 import csv
 
@@ -20,7 +21,17 @@ def main():
                         "min_energy_cluster_rmsd",
                         "min_energy_min_intermedoid_rmsd", "min_cluster_sampling",
                         "noise_cluster", "rmse_helix", "rmse_cyl",
-                        "min_medoid"])
+                        "residues_per_turn","min_medoid"])
+    
+    # directory for min_cluster_structures to a top level file
+    if not os.path.isdir("summary_output"):
+        os.mkdir("summary_output")
+    else:
+        sh.rmtree("summary_output")
+        os.mkdir("summary_output")
+    os.mkdir(os.path.join("summary_output", "min_cluster_structures"))
+    os.mkdir(os.path.join("summary_output", "rmsd_energy_plots"))
+    
     for ba in bond_angles:
         print("BA:", ba)
         sil_scores = []
@@ -30,8 +41,13 @@ def main():
             with H5Store(job.fn('clustering.h5')).open(mode='r') as data:
                 avg_silhouette_score = data['silhouette_avg']
                 cluster_sizes = data['cluster_sizes'][:]
-            if avg_silhouette_score is None or len(cluster_sizes) < 4 or job.sp.eps < 1.2777777/2/10 or job.sp.min_samples == 50:
-                pass
+                labels = np.unique(data['labels'][:])
+
+            no_noise_clusters = len(labels)
+            if -1 in labels:
+                no_noise_clusters -= 1
+            if avg_silhouette_score is None or no_noise_clusters < 3 or job.sp.eps < 1.2777777/2/10:
+                continue
             else:
                 sil_scores.append(avg_silhouette_score)
                 n_clusters.append(len(cluster_sizes))
@@ -113,13 +129,14 @@ def main():
             min_cluster_sampling = cluster_sampling_dict[medoid_min]
 
             # Get helix fitting data
-            # with open(job.fn('helix_fitting.pkl'), 'rb') as fp:
-            #    helix_info_dict = pickle.load(fp)
+            with open(job.fn('helix_fitting.pkl'), 'rb') as fp:
+               helix_info_dict = pickle.load(fp)
 
-            # print(job.fn(""))
-            # print(helix_info_dict.keys())
-            # min_helix_rmse = helix_info_dict["cluster_"+str(medoid_min)+"_minimum"]["rmse_helix"]
-            # min_cyl_rmse = helix_info_dict["cluster_"+str(medoid_min)+"_minimum"]["rmse_cylinder"]
+            print(job.fn(""))
+            print(helix_info_dict.keys())
+            min_helix_rmse = helix_info_dict["cluster_"+str(medoid_min)+"_minimum"]["rmse_helix"]
+            min_cyl_rmse = helix_info_dict["cluster_"+str(medoid_min)+"_minimum"]["rmse_cylinder"]
+            res_per_turn = helix_info_dict["cluster_"+str(medoid_min)+"_minimum"]["residues_per_turn"]
             
             # summary_csv.append(["bond_angle", "eps", "min_samples", "n_clusters",
             #                     "avg_silhouette_score",
@@ -133,8 +150,16 @@ def main():
                                 len(cluster_sizes), avg_silhouette_score,
                                 min_z_score, min_energy, min_cluster_rmsd,
                                 min_intermedoid_rmsd, min_cluster_sampling, 
-                                noise_cluster, min_medoid_str
+                                noise_cluster, min_helix_rmse, min_cyl_rmse,
+                                res_per_turn, min_medoid_str
             ])
+
+            sh.copyfile(job.fn(os.path.join("cluster_output", "cluster_"+str(medoid_min)+"_minimum.pdb")), 
+                        os.path.join("summary_output", "min_cluster_structures", "ba_" + str(ba) + "_min_structure.pdb"))
+
+            sh.copyfile(job.fn("rmsd_energy_scatter_plot.jpg"), 
+                        os.path.join("summary_output", "rmsd_energy_plots", "ba_" + str(ba) + "_rmsd_energy.jpg"))
+             
 
     with open("summary_stats.csv", "w") as f:
         writer = csv.writer(f)

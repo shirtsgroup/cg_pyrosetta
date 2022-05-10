@@ -82,9 +82,17 @@ def main():
     # spoke_labels = [spoke_labels[3], spoke_labels[4], spoke_labels[6], spoke_labels[7]]
     spoke_labels = ["", "", "", ""]
 
-    legend_labels = [str(round(float(a[0]),3)) for a in all_data]
+    all_data = all_data[:-4]
 
-    ranges = [[0,  1], [0, 8.2], [1.1, 0], [0, 2.3]]   
+    print(all_data)
+
+    legend_labels = [str(round(float(a[0]),3)) for a in all_data]
+    columns = [4, 5, 7, 8]
+    ranges = [[0, float(max(all_data, key=lambda x: x[i])[i])] for i in columns]
+
+    # Flip ranges for min_energy_cluster_rmsd and multipy rmsds by 10 to be consistent with sigma
+    ranges[2][0], ranges[2][1] = 10*ranges[2][1], 10*ranges[2][0]
+    ranges[3][0], ranges[3][1] = 10*ranges[3][0], 10*ranges[3][1]
 
     colors = pl.cm.tab20(np.linspace(0,1,len(all_data)))
 
