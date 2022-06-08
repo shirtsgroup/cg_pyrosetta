@@ -1,0 +1,7 @@
+project = alpha_helix_no_sc
+schema_version = 1
+ComputeEnvironment = DefaultSlurmEnvironment
+[General]
+[hosts]
+[flow]
+import_packaged_environments = off
