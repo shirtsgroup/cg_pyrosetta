@@ -6,16 +6,14 @@ import sys
 import os
 from setuptools import setup, find_packages
 import versioneer
-import yaml
+import pyrosetta
 short_description = __doc__.split("\n")
 
 
 # Setting up PyRosetta Build within package
 
                         #### CHANGE THIS PATH #####
-config_file =  open('.configs.yml', 'r')
-configs = yaml.load(config_file)
-fresh_pyrosetta_path = configs['clean_pyrosetta_path']
+fresh_pyrosetta_path = pyrosetta.__path__[0]
 pyrosetta_path = os.path.abspath('PyRosetta4.modified')
 input_path = os.path.abspath('cg_pyrosetta/data')
 
