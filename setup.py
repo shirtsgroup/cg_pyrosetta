@@ -14,7 +14,7 @@ short_description = __doc__.split("\n")
 
                         #### CHANGE THIS PATH #####
 fresh_pyrosetta_path = pyrosetta.__path__[0]
-pyrosetta_path = os.path.abspath('PyRosetta4.modified')
+pyrosetta_path = os.path.abspath('pyrosetta_modified')
 input_path = os.path.abspath('cg_pyrosetta/data')
 
 from cg_pyrosetta.build_cg_pyrosetta import PyRosettaBuilder
