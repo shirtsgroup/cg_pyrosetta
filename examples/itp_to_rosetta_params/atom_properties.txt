@@ -1,0 +1,17 @@
+NAME  ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME
+# Rosetta atom_properties file
+# Generated using itp_to_param.py
+# Original file: OCT.itp
+# Author: tfobe
+# Date: Friday, 10. June 2022
+# Time: 04:27PM
+# System: Linux-5.14.0-1042-oem-x86_64-with-glibc2.31
+C1       C     1.908   0.35982       1.0       3.5      13.5
+H1       H     1.459   0.06276       1.0       3.5      13.5
+C2       C     1.908   0.45773       1.0       3.5      13.5
+H2       H     1.387   0.06569       1.0       3.5      13.5
+H3       H     1.487   0.06569       1.0       3.5      13.5
+N1       N     1.824   0.71128       1.0       3.5      13.5
+H4       H       0.6   0.06569       1.0       3.5      13.5
+O1       O    1.6612   0.87864       1.0       3.5      13.5
+O2       O    1.6837   0.71128       1.0       3.5      13.5

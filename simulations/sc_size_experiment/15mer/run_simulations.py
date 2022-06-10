@@ -22,7 +22,7 @@ def set_parameters(job):
          'CG2' : ['X', job.sp.sc_size, 0.2],
         },
         atom_types_path = "parameters/atom_properties.txt",
-        mm_atom_types_path = "parameters/mm_atom_type_sets/mm_atom_properties.txt"
+        mm_atom_types_path = "parameters/mm_parameters/mm_atom_properties.txt"
     )
 
     with open(job.fn("job_status.txt"), "w") as f:
@@ -35,7 +35,12 @@ def set_parameters(job):
 @FlowProject.post.isfile("minimum.pdb")
 def run_mc_simulation(job):
     os.chdir(job.ws)
-    cg_pyrosetta.init(extra_res_fa="/ocean/projects/cts160011p/tfobe/foldamers/cg_pyrosetta/cg_pyrosetta/data/residue_type_sets/CG11x3.params")
+    cg_pyrosetta.init(extra_res_fa = "parameters/CG11x3.params",
+                      add_atom_types = "fa_standard parameters/atom_properties.txt",
+                      add_mm_atom_type_set_parameters = "fa_standard parameters/mm_parameters/mm_atom_properties.txt",
+                      extra_mm_params_dir = "parameters/mm_parameters",
+                      mute = "no"
+                    )
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
         CGMonteCarloAnnealerParameters(n_inner = 10000,

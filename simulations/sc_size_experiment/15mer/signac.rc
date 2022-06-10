@@ -1,8 +1,3 @@
-project = sc_bl_scan
+project = sc_exp
 workspace_dir = workspace
 schema_version = 1
-ComputeEnvironment = DefaultSlurmEnvironment
-[General]
-[hosts]
-[flow]
-import_packaged_environments = off
