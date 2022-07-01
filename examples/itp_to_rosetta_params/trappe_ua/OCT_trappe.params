@@ -2,8 +2,8 @@
 # custom terphenyl residue using trappe FF output
 # Author: tfobe
 
-NAME OCT
-IO_STRING OCT X
+NAME TPH
+IO_STRING TPH X
 TYPE POLYMER
 AA UNK
 

@@ -5,6 +5,7 @@ import getpass
 from datetime import datetime
 import platform
 from itertools import combinations, compress, permutations
+import mdtraj as md
 
 class ItpFileObject:
     def __init__(self, filename):
@@ -45,9 +46,11 @@ class ItpFileObject:
         
         end_section = atomtype_index + 1
         while "[" not in self.itp_file[end_section]:
-            end_section += 1
             if len(self.itp_file) == end_section:
                 break
+            else:
+                end_section += 1
+            
 
         self.atomtypes = {}
         for i in range(atomtype_index + 1, end_section):
@@ -75,6 +78,7 @@ class ItpFileObject:
                 break
 
         self.atoms = []
+
         for i in range(atom_index + 1, end_section):
             if len(self.itp_file[i]) > 1:
                 line = self.itp_file[i]
@@ -82,7 +86,7 @@ class ItpFileObject:
                 self.atoms.append(
                         {
                     "nr" : int(line_entries[0]),
-                    "type" : line_entries[1],
+                    "type" : line_entries[1].lower(),
                     "resnr" : int(line_entries[2]),
                     "residue" : line_entries[3],
                     "atom" : line_entries[4],
@@ -91,6 +95,17 @@ class ItpFileObject:
                     "mass" : float(line_entries[7]),
                     }
                 )
+        
+        # Rosetta only reads in at most 3 character atoms...
+        if len(self.atoms) > 100:
+            characters = 'abcdefghijklmnopqrstuvwxyz'
+            for i in range(len(self.atoms)):
+                element = self.atoms[i]["atom"][0]
+                number = int(self.atoms[i]["atom"][1:]) - 1
+                abc_id = element + characters[int(np.floor(number/26))] + characters[number % 26]
+                print(abc_id)
+                self.atoms[i]["atom"] = abc_id
+
 
     def get_bonds(self):
         bond_index = 0
@@ -186,6 +201,9 @@ class ItpFileObject:
                     pass
         return None
     
+    def is_hydrogen(self, atom):
+        return''.join([i.lower() for i in atom["type"] if not i.isdigit()]) == "h"
+    
     def is_bonded(self, ai, aj):
         check_bond = self.find_bond(ai, aj)
         if check_bond is None:
@@ -233,7 +251,10 @@ class ItpFileObject:
         return None
 
     
-    def write_param_file(self, param_filename):
+    def write_param_file(self, param_filename, structure_file, nbr_radius = 20):
+
+        md_structure = md.load(structure_file)
+
         with open(param_filename, "w") as param_f:
             # write header
             param_f.write("# Rosetta residue topology file\n")
@@ -252,59 +273,105 @@ class ItpFileObject:
 
             # Atom section
             for atom in self.atoms:
-                param_f.write("ATOM " + atom["atom"] + " " + atom["type"] + " " + atom["type"] + " " + str(atom["charge"]) + "\n")
+                entry = [
+                    "ATOM", atom["atom"], atom["type"], atom["type"],atom["charge"], 5
+                ]
+                param_f.write('{0:<5} {1:<5} {2:<5} {3:<5} {4:10.5f}\n'.format(*entry))
             param_f.write("\n")
 
             # Bond section
             for bond in self.bonds:
-                param_f.write("BOND " + self.atoms[bond["ai"]-1]["atom"] + " " + self.atoms[bond["aj"]-1]["atom"] + "\n")
+                entry = [
+                    "BOND", self.atoms[bond["ai"]-1]["atom"], self.atoms[bond["aj"]-1]["atom"]
+                ]
+                param_f.write('{0:<5} {1:<5} {2:<5}\n'.format(*entry))
             param_f.write("\n")
 
+            # non-bonded atom
+            heavy_atoms = []
+            for atom in self.atoms:
+                if self.is_hydrogen(atom):
+                    continue
+                else:
+                    heavy_atoms.append(atom)
+            
+            middle_heavy_atoms = int(len(heavy_atoms)/2)
+            param_f.write("NBR_ATOM " + heavy_atoms[middle_heavy_atoms]["atom"] + "\n")
+            param_f.write("NBR_RADIUS " + str(nbr_radius) + "\n\n")
+
+            # Find first 3 heavy atoms that are bonded
+
+            start_atoms = []
+
+            # Get the first heavy atom
+            for atom in self.atoms:
+                if self.is_hydrogen(atom): # checks if Hydrogen
+                    continue
+                else:
+                    start_atoms.append(atom["nr"])
+                    break
+            
+            # Find 2 more heavy atoms bonded to
+
+            for atom_2 in self.get_neighbors(start_atoms[0]):
+                if self.is_hydrogen(self.atoms[atom_2-1]):
+                    continue
+                else:
+                    start_atoms.append(atom_2)
+                    break
+            
+            for atom_3 in self.get_neighbors(start_atoms[1]):
+                if self.is_hydrogen(self.atoms[atom_3-1]):
+                    continue
+                else:
+                    if atom_3 != start_atoms[0]:
+                        start_atoms.append(atom_3)
+                        break
+                    else:
+                        continue
+            
             # Z-matrix entry 1
             z_entry = ["ICOOR_INTERNAL",
-                       self.atoms[0]["atom"],
+                       self.atoms[start_atoms[0]-1]["atom"],
                        0,
                        0,
                        0,
-                       self.atoms[0]["atom"],
-                       self.atoms[1]["atom"],
-                       self.atoms[2]["atom"]
+                       self.atoms[start_atoms[0]-1]["atom"],
+                       self.atoms[start_atoms[1]-1]["atom"],
+                       self.atoms[start_atoms[2]-1]["atom"]
                     ]
 
-            param_f.write('{0:<13} {1:^8} {2:>10} {3:>10} {4:>10} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
+            param_f.write('{0:<13} {1:>8} {2:10.5f} {3:10.5f} {4:10.5f} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
             
             # Z-matrix entry 2
+            
             z_entry = ["ICOOR_INTERNAL",
-                       self.atoms[1]["atom"],
+                       self.atoms[start_atoms[1]-1]["atom"],
                        0,
                        round(180,5),
-                       round(10*self.find_bond(1, 2)["length"], 5),
-                       self.atoms[0]["atom"],
-                       self.atoms[1]["atom"],
-                       self.atoms[2]["atom"]
+                       round(10*self.find_bond(start_atoms[0], start_atoms[1])["length"], 5),
+                       self.atoms[start_atoms[0]-1]["atom"],
+                       self.atoms[start_atoms[1]-1]["atom"],
+                       self.atoms[start_atoms[2]-1]["atom"]
                     ]
 
-            param_f.write('{0:<13} {1:^8} {2:>10} {3:>10} {4:>10} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
+            param_f.write('{0:<13} {1:>8} {2:10.5f} {3:10.5f} {4:10.5f} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
 
 
             # Z-matrix entry 3
             z_entry = ["ICOOR_INTERNAL",
-                       self.atoms[2]["atom"],
+                       self.atoms[start_atoms[2]-1]["atom"],
                        0,
-                       round(self.find_angle(1,2,3)["angle"], 5),
-                       round(10*self.find_bond(2,3)["length"], 5),
-                       self.atoms[0]["atom"],
-                       self.atoms[1]["atom"],
-                       self.atoms[2]["atom"]
+                       round(180 - self.find_angle(start_atoms[0], start_atoms[1], start_atoms[2])["angle"], 5),
+                       round(10*self.find_bond(start_atoms[1], start_atoms[2])["length"], 5),
+                       self.atoms[start_atoms[1]-1]["atom"],
+                       self.atoms[start_atoms[0]-1]["atom"],
+                       self.atoms[start_atoms[2]-1]["atom"]
                     ]
-
-            param_f.write('{0:<13} {1:^8} {2:>10} {3:>10} {4:>10} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
+            param_f.write('{0:<13} {1:>8} {2:10.5f} {3:10.5f} {4:10.5f} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
 
             # Writing remainder Z-matrix entries
-            existing_atoms = [self.atoms[0]["nr"],
-                              self.atoms[1]["nr"],
-                              self.atoms[2]["nr"]
-                        ]
+            existing_atoms = [*start_atoms]
 
             # Grow a torsion list from existing atoms
             torsion_list = []
@@ -329,6 +396,8 @@ class ItpFileObject:
                                 potential_torsion = [atom_1, atom_2, atom_3, atom_4]
                                 if atom_4 not in existing_atoms:
                                     existing_atoms.append(atom_4)
+                                else:
+                                    continue
                                 if atom_2 == atom_4 or \
                                     potential_torsion in torsion_list or \
                                     potential_torsion[::-1] in torsion_list:  
@@ -345,18 +414,29 @@ class ItpFileObject:
                                         bond_length = torsion[2:]
                                     else:
                                         sys.exit("Error! Torsion between atoms" + ", ".join(potential_torsion) + "was not found in the .itp file.")
-                                                
+                                    
+                                    # calculate torsion/bond angle/bond length from structure                                    
+                                    torsion_index = [t_i - 1 for t_i in torsion]
+                                    b_angle_index = [ba_i - 1 for ba_i in b_angle]
+                                    bond_length_index = [bl_i - 1 for bl_i in bond_length]
+                                    structure_torsion = md.compute_dihedrals(md_structure, np.array([*torsion_index]).reshape(1,4), periodic=False)[0][0]
+                                    structure_torsion *= 180 / np.pi
+                                    structure_angle = md.compute_angles(md_structure, np.array([*b_angle_index]).reshape(1,3), periodic=False)[0][0]
+                                    structure_angle *= 180 / np.pi
+                                    structure_bl = md.compute_distances(md_structure, np.array([*bond_length_index]).reshape(1,2), periodic=False)[0][0]
+                                    
+                                    
                                     z_entry = ["ICOOR_INTERNAL",
-                                            self.atoms[torsion[3]-1]["atom"],
-                                            round(self.find_torsion(*torsion)["angle"], 5),
-                                            round(self.find_angle(*b_angle)["angle"], 5),
-                                            round(10*self.find_bond(*bond_length)["length"], 5),
-                                            self.atoms[torsion[2]-1]["atom"],
-                                            self.atoms[torsion[1]-1]["atom"],
-                                            self.atoms[torsion[0]-1]["atom"]
+                                            self.atoms[torsion_index[3]]["atom"],
+                                            round(structure_torsion, 5),
+                                            round(180 - structure_angle, 5),
+                                            round(10*structure_bl, 5),
+                                            self.atoms[torsion_index[2]]["atom"],
+                                            self.atoms[torsion_index[1]]["atom"],
+                                            self.atoms[torsion_index[0]]["atom"]
                                             ]
 
-                                    param_f.write('{0:<13} {1:^8} {2:>10} {3:>10} {4:>10} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
+                                    param_f.write('{0:<13} {1:>8} {2:10.5f} {3:10.5f} {4:10.5f} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
 
     def write_atom_properties(self, param_filename):
         with open(param_filename, "w") as atom_f:
@@ -371,9 +451,9 @@ class ItpFileObject:
             atom_f.write("# System: " + platform.platform() + "\n")
             at_in_atoms = list(set([a["type"] for a in self.atoms])) 
             for atom_type in self.atomtypes.keys():
-                if atom_type in at_in_atoms:
+                if atom_type.lower() in at_in_atoms:
                     entry = [
-                        atom_type,
+                        atom_type.lower(),
                         ''.join([i for i in atom_type if not i.isdigit()]),  # remove numbers from atomtype
                         round(self.atomtypes[atom_type]["sigma"] * 10 * 2 ** (1/6) / 2, 5) , # Converting nm to Anstroms and r_min and divide by 2 for Rosetta conventions
                         round(self.atomtypes[atom_type]["epsilon"], 5),
@@ -396,9 +476,9 @@ class ItpFileObject:
             atom_f.write("# System: " + platform.platform() + "\n")
             at_in_atoms = list(set([a["type"] for a in self.atoms])) 
             for atom_type in self.atomtypes.keys():
-                if atom_type in at_in_atoms:
+                if atom_type.lower() in at_in_atoms:
                     entry = [
-                        atom_type,
+                        atom_type.lower(),
                         -round(self.atomtypes[atom_type]["epsilon"], 5),                        
                         round(self.atomtypes[atom_type]["sigma"] * 10 * 2 ** (1/6) / 2, 5) , # Converting nm to Anstroms and r_min and divide by 2 for Rosetta conventions
                         -round(self.atomtypes[atom_type]["epsilon"], 5),                        
@@ -407,6 +487,121 @@ class ItpFileObject:
                     atom_f.write('{0:<5}{1:>5}{2:>10}{3:>10}{4:>10}\n'.format(*entry))
 
 
+
+    def write_mm_bond_lengths(self, mm_bond_length_filename):
+        with open(mm_bond_length_filename, "w") as bl_f:
+            # write header
+            bl_f.write("ANGLES\n")
+            bl_f.write("! Rosetta atom_properties file\n")
+            bl_f.write("! Generated using itp_to_param.py\n")
+            bl_f.write("! Original file: " + self.filename + "\n")
+            bl_f.write("! Author: " + getpass.getuser() + "\n")
+            bl_f.write("! Date: " + datetime.now().strftime("%A, %d. %B %Y") + "\n")
+            bl_f.write("! Time: " + datetime.now().strftime("%I:%M%p")+ "\n")
+            bl_f.write("! System: " + platform.platform() + "\n")
+            bl_f.write("! atom types     Kb    b0\n")
+
+            # write angle parameters 
+            exisiting_angles = {}
+            for bond in self.bonds:
+                type_i, type_j = self.atoms[bond["ai"]-1]["type"], self.atoms[bond["aj"]-1]["type"]
+                bond_id = type_i + type_j
+                if bond_id not in exisiting_angles.keys():
+                    entry = [
+                        type_i,
+                        type_j,
+                        round(bond["k"] * 2 * 0.239 / 100, 5), # kJ to kcal and nm to A
+                        round(bond["length"]*10, 5)
+                    ]
+                    bl_f.write('{0:<5}{1:<5}{2:>10}{3:>10}\n'.format(*entry))
+                    exisiting_angles[bond_id] = [bond["k"], bond["length"]]
+                else:
+                    print("Angle Type:", bond_id, "was already found. Skipping!")
+                    assert(exisiting_angles[bond_id][0] == bond["k"])
+                    assert(exisiting_angles[bond_id][1] == bond["angle"])
+                    continue
+
+
+    def write_mm_bond_angles(self, mm_bond_angle_filename):
+        with open(mm_bond_angle_filename, "w") as angle_f:
+            # write header
+            angle_f.write("ANGLES\n")
+            angle_f.write("! Rosetta atom_properties file\n")
+            angle_f.write("! Generated using itp_to_param.py\n")
+            angle_f.write("! Original file: " + self.filename + "\n")
+            angle_f.write("! Author: " + getpass.getuser() + "\n")
+            angle_f.write("! Date: " + datetime.now().strftime("%A, %d. %B %Y") + "\n")
+            angle_f.write("! Time: " + datetime.now().strftime("%I:%M%p")+ "\n")
+            angle_f.write("! System: " + platform.platform() + "\n")
+            angle_f.write("! atom types     Ktheta    Theta0   Kub     S0\n")
+
+            # write angle parameters 
+            exisiting_angles = {}
+            for angle in self.angles:
+                type_i, type_j, type_k = self.atoms[angle["ai"]-1]["type"], self.atoms[angle["aj"]-1]["type"], self.atoms[angle["ak"]-1]["type"]
+                angle_id = type_i + type_j + type_k
+                if angle_id not in exisiting_angles.keys():
+                    entry = [
+                        type_i,
+                        type_j,
+                        type_k,
+                        round(angle["k"] * 2 * 0.239, 5), # kJ to kcal
+                        round(angle["angle"], 4)
+                    ]
+                    angle_f.write('{0:<5}{1:<5}{2:<5}{3:>10}{4:>10}\n'.format(*entry))
+                    exisiting_angles[angle_id] = [angle["k"], angle["angle"]]
+                else:
+                    print("Angle Type:", angle_id, "was already found. Skipping!")
+                    assert(exisiting_angles[angle_id][0] == angle["k"])
+                    assert(exisiting_angles[angle_id][1] == angle["angle"])
+                    continue
+
+
+
+    def write_mm_torsions(self, mm_torsion_filename):
+        with open(mm_torsion_filename, "w") as torsion_f:
+            # write header
+            torsion_f.write("# Rosetta atom_properties file\n")
+            torsion_f.write("# Generated using itp_to_param.py\n")
+            torsion_f.write("# Original file: " + self.filename + "\n")
+            torsion_f.write("# Author: " + getpass.getuser() + "\n")
+            torsion_f.write("# Date: " + datetime.now().strftime("%A, %d. %B %Y") + "\n")
+            torsion_f.write("# Time: " + datetime.now().strftime("%I:%M%p")+ "\n")
+            torsion_f.write("# System: " + platform.platform() + "\n")
+            torsion_f.write("# atom types     Ktheta  periodicity  Theta0\n")
+
+            # write angle parameters 
+            exisiting_torsions = {}
+            error_count = 0
+            for torsion in self.torsions:
+                type_i, type_j, type_k, type_l = self.atoms[torsion["ai"]-1]["type"], \
+                                                self.atoms[torsion["aj"]-1]["type"], \
+                                                self.atoms[torsion["ak"]-1]["type"], \
+                                                self.atoms[torsion["al"]-1]["type"]
+                torsion_id = type_i + type_j + type_k + type_l + "_" + str(torsion["periodicity"]) 
+                if torsion_id not in exisiting_torsions.keys():
+                    entry = [
+                        type_i,
+                        type_j,
+                        type_k,
+                        type_l,
+                        round(torsion["k"] * 2 *0.239, 5), # kJ to kcal
+                        torsion["periodicity"],
+                        round(torsion["angle"], 5)
+                    ]
+                    torsion_f.write('{0:<5}{1:<5}{2:<5}{3:<5}{4:>5}{5:>10}{6:>10}\n'.format(*entry))
+                    exisiting_torsions[torsion_id] = [torsion["k"], torsion["angle"]]
+                else:
+                    print("Torsion Type:", torsion_id, "was already found. Skipping!")
+                    print("k:", exisiting_torsions[torsion_id][0], torsion["k"] )
+                    print("torsion:", exisiting_torsions[torsion_id][1], torsion["angle"] )
+                    if exisiting_torsions[torsion_id][0] != torsion["k"] or \
+                            exisiting_torsions[torsion_id][1] != torsion["angle"]:
+                        print("ERROR!!", torsion_id)
+                        error_count += 1
+                    continue
+            
+            print("There were", error_count, "instances of oversubscribed torsion ids")
 
 
 def parse_args():
@@ -426,19 +621,73 @@ def parse_args():
 
 def main():
     args = parse_args()
-    itp_file = ItpFileObject(args.file)
+    itp_file = ItpFileObject(args.file, )
     id = args.file.split(".")[0]
-    itp_file.write_param_file(id + ".params")
-    itp_file.write_atom_properties("atom_properties.txt")
-    itp_file.write_mm_atom_properties("mm_atom_properties.txt")
+    # itp_file.write_param_file("parameters/tph_tetramer.param", "em_terphenyl_pmp_octamer.gro")
+    itp_file.write_atom_properties("parameters/atom_properties.txt")
+    itp_file.write_mm_atom_properties("parameters/mm_atom_properties.txt")
+    itp_file.write_mm_bond_lengths("parameters/mm_bond_length_params.txt")
+    itp_file.write_mm_bond_angles("parameters/mm_bond_angle_params.txt")
+    itp_file.write_mm_torsions("parameters/mm_torsion_params.txt")
 
+    
+    # Test some basic CG PyRosetta functionality
+    
     import cg_pyrosetta
-    cg_pyrosetta.init(add_atom_types = "fa_standard atom_properties.txt",
-                      add_mm_atom_type_set_parameters = "fa_standard mm_atom_properties.txt",
-                      extra_res_fa = "OCT.params"
-                )
-    cg_pyrosetta.pyrosetta.pose_from_sequence("X[OCT]")
 
+    cg_pyrosetta.init(add_atom_types = "fa_standard parameters/atom_properties.txt", 
+                      add_mm_atom_type_set_parameters = "fa_standard parameters/mm_atom_properties.txt",
+                      extra_res_fa = "parameters/tph_tetramer.param",
+                      extra_mm_params_dir = "parameters",
+                      mute = "no"
+    )
+    pymol = cg_pyrosetta.pyrosetta.PyMOLMover()
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[MOL]")
+    pymol.apply(pose)
+    pose.dump_pdb("test.pdb")
+    small = cg_pyrosetta.CG_movers.CGSmallMover(pose)
+
+    energy_function = cg_pyrosetta.CG_monte_carlo.EnergyFunctionFactory().build_energy_function(
+        {
+            "mm_twist" : 1,
+            "mm_bend" : 1,
+            "mm_stretch" : 1,
+            "ring_close" : 10,
+            "fa_atr" : 1,
+            "fa_rep" : 1,
+            "fa_intra_rep" : 1,
+            "fa_intra_atr" : 1,
+        }
+    )
+    
+    print("Total Energy:", energy_function(pose))
+    
+
+    # Build Minimizer
+    mini = cg_pyrosetta.pyrosetta.rosetta.protocols.minimization_packing.MinMover()
+    mini.min_type('lbfgs_armijo_nonmonotone')
+    mini.score_function(energy_function)
+
+    movemap = cg_pyrosetta.pyrosetta.MoveMap()
+    movemap.set_bb_true_range(1, pose.size())
+    movemap.set_branches(True)
+    movemap.set(cg_pyrosetta.pyrosetta.rosetta.core.id.PHI, True)
+    movemap.set(cg_pyrosetta.pyrosetta.rosetta.core.id.THETA, True)
+
+    mini.apply(pose)
+    pymol.apply(pose)
+
+    small.angle = 10
+
+    for i in range(5000):
+        small.apply(pose)
+        pymol.apply(pose)
+        mini.apply(pose)
+        pymol.apply(pose)
+        print("Step: ", i)
+        print("Total Energy:", energy_function(pose))
+
+    pose.dump_pdb("test.pdb")
 
 
 

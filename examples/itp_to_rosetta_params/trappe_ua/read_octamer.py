@@ -10,7 +10,7 @@ def main():
                       add_mm_atom_type_set_parameters = "fa_standard mm_atom_properties.txt",
                       extra_res_fa = "OCT_trappe.params"
     )
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[OCT]X[OCT]")
+    pose = cg_pyrosetta.pyrosetta.pose_from_sequence("X[TPH]X[TPH]")
     pose.dump_pdb("OCT.pdb")
 
     cg_pyrosetta.pyrosetta
