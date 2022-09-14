@@ -6,7 +6,7 @@ cg_pyrosetta.init()
 
 def test_mm_twist():
     # Set CG1-CG1-CG1-CG1 torsion
-    cg_pyrosetta.change_parameters.changeTorsionParameters({'CG2 CG1 CG1 CG2': [10, 6, 35]})
+    cg_pyrosetta.parameters.changeTorsionParameters({'CG2 CG1 CG1 CG2': [10, 6, 35]})
     # Build 1-1 CG model
     pose = cg_pyrosetta.pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]')
 
@@ -31,7 +31,7 @@ def test_mm_twist():
 
 def test_mm_bend():
     # Set CG1-CG1-CG1-CG1 torsion
-    cg_pyrosetta.change_parameters.changeAngleParameters({'CG2 CG1 CG1': [10, 10]})
+    cg_pyrosetta.parameters.changeAngleParameters({'CG2 CG1 CG1': [10, 10]})
     # Build 1-1 CG model
     pose = cg_pyrosetta.pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3]X[CG11x3:CGUpper]')
 

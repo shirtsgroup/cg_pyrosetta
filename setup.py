@@ -72,5 +72,10 @@ setup(
 
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
     # zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'itp_to_rosetta_params = cg_pyrosetta.scripts:itp_to_rosetta_params',
+        ]
+    }
 
 )

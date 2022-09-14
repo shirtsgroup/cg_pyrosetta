@@ -17,7 +17,7 @@ def set_parameters(job):
     os.chdir(job.ws)
     # set parameters
     print("Changing parameters in", os.path.abspath(""))
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {
          'CG2' : ['X', job.sp.sc_size, 0.2],
         },

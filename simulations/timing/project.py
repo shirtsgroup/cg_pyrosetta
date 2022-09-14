@@ -17,7 +17,7 @@ def set_parameters(job):
     os.chdir(job.ws)
     # set parameters
     print("Changing parameters in", os.path.abspath(""))
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {
          'CG1 CG2 CG3' : [15, job.sp.bbb_angle],
          'CG2 CG1 CG1' : [15, (360 - job.sp.bbb_angle)/2]

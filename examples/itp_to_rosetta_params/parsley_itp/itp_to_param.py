@@ -8,7 +8,18 @@ from itertools import combinations, compress, permutations
 import mdtraj as md
 
 class ItpFileObject:
+    """
+    Object to convert between gromacs itp files and rosetta parameter files
+    """
     def __init__(self, filename):
+        """
+        Instantiate an ItpFileObject
+
+        Parameters
+        ----------
+        filename : str
+            string of the filename to load into the object
+        """
         self.filename = filename
         self.itp_file = []
         with open(self.filename, 'r') as f:
@@ -25,6 +36,9 @@ class ItpFileObject:
         self.get_molecule()
 
     def get_molecule(self):
+        """
+        Function for saving molecule name from itp file
+        """
         moltype_index = 0
         while "[ moleculetype ]" not in self.itp_file[moltype_index]:
             moltype_index += 1
@@ -40,6 +54,9 @@ class ItpFileObject:
         self.mol_name = line_entries[0]
     
     def get_atomtypes(self):
+        """
+        Function for saving atomtypes from itp file
+        """
         atomtype_index = 0
         while "[ atomtypes ]" not in self.itp_file[atomtype_index]:
             atomtype_index += 1
@@ -67,6 +84,9 @@ class ItpFileObject:
                 }
 
     def get_atoms(self):
+        """
+        Function for saving atom names and other properties from itp file
+        """
         atom_index = 0
         while "[ atoms ]" not in self.itp_file[atom_index]:
             atom_index += 1
@@ -108,6 +128,9 @@ class ItpFileObject:
 
 
     def get_bonds(self):
+        """
+        Function for saving bond information from itp file
+        """
         bond_index = 0
         while "[ bonds ]" not in self.itp_file[bond_index]:
             bond_index += 1
@@ -160,6 +183,9 @@ class ItpFileObject:
                 )
 
     def get_torsions(self):
+        """
+        Function for saving torsion information from itp file
+        """
         torsion_index = 0
         while "[ dihedrals ]" not in self.itp_file[torsion_index]:
             torsion_index += 1
@@ -190,6 +216,21 @@ class ItpFileObject:
                 )
 
     def find_bond(self, ai, aj):
+        """
+        Function for identifying a bond entry by atom type
+
+        Parameters
+        ----------
+        ai : int
+            atom index of atom i
+        aj : int
+            atom index of atom j
+
+        Returns
+        -------
+        bond : dict
+            bond information dictionary. If no bond is found, returns None
+        """
         for perm in permutations([ai, aj]):
             for bond in self.bonds:
                 if bond["ai"] == perm[0]:
@@ -202,9 +243,31 @@ class ItpFileObject:
         return None
     
     def is_hydrogen(self, atom):
+        """
+        Function to check if a provided atom index is a hydrogen
+
+        Parameters
+        ----------
+        atom : int
+            atom index to check
+        """
         return''.join([i.lower() for i in atom["type"] if not i.isdigit()]) == "h"
     
     def is_bonded(self, ai, aj):
+        """
+        Function to check if two provided atom indices are bonded
+
+        Parameters
+        ----------
+        ai : int
+            atom index i
+        aj : int
+            atom index j
+
+        Returns
+        -------
+        out : bool
+        """
         check_bond = self.find_bond(ai, aj)
         if check_bond is None:
             return False
@@ -212,12 +275,38 @@ class ItpFileObject:
             return True
 
     def get_neighbors(self, ai):
+        """
+        Function returns list of neighboring atoms
+
+        Parameters
+        ----------
+        ai : int
+            index of atom
+        """
         n_filter = [self.is_bonded(ai, n + 1) or self.is_bonded(n + 1, ai) for n in range(len(self.atoms))]
         neighbors_filterd = compress(self.atoms, n_filter)
         return [atom["nr"] for atom in neighbors_filterd]
 
 
     def find_angle(self, ai, aj, ak):
+        """
+        Function for identifying angle information by atom number. Checks for
+        permutations of the provided atoms.
+
+        Parameters
+        ----------
+        ai : int
+            atom index of atom i
+        aj : int
+            atom index of atom j
+        ak : int
+            atom index of atom k
+
+        Returns
+        -------
+        angle : dict
+            angle information dictionary. If no bond is found, returns None
+        """
         for perm in permutations([ai, aj, ak]):
             for angle in self.angles:
                 if angle["ai"] == perm[0]:
@@ -233,6 +322,26 @@ class ItpFileObject:
         return None
 
     def find_torsion(self, ai, aj, ak, al):
+        """
+        Function for identifying torsion information by atom number. Checks for permutations
+        of the provided atoms.
+
+        Parameters
+        ----------
+        ai : int
+            atom index of atom i
+        aj : int
+            atom index of atom j
+        ak : int
+            atom index of atom k
+        al : int
+            atom index of atom l
+
+        Returns
+        -------
+        angle : dict
+            torsion information dictionary. If no bond is found, returns None
+        """
         for perm in permutations([ai, aj, ak, al]):
             for torsion in self.torsions:
                 if torsion["ai"] == perm[0]:
@@ -252,6 +361,17 @@ class ItpFileObject:
 
     
     def write_param_file(self, param_filename, structure_file, nbr_radius = 20):
+        """
+        Function to write Rosetta parameter file
+
+        Parameters
+        ----------
+        param_filename : str
+            File name to write parameter file
+        structure_file : str
+            Structure file used for placing atoms in 3D space
+        nbr_radius : float, default 20
+        """
 
         md_structure = md.load(structure_file)
 
@@ -439,6 +559,14 @@ class ItpFileObject:
                                     param_f.write('{0:<13} {1:>8} {2:10.5f} {3:10.5f} {4:10.5f} {5:>6} {6:>6} {7:>6}\n'.format(*z_entry))
 
     def write_atom_properties(self, param_filename):
+        """
+        Function to write rosetta atom_propeties file
+
+        Parameters
+        ----------
+        param_filename : str
+            File name to write atom_property file
+        """
         with open(param_filename, "w") as atom_f:
             # write header
             atom_f.write("NAME  ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME\n")
@@ -464,6 +592,14 @@ class ItpFileObject:
                     atom_f.write('{0:<5}{1:>5}{2:>10}{3:>10}{4:>10}{5:>10}{6:>10}\n'.format(*entry))
 
     def write_mm_atom_properties(self, mm_param_filename):
+        """
+        Function to write rosetta mm_atom_properties file
+
+        Parameters
+        ----------
+        mm_param_filename : str
+            File name to write mm_atom_property file
+        """
         with open(mm_param_filename, "w") as atom_f:
             # write header
             atom_f.write("NAME    LJ_WDEPTH   LJ_RADIUS   LJ_3B_WDEPTH    LJ_3B_RADIUS\n")
@@ -489,6 +625,14 @@ class ItpFileObject:
 
 
     def write_mm_bond_lengths(self, mm_bond_length_filename):
+        """
+        Function to write rosetta mm_bond_length parameter file
+
+        Parameters
+        ----------
+        mm_bond_length_filename : str
+            File name to write mm_bond_length file
+        """
         with open(mm_bond_length_filename, "w") as bl_f:
             # write header
             bl_f.write("ANGLES\n")
@@ -523,6 +667,14 @@ class ItpFileObject:
 
 
     def write_mm_bond_angles(self, mm_bond_angle_filename):
+        """
+        Function to write rosetta mm_bond_angle parameter file
+
+        Parameters
+        ----------
+        mm_bond_angle_filename : str
+            File name to write mm_bond_angle file
+        """
         with open(mm_bond_angle_filename, "w") as angle_f:
             # write header
             angle_f.write("ANGLES\n")
@@ -559,6 +711,14 @@ class ItpFileObject:
 
 
     def write_mm_torsions(self, mm_torsion_filename):
+        """
+        Function to write rosetta mm_bond_torsion parameter file
+
+        Parameters
+        ----------
+        mm_torsion_filename : str
+            File name to write mm_bond_torsion file
+        """
         with open(mm_torsion_filename, "w") as torsion_f:
             # write header
             torsion_f.write("# Rosetta atom_properties file\n")

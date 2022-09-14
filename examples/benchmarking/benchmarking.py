@@ -53,14 +53,14 @@ def build_inputs(seqences, name, rep, kts):
 if __name__ == '__main__':
     p = Pool(5)
 
-    cg_pyrosetta.change_parameters.changeTorsionParameters(
+    cg_pyrosetta.parameters.changeTorsionParameters(
         {'CG1 CG1 CG1 CG1':[5,3,0],
             'CG2 CG1 CG1 CG2':[0,0,0],
             'CG2 CG1 CG1 CG1':[0,0,0],
             'X CG2 CG1 CG1':[0,0,0]},
     )
 
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {'CG1 CG1 CG1':[20,120],
         'CG2 CG1 CG1':[20,120],
         'CG1 CG1 CG2':[0,0],

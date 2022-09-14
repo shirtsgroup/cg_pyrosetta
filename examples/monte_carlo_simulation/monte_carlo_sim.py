@@ -6,7 +6,7 @@ import pyrosetta
 pyrosetta.init()
 
 # Set desired parameters
-cg_pyrosetta.change_parameters.changeTorsionParameters(
+cg_pyrosetta.parameters.changeTorsionParameters(
     {
      'CG1 CG1 CG1 CG1':[0,0,0],
      'CG2 CG1 CG1 CG1':[0,0,0],
@@ -14,14 +14,14 @@ cg_pyrosetta.change_parameters.changeTorsionParameters(
      }
 )
 
-cg_pyrosetta.change_parameters.changeAngleParameters(
+cg_pyrosetta.parameters.changeAngleParameters(
     {
      'CG1 CG1 CG1':[0,0,0],
      'CG2 CG1 CG1':[0,0,0]
     }
 )
 
-cg_pyrosetta.change_parameters.changeAtomParameters(
+cg_pyrosetta.parameters.changeAtomParameters(
     {
         'CG1':['X', 1.0, 0.2],
         'CG2':['X', 0.5, 0.2]

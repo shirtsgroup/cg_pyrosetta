@@ -23,8 +23,9 @@ else:
 
 import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
-import cg_pyrosetta.change_parameters
+import cg_pyrosetta.parameters
 import cg_pyrosetta.CG_monte_carlo
+import cg_pyrosetta.scripts
 from cg_pyrosetta.utils import init
 import pyrosetta_modified as pyrosetta
 
