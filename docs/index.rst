@@ -13,23 +13,27 @@ Welcome to Coarse Grained PyRosetta's documentation!
 
 .. mdinclude:: ../README.md
 
-.. automodule:: cg_pyrosetta.cg_pyrosetta
+.. automodule:: cg_pyrosetta
     :members:
 
 Building cg_pyrosetta
 ======================
-.. automodule:: cg_pyrosetta.build_cg_pyrosetta
+.. automodule:: build_cg_pyrosetta
     :members:
 
 CG Movers
 =========
-.. automodule:: cg_pyrosetta.CG_movers
+.. automodule:: CG_movers
     :members:
 
 Folding CG Models
 =================
-.. autoclass:: cg_pyrosetta.CG_folding.CGFoldingAlgorithm
+.. autoclass:: CG_folding
     :members:
+
+.. autoclass:: cg_monte_carlo
+    :members:
+
 
 
 Indices and tables
