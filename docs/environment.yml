@@ -1,0 +1,17 @@
+name: conda_pyrosetta
+channels:
+  - conda-forge
+  - omnia
+  - https://levinthal:paradox@conda.rosettacommons.org
+  - defaults
+dependencies:
+  - python=3.9
+  - pyrosetta
+  - yaml
+  - conda-build
+  - conda
+  - signac
+  - signac-flow
+  - pytest
+  - mdtraj
+prefix: /home/tfobe/anaconda3/envs/conda_pyrosetta
