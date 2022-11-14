@@ -10,24 +10,26 @@ Welcome to Coarse Grained PyRosetta's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+Readme File
+===========
+.. 
+   mdinclude:: ../README.md
 
-mdinclude:: ../README.md
-
-automodule:: cg_pyrosetta
+.. automodule:: cg_pyrosetta.cg_pyrosetta
 
 Building cg_pyrosetta
 ======================
-automodule:: build_cg_pyrosetta
+.. automodule:: cg_pyrosetta.build_cg_pyrosetta
 
 CG Movers
 =========
-automodule:: CG_movers
+.. automodule:: cg_pyrosetta.CG_movers
 
 Folding CG Models
 =================
-automodule:: CG_folding
+.. automodule:: cg_pyrosetta.CG_folding
 
-automodule:: cg_monte_carlo
+.. automodule:: cg_pyrosetta.CG_monte_carlo
 
 
 
