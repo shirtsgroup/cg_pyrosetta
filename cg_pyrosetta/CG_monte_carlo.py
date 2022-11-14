@@ -42,7 +42,22 @@ class Observer(ABC):
 
 
 class EnergyObserver(Observer):
+    """
+    Observer design pattern to record energy from MC simulation
+    """
     def __init__(self, subject, write_file = True, file_name = "energies.txt"):
+        """
+        EnergyObserver constructor
+
+        Paramters
+        ---------
+        subject : Subject
+            Object the energy observer will observe for energies
+        write_file : bool
+            Flag wether to write energies to file
+        file_name : string
+            output name of energy file
+        """
         self.energies = []
         self.subject = subject
         self.write_file = write_file
@@ -51,6 +66,9 @@ class EnergyObserver(Observer):
             os.remove(file_name)
 
     def update(self):
+        """
+        Function pulls energy from subject and writes to file, depending on `self.write_file` flag.
+        """
         energy = self.subject.get_energy()
         self.energies.append(energy)
         if self.write_file is True:
@@ -66,6 +84,9 @@ class EnergyObserver(Observer):
 
 
 class StructureObserver(Observer):
+    """
+    Observer pattern to record structure files of MC simulation
+    """
     def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_file = "trajectory.pdb"):
         self.structures = []
         self.subject = subject
