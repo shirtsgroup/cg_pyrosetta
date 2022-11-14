@@ -88,6 +88,20 @@ class StructureObserver(Observer):
     Observer pattern to record structure files of MC simulation
     """
     def __init__(self, subject, write_file = True, file_name = "structure.txt", pdb_file = "trajectory.pdb"):
+        """
+        StructureObserver constructor
+
+        Parameters
+        ----------
+        subject : Subject
+            Object to write structures from
+        write_file : bool
+            Flag of whether to structures to file
+        file_name : str
+            Output file name of structure files
+        pdb_file : str
+            Output file name of the pdb trajectory
+        """
         self.structures = []
         self.subject = subject
         self.write_file = write_file
@@ -103,6 +117,9 @@ class StructureObserver(Observer):
 
 
     def update(self):
+        """
+        This function pulls structures from subject and writes to file, depending on `self.write_file` flag.
+        """
         structure = self.subject.pose.clone()
         self.structures.append(structure)
         if self.write_file is True:
@@ -118,7 +135,18 @@ class StructureObserver(Observer):
                     f.write(str(len(self.structures)) + "\n")
 
 class KTObserver(Observer):
+    """
+    Observer object to write kT values from a simulation
+    """
     def __init__(self, subject, write_file = True, file_name = "kt_schedule.txt"):
+        """
+        KTObserver constructor
+
+        Parameters
+        ----------
+        subject : Subject
+            Object to pull kT values from
+        """
         self.kts = []
         self.subject = subject
         self.write_file = write_file
@@ -127,6 +155,9 @@ class KTObserver(Observer):
             os.remove(file_name)
 
     def update(self):
+        """
+        This function pull kT values from subject and writes to file, depending on `self.write_file` flag.
+        """
         kt = self.subject.kT
         self.kts.append(kt)
         if self.write_file is True:
