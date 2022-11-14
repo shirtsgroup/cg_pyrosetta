@@ -160,5 +160,8 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+autodoc_mock_imports = [
+    ""
+]
 
 # -- Extension configuration -------------------------------------------------
