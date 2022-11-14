@@ -88,14 +88,14 @@ def build_scorefxn(cgmodel,mm=False):
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_atr, 1)
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-        cg_pyrosetta.change_parameters.changeTorsionParameters(
+        cg_pyrosetta.parameters.changeTorsionParameters(
           {'CG1 CG1 CG1 CG1':[0,0,0],
           'CG2 CG1 CG1 CG2':[0,0,0],
           'CG2 CG1 CG1 CG1':[0,0,0],
           'X CG2 CG1 CG1':[0,0,0]}
         )
 
-        cg_pyrosetta.change_parameters.changeAngleParameters(
+        cg_pyrosetta.parameters.changeAngleParameters(
           {'CG1 CG1 CG1':[0,0],
           'CG2 CG1 CG1':[0,0],
           'CG1 CG1 CG2':[0,0],

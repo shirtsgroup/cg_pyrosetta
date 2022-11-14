@@ -1,0 +1,1160 @@
+# Rosetta residue topology file
+# Generated using itp_to_param.py
+# Original file: terphenyl_pmp_octamer.top
+# Author: tfobe
+# Date: Thursday, 30. June 2022
+# Time: 06:51PM
+# System: Linux-5.14.0-1042-oem-x86_64-with-glibc2.31
+
+NAME MOL
+IO_STRING MOL X
+TYPE POLYMER
+AA UNK
+
+ATOM  Cab   c1    c1      -0.01138
+ATOM  Cac   c2    c2      -0.18991
+ATOM  Cad   c3    c3       0.12579
+ATOM  Cae   c4    c4      -0.13551
+ATOM  Caf   c5    c5      -0.00719
+ATOM  Cag   c6    c6      -0.13958
+ATOM  Cah   c7    c7      -0.00849
+ATOM  Cai   c8    c8      -0.03514
+ATOM  Caj   c9    c9      -0.11572
+ATOM  Cak   c10   c10     -0.12170
+ATOM  Cal   c11   c11     -0.09422
+ATOM  Cam   c12   c12     -0.12170
+ATOM  Can   c13   c13     -0.11572
+ATOM  Cao   c14   c14     -0.12873
+ATOM  Cap   c15   c15     -0.09027
+ATOM  Caq   c16   c16     -0.14494
+ATOM  Car   c17   c17     -0.09027
+ATOM  Cas   c18   c18     -0.12873
+ATOM  Cat   c19   c19      0.15138
+ATOM  Nab   n1    n1      -0.57190
+ATOM  Cau   c20   c20      0.67087
+ATOM  Oab   o1    o1      -0.59636
+ATOM  Cav   c21   c21     -0.00483
+ATOM  Caw   c22   c22     -0.14070
+ATOM  Cax   c23   c23      0.12494
+ATOM  Cay   c24   c24     -0.19021
+ATOM  Caz   c25   c25     -0.00874
+ATOM  Cba   c26   c26     -0.14166
+ATOM  Cbb   c27   c27     -0.03680
+ATOM  Cbc   c28   c28     -0.01354
+ATOM  Cbd   c29   c29     -0.12989
+ATOM  Cbe   c30   c30     -0.09120
+ATOM  Cbf   c31   c31     -0.14197
+ATOM  Cbg   c32   c32     -0.09120
+ATOM  Cbh   c33   c33     -0.12989
+ATOM  Cbi   c34   c34     -0.11591
+ATOM  Cbj   c35   c35     -0.12228
+ATOM  Cbk   c36   c36     -0.09241
+ATOM  Cbl   c37   c37     -0.12228
+ATOM  Cbm   c38   c38     -0.11591
+ATOM  Cbn   c39   c39      0.67646
+ATOM  Cbo   c40   c40      0.15071
+ATOM  Nac   n2    n2      -0.57008
+ATOM  Oac   o2    o2      -0.60581
+ATOM  Cbp   c41   c41     -0.00517
+ATOM  Cbq   c42   c42     -0.18905
+ATOM  Cbr   c43   c43      0.12527
+ATOM  Cbs   c44   c44     -0.14022
+ATOM  Cbt   c45   c45     -0.00998
+ATOM  Cbu   c46   c46     -0.14075
+ATOM  Cbv   c47   c47     -0.02959
+ATOM  Cbw   c48   c48     -0.02001
+ATOM  Cbx   c49   c49     -0.12888
+ATOM  Cby   c50   c50     -0.09262
+ATOM  Cbz   c51   c51     -0.13568
+ATOM  Cca   c52   c52     -0.09262
+ATOM  Ccb   c53   c53     -0.12888
+ATOM  Ccc   c54   c54     -0.11744
+ATOM  Ccd   c55   c55     -0.11782
+ATOM  Cce   c56   c56     -0.11497
+ATOM  Ccf   c57   c57     -0.11782
+ATOM  Ccg   c58   c58     -0.11744
+ATOM  Cch   c59   c59      0.67928
+ATOM  Cci   c60   c60      0.14027
+ATOM  Nad   n3    n3      -0.55814
+ATOM  Oad   o3    o3      -0.58939
+ATOM  Ccj   c61   c61     -0.01476
+ATOM  Cck   c62   c62     -0.19189
+ATOM  Ccl   c63   c63      0.12316
+ATOM  Ccm   c64   c64     -0.13985
+ATOM  Ccn   c65   c65      0.00098
+ATOM  Cco   c66   c66     -0.13976
+ATOM  Ccp   c67   c67     -0.00127
+ATOM  Ccq   c68   c68     -0.03987
+ATOM  Ccr   c69   c69     -0.11272
+ATOM  Ccs   c70   c70     -0.11464
+ATOM  Cct   c71   c71     -0.09829
+ATOM  Ccu   c72   c72     -0.11464
+ATOM  Ccv   c73   c73     -0.11272
+ATOM  Ccw   c74   c74     -0.13736
+ATOM  Ccx   c75   c75     -0.07433
+ATOM  Ccy   c76   c76     -0.13176
+ATOM  Ccz   c77   c77     -0.07433
+ATOM  Cda   c78   c78     -0.13736
+ATOM  Cdb   c79   c79      0.14046
+ATOM  Nae   n4    n4      -0.55974
+ATOM  Cdc   c80   c80      0.64462
+ATOM  Oae   o4    o4      -0.53868
+ATOM  Cdd   c81   c81     -0.01002
+ATOM  Cde   c82   c82     -0.18865
+ATOM  Cdf   c83   c83      0.12515
+ATOM  Cdg   c84   c84     -0.13911
+ATOM  Cdh   c85   c85     -0.00516
+ATOM  Cdi   c86   c86     -0.14244
+ATOM  Cdj   c87   c87     -0.01339
+ATOM  Cdk   c88   c88     -0.03300
+ATOM  Cdl   c89   c89     -0.11609
+ATOM  Cdm   c90   c90     -0.12129
+ATOM  Cdn   c91   c91     -0.09587
+ATOM  Cdo   c92   c92     -0.12129
+ATOM  Cdp   c93   c93     -0.11609
+ATOM  Cdq   c94   c94     -0.13027
+ATOM  Cdr   c95   c95     -0.09058
+ATOM  Cds   c96   c96     -0.14406
+ATOM  Cdt   c97   c97     -0.09058
+ATOM  Cdu   c98   c98     -0.13027
+ATOM  Cdv   c99   c99      0.15248
+ATOM  Naf   n5    n5      -0.57311
+ATOM  Cdw   c100  c100     0.67429
+ATOM  Oaf   o5    o5      -0.59604
+ATOM  Cdx   c101  c101    -0.00421
+ATOM  Cdy   c102  c102    -0.18953
+ATOM  Cdz   c103  c103     0.12475
+ATOM  Cea   c104  c104    -0.13693
+ATOM  Ceb   c105  c105    -0.01177
+ATOM  Cec   c106  c106    -0.14209
+ATOM  Ced   c107  c107    -0.03164
+ATOM  Cee   c108  c108    -0.01365
+ATOM  Cef   c109  c109    -0.12806
+ATOM  Ceg   c110  c110    -0.09143
+ATOM  Ceh   c111  c111    -0.13950
+ATOM  Cei   c112  c112    -0.09143
+ATOM  Cej   c113  c113    -0.12806
+ATOM  Cek   c114  c114    -0.11740
+ATOM  Cel   c115  c115    -0.11950
+ATOM  Cem   c116  c116    -0.09746
+ATOM  Cen   c117  c117    -0.11950
+ATOM  Ceo   c118  c118    -0.11740
+ATOM  Cep   c119  c119     0.67569
+ATOM  Ceq   c120  c120     0.16581
+ATOM  Nag   n6    n6      -0.56279
+ATOM  Oag   o6    o6      -0.60608
+ATOM  Cer   c121  c121     0.00313
+ATOM  Ces   c122  c122    -0.19179
+ATOM  Cet   c123  c123     0.12268
+ATOM  Ceu   c124  c124    -0.14162
+ATOM  Cev   c125  c125    -0.01770
+ATOM  Cew   c126  c126    -0.14455
+ATOM  Cex   c127  c127    -0.04274
+ATOM  Cey   c128  c128    -0.01202
+ATOM  Cez   c129  c129    -0.12904
+ATOM  Cfa   c130  c130    -0.09346
+ATOM  Cfb   c131  c131    -0.14137
+ATOM  Cfc   c132  c132    -0.09346
+ATOM  Cfd   c133  c133    -0.12904
+ATOM  Cfe   c134  c134    -0.11201
+ATOM  Cff   c135  c135    -0.10852
+ATOM  Cfg   c136  c136    -0.10806
+ATOM  Cfh   c137  c137    -0.10852
+ATOM  Cfi   c138  c138    -0.11201
+ATOM  Cfj   c139  c139     0.67347
+ATOM  Cfk   c140  c140     0.14142
+ATOM  Nah   n7    n7      -0.56269
+ATOM  Oah   o7    o7      -0.59422
+ATOM  Cfl   c141  c141    -0.00986
+ATOM  Cfm   c142  c142    -0.18747
+ATOM  Cfn   c143  c143     0.12413
+ATOM  Cfo   c144  c144    -0.13875
+ATOM  Cfp   c145  c145    -0.00364
+ATOM  Cfq   c146  c146    -0.14232
+ATOM  Cfr   c147  c147    -0.01264
+ATOM  Cfs   c148  c148    -0.03439
+ATOM  Cft   c149  c149    -0.11580
+ATOM  Cfu   c150  c150    -0.11871
+ATOM  Cfv   c151  c151    -0.10886
+ATOM  Cfw   c152  c152    -0.11871
+ATOM  Cfx   c153  c153    -0.11580
+ATOM  Cfy   c154  c154    -0.13121
+ATOM  Cfz   c155  c155    -0.09162
+ATOM  Cga   c156  c156    -0.14291
+ATOM  Cgb   c157  c157    -0.09162
+ATOM  Cgc   c158  c158    -0.13121
+ATOM  Cgd   c159  c159     0.14208
+ATOM  Nai   n8    n8      -0.56217
+ATOM  Cge   c160  c160     0.67066
+ATOM  Oai   o8    o8      -0.59884
+ATOM  Cgf   c161  c161     0.75363
+ATOM  Oaj   o9    o9      -0.60266
+ATOM  Oak   o10   o10     -0.45211
+ATOM  Cgg   c162  c162     0.18776
+ATOM  Cgh   c163  c163    -0.11473
+ATOM  Cgi   c164  c164    -0.11473
+ATOM  Cgj   c165  c165    -0.11473
+ATOM  Oal   o11   o11     -0.43846
+ATOM  Cgk   c166  c166     0.12633
+ATOM  Hab   h1    h1       0.14131
+ATOM  Oam   o12   o12     -0.32600
+ATOM  Hac   h2    h2       0.15555
+ATOM  Had   h3    h3       0.13755
+ATOM  Hae   h4    h4       0.13740
+ATOM  Haf   h5    h5       0.13636
+ATOM  Hag   h6    h6       0.13636
+ATOM  Hah   h7    h7       0.13740
+ATOM  Hai   h8    h8       0.14069
+ATOM  Haj   h9    h9       0.14777
+ATOM  Hak   h10   h10      0.14777
+ATOM  Hal   h11   h11      0.14069
+ATOM  Ham   h12   h12      0.08601
+ATOM  Cgl   c167  c167    -0.11000
+ATOM  Han   h13   h13      0.31146
+ATOM  Hao   h14   h14      0.15405
+ATOM  Oan   o13   o13     -0.32871
+ATOM  Hap   h15   h15      0.14285
+ATOM  Haq   h16   h16      0.14036
+ATOM  Har   h17   h17      0.14058
+ATOM  Has   h18   h18      0.14842
+ATOM  Hat   h19   h19      0.14842
+ATOM  Hau   h20   h20      0.14058
+ATOM  Hav   h21   h21      0.13839
+ATOM  Haw   h22   h22      0.13767
+ATOM  Hax   h23   h23      0.13767
+ATOM  Hay   h24   h24      0.13839
+ATOM  Haz   h25   h25      0.08742
+ATOM  Cgm   c168  c168    -0.11405
+ATOM  Hba   h26   h26      0.31142
+ATOM  Hbb   h27   h27      0.14323
+ATOM  Oao   o14   o14     -0.32702
+ATOM  Hbc   h28   h28      0.15160
+ATOM  Hbd   h29   h29      0.14118
+ATOM  Hbe   h30   h30      0.13932
+ATOM  Hbf   h31   h31      0.15000
+ATOM  Hbg   h32   h32      0.15000
+ATOM  Hbh   h33   h33      0.13932
+ATOM  Hbi   h34   h34      0.13725
+ATOM  Hbj   h35   h35      0.13514
+ATOM  Hbk   h36   h36      0.13514
+ATOM  Hbl   h37   h37      0.13725
+ATOM  Cgn   c169  c169    -0.10177
+ATOM  Hbm   h38   h38      0.04586
+ATOM  Hbn   h39   h39      0.30348
+ATOM  Hbo   h40   h40      0.14171
+ATOM  Oap   o15   o15     -0.32776
+ATOM  Hbp   h41   h41      0.15353
+ATOM  Hbq   h42   h42      0.14303
+ATOM  Hbr   h43   h43      0.13301
+ATOM  Hbs   h44   h44      0.13406
+ATOM  Hbt   h45   h45      0.13406
+ATOM  Hbu   h46   h46      0.13301
+ATOM  Hbv   h47   h47      0.14175
+ATOM  Hbw   h48   h48      0.15453
+ATOM  Hbx   h49   h49      0.15453
+ATOM  Hby   h50   h50      0.14175
+ATOM  Hbz   h51   h51      0.09022
+ATOM  Hca   h52   h52      0.04632
+ATOM  Hcb   h53   h53      0.30277
+ATOM  Hcc   h54   h54      0.14421
+ATOM  Oaq   o16   o16     -0.32681
+ATOM  Hcd   h55   h55      0.15461
+ATOM  Hce   h56   h56      0.13863
+ATOM  Hcf   h57   h57      0.13699
+ATOM  Hcg   h58   h58      0.13654
+ATOM  Hch   h59   h59      0.13654
+ATOM  Hci   h60   h60      0.13699
+ATOM  Hcj   h61   h61      0.13908
+ATOM  Hck   h62   h62      0.14927
+ATOM  Hcl   h63   h63      0.14927
+ATOM  Hcm   h64   h64      0.13908
+ATOM  Cgo   c170  c170    -0.10786
+ATOM  Hcn   h65   h65      0.08262
+ATOM  Hco   h66   h66      0.31421
+ATOM  Hcp   h67   h67      0.14300
+ATOM  Oar   o17   o17     -0.32535
+ATOM  Hcq   h68   h68      0.15546
+ATOM  Hcr   h69   h69      0.13897
+ATOM  Hcs   h70   h70      0.14013
+ATOM  Hct   h71   h71      0.14665
+ATOM  Hcu   h72   h72      0.14665
+ATOM  Hcv   h73   h73      0.14013
+ATOM  Hcw   h74   h74      0.13704
+ATOM  Hcx   h75   h75      0.13660
+ATOM  Hcy   h76   h76      0.13660
+ATOM  Hcz   h77   h77      0.13704
+ATOM  Cgp   c171  c171    -0.11215
+ATOM  Hda   h78   h78      0.08391
+ATOM  Hdb   h79   h79      0.32899
+ATOM  Hdc   h80   h80      0.14408
+ATOM  Oas   o18   o18     -0.32807
+ATOM  Hdd   h81   h81      0.15390
+ATOM  Hde   h82   h82      0.14294
+ATOM  Hdf   h83   h83      0.14218
+ATOM  Hdg   h84   h84      0.14755
+ATOM  Hdh   h85   h85      0.14755
+ATOM  Hdi   h86   h86      0.14218
+ATOM  Hdj   h87   h87      0.13382
+ATOM  Hdk   h88   h88      0.13556
+ATOM  Hdl   h89   h89      0.13556
+ATOM  Hdm   h90   h90      0.13382
+ATOM  Cgq   c172  c172    -0.09991
+ATOM  Hdn   h91   h91      0.09052
+ATOM  Hdo   h92   h92      0.30419
+ATOM  Hdp   h93   h93      0.14276
+ATOM  Oat   o19   o19     -0.32531
+ATOM  Hdq   h94   h94      0.15464
+ATOM  Hdr   h95   h95      0.13744
+ATOM  Hds   h96   h96      0.13802
+ATOM  Hdt   h97   h97      0.13436
+ATOM  Hdu   h98   h98      0.13436
+ATOM  Hdv   h99   h99      0.13802
+ATOM  Hdw   h100  h100     0.14060
+ATOM  Hdx   h101  h101     0.14900
+ATOM  Hdy   h102  h102     0.14900
+ATOM  Hdz   h103  h103     0.14060
+ATOM  Hea   h104  h104     0.09346
+ATOM  Cgr   c173  c173    -0.09883
+ATOM  Heb   h105  h105     0.30192
+ATOM  Hec   h106  h106     0.05207
+ATOM  Hed   h107  h107     0.05207
+ATOM  Hee   h108  h108     0.05207
+ATOM  Hef   h109  h109     0.05207
+ATOM  Heg   h110  h110     0.05207
+ATOM  Heh   h111  h111     0.05207
+ATOM  Hei   h112  h112     0.05207
+ATOM  Hej   h113  h113     0.05207
+ATOM  Hek   h114  h114     0.05207
+ATOM  Hel   h115  h115     0.05180
+ATOM  Hem   h116  h116     0.05180
+ATOM  Hen   h117  h117     0.05180
+ATOM  Heo   h118  h118     0.04739
+ATOM  Hep   h119  h119     0.04739
+ATOM  Heq   h120  h120     0.04739
+ATOM  Her   h121  h121     0.04613
+ATOM  Hes   h122  h122     0.04613
+ATOM  Het   h123  h123     0.04613
+ATOM  Heu   h124  h124     0.04383
+ATOM  Hev   h125  h125     0.04383
+ATOM  Hew   h126  h126     0.04383
+ATOM  Hex   h127  h127     0.04397
+ATOM  Hey   h128  h128     0.04397
+ATOM  Hez   h129  h129     0.04397
+ATOM  Hfa   h130  h130     0.04594
+ATOM  Hfb   h131  h131     0.04594
+ATOM  Hfc   h132  h132     0.04594
+ATOM  Hfd   h133  h133     0.04587
+ATOM  Hfe   h134  h134     0.04587
+ATOM  Hff   h135  h135     0.04587
+ATOM  Hfg   h136  h136     0.04632
+ATOM  Hfh   h137  h137     0.04586
+ATOM  Hfi   h138  h138     0.04586
+ATOM  Hfj   h139  h139     0.04335
+ATOM  Hfk   h140  h140     0.04335
+ATOM  Hfl   h141  h141     0.04335
+ATOM  Cgs   c174  c174     0.11205
+ATOM  Cgt   c175  c175     0.11268
+ATOM  Cgu   c176  c176     0.11237
+ATOM  Cgv   c177  c177     0.11223
+ATOM  Cgw   c178  c178     0.11331
+ATOM  Cgx   c179  c179     0.11195
+ATOM  Cgy   c180  c180     0.11203
+ATOM  Cgz   c181  c181     0.11307
+ATOM  Hfm   h142  h142     0.04523
+ATOM  Hfn   h143  h143     0.04523
+ATOM  Hfo   h144  h144     0.04523
+ATOM  Hfp   h145  h145     0.04638
+ATOM  Hfq   h146  h146     0.04638
+ATOM  Hfr   h147  h147     0.04638
+ATOM  Hfs   h148  h148     0.04613
+ATOM  Hft   h149  h149     0.04613
+ATOM  Hfu   h150  h150     0.04613
+ATOM  Hfv   h151  h151     0.04542
+ATOM  Hfw   h152  h152     0.04542
+ATOM  Hfx   h153  h153     0.04542
+ATOM  Hfy   h154  h154     0.04603
+ATOM  Hfz   h155  h155     0.04603
+ATOM  Hga   h156  h156     0.04603
+ATOM  Hgb   h157  h157     0.04586
+ATOM  Hgc   h158  h158     0.04586
+ATOM  Hgd   h159  h159     0.04586
+ATOM  Hge   h160  h160     0.04632
+ATOM  Hgf   h161  h161     0.09307
+ATOM  Cha   c182  c182    -0.09987
+ATOM  Hgg   h162  h162     0.04299
+ATOM  Hgh   h163  h163     0.04299
+ATOM  Hgi   h164  h164     0.04299
+
+BOND  Cab   Cac  
+BOND  Cab   Cag  
+BOND  Cab   Cah  
+BOND  Cac   Cad  
+BOND  Cac   Hab  
+BOND  Cad   Cae  
+BOND  Cad   Oam  
+BOND  Cae   Caf  
+BOND  Cae   Hac  
+BOND  Caf   Cag  
+BOND  Caf   Cai  
+BOND  Cag   Had  
+BOND  Cah   Cao  
+BOND  Cah   Cas  
+BOND  Cai   Caj  
+BOND  Cai   Can  
+BOND  Caj   Cak  
+BOND  Caj   Hae  
+BOND  Cak   Cal  
+BOND  Cak   Haf  
+BOND  Cal   Cam  
+BOND  Cal   Cat  
+BOND  Cam   Can  
+BOND  Cam   Hag  
+BOND  Can   Hah  
+BOND  Cao   Cap  
+BOND  Cao   Hai  
+BOND  Cap   Caq  
+BOND  Cap   Haj  
+BOND  Caq   Car  
+BOND  Caq   Cau  
+BOND  Car   Cas  
+BOND  Car   Hak  
+BOND  Cas   Hal  
+BOND  Cat   Nab  
+BOND  Cat   Ham  
+BOND  Cat   Cgl  
+BOND  Nab   Cbn  
+BOND  Nab   Han  
+BOND  Cau   Oab  
+BOND  Cau   Nad  
+BOND  Cav   Caw  
+BOND  Cav   Cba  
+BOND  Cav   Cbb  
+BOND  Caw   Cax  
+BOND  Caw   Hao  
+BOND  Cax   Cay  
+BOND  Cax   Oan  
+BOND  Cay   Caz  
+BOND  Cay   Hap  
+BOND  Caz   Cba  
+BOND  Caz   Cbc  
+BOND  Cba   Haq  
+BOND  Cbb   Cbi  
+BOND  Cbb   Cbm  
+BOND  Cbc   Cbd  
+BOND  Cbc   Cbh  
+BOND  Cbd   Cbe  
+BOND  Cbd   Har  
+BOND  Cbe   Cbf  
+BOND  Cbe   Has  
+BOND  Cbf   Cbg  
+BOND  Cbf   Cbn  
+BOND  Cbg   Cbh  
+BOND  Cbg   Hat  
+BOND  Cbh   Hau  
+BOND  Cbi   Cbj  
+BOND  Cbi   Hav  
+BOND  Cbj   Cbk  
+BOND  Cbj   Haw  
+BOND  Cbk   Cbl  
+BOND  Cbk   Cbo  
+BOND  Cbl   Cbm  
+BOND  Cbl   Hax  
+BOND  Cbm   Hay  
+BOND  Cbn   Oac  
+BOND  Cbo   Nac  
+BOND  Cbo   Haz  
+BOND  Cbo   Cgm  
+BOND  Nac   Cge  
+BOND  Nac   Hba  
+BOND  Cbp   Cbq  
+BOND  Cbp   Cbu  
+BOND  Cbp   Cbv  
+BOND  Cbq   Cbr  
+BOND  Cbq   Hbb  
+BOND  Cbr   Cbs  
+BOND  Cbr   Oao  
+BOND  Cbs   Cbt  
+BOND  Cbs   Hbc  
+BOND  Cbt   Cbu  
+BOND  Cbt   Cbw  
+BOND  Cbu   Hbd  
+BOND  Cbv   Ccc  
+BOND  Cbv   Ccg  
+BOND  Cbw   Cbx  
+BOND  Cbw   Ccb  
+BOND  Cbx   Cby  
+BOND  Cbx   Hbe  
+BOND  Cby   Cbz  
+BOND  Cby   Hbf  
+BOND  Cbz   Cca  
+BOND  Cbz   Cch  
+BOND  Cca   Ccb  
+BOND  Cca   Hbg  
+BOND  Ccb   Hbh  
+BOND  Ccc   Ccd  
+BOND  Ccc   Hbi  
+BOND  Ccd   Cce  
+BOND  Ccd   Hbj  
+BOND  Cce   Ccf  
+BOND  Cce   Cci  
+BOND  Ccf   Ccg  
+BOND  Ccf   Hbk  
+BOND  Ccg   Hbl  
+BOND  Cch   Oad  
+BOND  Cch   Nae  
+BOND  Cci   Nad  
+BOND  Cci   Cgn  
+BOND  Cci   Hbz  
+BOND  Nad   Hbn  
+BOND  Ccj   Cck  
+BOND  Ccj   Cco  
+BOND  Ccj   Ccp  
+BOND  Cck   Ccl  
+BOND  Cck   Hbo  
+BOND  Ccl   Ccm  
+BOND  Ccl   Oap  
+BOND  Ccm   Ccn  
+BOND  Ccm   Hbp  
+BOND  Ccn   Cco  
+BOND  Ccn   Ccq  
+BOND  Cco   Hbq  
+BOND  Ccp   Ccw  
+BOND  Ccp   Cda  
+BOND  Ccq   Ccv  
+BOND  Ccq   Ccr  
+BOND  Ccu   Ccv  
+BOND  Ccv   Hbu  
+BOND  Cct   Ccu  
+BOND  Ccu   Hbt  
+BOND  Ccs   Cct  
+BOND  Cct   Cdb  
+BOND  Ccr   Ccs  
+BOND  Ccs   Hbs  
+BOND  Ccr   Hbr  
+BOND  Ccw   Ccx  
+BOND  Ccw   Hbv  
+BOND  Ccx   Ccy  
+BOND  Ccx   Hbw  
+BOND  Ccy   Ccz  
+BOND  Ccy   Cdc  
+BOND  Ccz   Cda  
+BOND  Ccz   Hbx  
+BOND  Cda   Hby  
+BOND  Cdb   Nae  
+BOND  Cdb   Hgf  
+BOND  Cdb   Cha  
+BOND  Nae   Hcb  
+BOND  Cdc   Oae  
+BOND  Cdc   Oal  
+BOND  Cdd   Cde  
+BOND  Cdd   Cdi  
+BOND  Cdd   Cdj  
+BOND  Cde   Cdf  
+BOND  Cde   Hcc  
+BOND  Cdf   Cdg  
+BOND  Cdf   Oaq  
+BOND  Cdg   Cdh  
+BOND  Cdg   Hcd  
+BOND  Cdh   Cdi  
+BOND  Cdh   Cdk  
+BOND  Cdi   Hce  
+BOND  Cdj   Cdq  
+BOND  Cdj   Cdu  
+BOND  Cdk   Cdl  
+BOND  Cdk   Cdp  
+BOND  Cdl   Cdm  
+BOND  Cdl   Hcf  
+BOND  Cdm   Cdn  
+BOND  Cdm   Hcg  
+BOND  Cdn   Cdo  
+BOND  Cdn   Cdv  
+BOND  Cdo   Cdp  
+BOND  Cdo   Hch  
+BOND  Cdp   Hci  
+BOND  Cdq   Cdr  
+BOND  Cdq   Hcj  
+BOND  Cdr   Cds  
+BOND  Cdr   Hck  
+BOND  Cds   Cdt  
+BOND  Cds   Cdw  
+BOND  Cdt   Cdu  
+BOND  Cdt   Hcl  
+BOND  Cdu   Hcm  
+BOND  Cdv   Naf  
+BOND  Cdv   Cgo  
+BOND  Cdv   Hcn  
+BOND  Naf   Cep  
+BOND  Naf   Hco  
+BOND  Cdw   Oaf  
+BOND  Cdw   Nah  
+BOND  Cdx   Cdy  
+BOND  Cdx   Cec  
+BOND  Cdx   Ced  
+BOND  Cdy   Cdz  
+BOND  Cdy   Hcp  
+BOND  Cdz   Cea  
+BOND  Cdz   Oar  
+BOND  Cea   Ceb  
+BOND  Cea   Hcq  
+BOND  Ceb   Cec  
+BOND  Ceb   Cee  
+BOND  Cec   Hcr  
+BOND  Ced   Cek  
+BOND  Ced   Ceo  
+BOND  Cee   Cef  
+BOND  Cee   Cej  
+BOND  Cef   Ceg  
+BOND  Cef   Hcs  
+BOND  Ceg   Ceh  
+BOND  Ceg   Hct  
+BOND  Ceh   Cei  
+BOND  Ceh   Cep  
+BOND  Cei   Cej  
+BOND  Cei   Hcu  
+BOND  Cej   Hcv  
+BOND  Cek   Cel  
+BOND  Cek   Hcw  
+BOND  Cel   Cem  
+BOND  Cel   Hcx  
+BOND  Cem   Cen  
+BOND  Cem   Ceq  
+BOND  Cen   Ceo  
+BOND  Cen   Hcy  
+BOND  Ceo   Hcz  
+BOND  Cep   Oag  
+BOND  Ceq   Nag  
+BOND  Ceq   Cgp  
+BOND  Ceq   Hda  
+BOND  Nag   Cgf  
+BOND  Nag   Hdb  
+BOND  Cer   Ces  
+BOND  Cer   Cew  
+BOND  Cer   Cex  
+BOND  Ces   Cet  
+BOND  Ces   Hdc  
+BOND  Cet   Ceu  
+BOND  Cet   Oas  
+BOND  Ceu   Cev  
+BOND  Ceu   Hdd  
+BOND  Cev   Cew  
+BOND  Cev   Cey  
+BOND  Cew   Hde  
+BOND  Cex   Cfe  
+BOND  Cex   Cfi  
+BOND  Cey   Cez  
+BOND  Cey   Cfd  
+BOND  Cez   Cfa  
+BOND  Cez   Hdf  
+BOND  Cfa   Cfb  
+BOND  Cfa   Hdg  
+BOND  Cfb   Cfc  
+BOND  Cfb   Cfj  
+BOND  Cfc   Cfd  
+BOND  Cfc   Hdh  
+BOND  Cfd   Hdi  
+BOND  Cfe   Cff  
+BOND  Cfe   Hdj  
+BOND  Cff   Cfg  
+BOND  Cff   Hdk  
+BOND  Cfg   Cfh  
+BOND  Cfg   Cfk  
+BOND  Cfh   Cfi  
+BOND  Cfh   Hdl  
+BOND  Cfi   Hdm  
+BOND  Cfj   Oah  
+BOND  Cfj   Nai  
+BOND  Cfk   Nah  
+BOND  Cfk   Cgq  
+BOND  Cfk   Hdn  
+BOND  Nah   Hdo  
+BOND  Cfl   Cfm  
+BOND  Cfl   Cfq  
+BOND  Cfl   Cfr  
+BOND  Cfm   Cfn  
+BOND  Cfm   Hdp  
+BOND  Cfn   Cfo  
+BOND  Cfn   Oat  
+BOND  Cfo   Cfp  
+BOND  Cfo   Hdq  
+BOND  Cfp   Cfq  
+BOND  Cfp   Cfs  
+BOND  Cfq   Hdr  
+BOND  Cfr   Cfy  
+BOND  Cfr   Cgc  
+BOND  Cfs   Cft  
+BOND  Cfs   Cfx  
+BOND  Cft   Cfu  
+BOND  Cft   Hds  
+BOND  Cfu   Cfv  
+BOND  Cfu   Hdt  
+BOND  Cfv   Cfw  
+BOND  Cfv   Cgd  
+BOND  Cfw   Cfx  
+BOND  Cfw   Hdu  
+BOND  Cfx   Hdv  
+BOND  Cfy   Cfz  
+BOND  Cfy   Hdw  
+BOND  Cfz   Cga  
+BOND  Cfz   Hdx  
+BOND  Cga   Cgb  
+BOND  Cga   Cge  
+BOND  Cgb   Cgc  
+BOND  Cgb   Hdy  
+BOND  Cgc   Hdz  
+BOND  Cgd   Nai  
+BOND  Cgd   Hea  
+BOND  Cgd   Cgr  
+BOND  Nai   Heb  
+BOND  Cge   Oai  
+BOND  Cgf   Oaj  
+BOND  Cgf   Oak  
+BOND  Oak   Cgg  
+BOND  Cgg   Cgh  
+BOND  Cgg   Cgi  
+BOND  Cgg   Cgj  
+BOND  Cgh   Hec  
+BOND  Cgh   Hed  
+BOND  Cgh   Hee  
+BOND  Cgi   Hef  
+BOND  Cgi   Heg  
+BOND  Cgi   Heh  
+BOND  Cgj   Hei  
+BOND  Cgj   Hej  
+BOND  Cgj   Hek  
+BOND  Oal   Cgk  
+BOND  Cgk   Hel  
+BOND  Cgk   Hem  
+BOND  Cgk   Hen  
+BOND  Oam   Cgx  
+BOND  Cgl   Hfd  
+BOND  Cgl   Hfe  
+BOND  Cgl   Hff  
+BOND  Oan   Cgw  
+BOND  Cgm   Hfa  
+BOND  Cgm   Hfb  
+BOND  Cgm   Hfc  
+BOND  Oao   Cgy  
+BOND  Cgn   Hfk  
+BOND  Cgn   Hfj  
+BOND  Cgn   Hfl  
+BOND  Oap   Cgz  
+BOND  Oaq   Cgt  
+BOND  Cgo   Her  
+BOND  Cgo   Hes  
+BOND  Cgo   Het  
+BOND  Oar   Cgs  
+BOND  Cgp   Heo  
+BOND  Cgp   Hep  
+BOND  Cgp   Heq  
+BOND  Oas   Cgu  
+BOND  Cgq   Hex  
+BOND  Cgq   Hey  
+BOND  Cgq   Hez  
+BOND  Oat   Cgv  
+BOND  Cgr   Heu  
+BOND  Cgr   Hev  
+BOND  Cgr   Hew  
+BOND  Hfi   Cgs  
+BOND  Hfh   Cgs  
+BOND  Hbm   Cgs  
+BOND  Cgt   Hge  
+BOND  Hfg   Cgt  
+BOND  Hca   Cgt  
+BOND  Cgu   Hgb  
+BOND  Cgu   Hgc  
+BOND  Cgu   Hgd  
+BOND  Cgv   Hfv  
+BOND  Cgv   Hfw  
+BOND  Cgv   Hfx  
+BOND  Cgw   Hfy  
+BOND  Cgw   Hfz  
+BOND  Cgw   Hga  
+BOND  Cgx   Hfs  
+BOND  Cgx   Hft  
+BOND  Cgx   Hfu  
+BOND  Cgy   Hfp  
+BOND  Cgy   Hfq  
+BOND  Cgy   Hfr  
+BOND  Cgz   Hfm  
+BOND  Cgz   Hfn  
+BOND  Cgz   Hfo  
+BOND  Cha   Hgg  
+BOND  Cha   Hgh  
+BOND  Cha   Hgi  
+
+NBR_ATOM Cdt
+NBR_RADIUS 20
+
+ICOOR_INTERNAL      Cab    0.00000    0.00000    0.00000    Cab    Cac    Cad
+ICOOR_INTERNAL      Cac    0.00000  180.00000    1.38719    Cab    Cac    Cad
+ICOOR_INTERNAL      Cad    0.00000   53.19376    1.38719    Cac    Cab    Cad
+ICOOR_INTERNAL      Cae    1.98856   61.21801    1.40064    Cad    Cac    Cab
+ICOOR_INTERNAL      Oam -179.45545   54.80418    1.38236    Cad    Cac    Cab
+ICOOR_INTERNAL      Caf   -1.50704   57.87022    1.40688    Cae    Cad    Cac
+ICOOR_INTERNAL      Hac  176.86965   62.57031    1.07824    Cae    Cad    Cac
+ICOOR_INTERNAL      Cgx    6.61482   61.95588    1.42850    Oam    Cad    Cac
+ICOOR_INTERNAL      Cag   -0.26580   60.82030    1.39979    Cab    Cac    Cad
+ICOOR_INTERNAL      Cah -177.13713   58.49562    1.46881    Cab    Cac    Cad
+ICOOR_INTERNAL      Cai  176.70799   57.90945    1.48057    Caf    Cae    Cad
+ICOOR_INTERNAL      Hfs  176.48128   70.85279    1.09362    Cgx    Oam    Cad
+ICOOR_INTERNAL      Hft  -64.82639   69.49455    1.10173    Cgx    Oam    Cad
+ICOOR_INTERNAL      Hfu   56.80908   68.66902    1.08522    Cgx    Oam    Cad
+ICOOR_INTERNAL      Hab -178.34438   58.93634    1.09142    Cac    Cad    Cae
+ICOOR_INTERNAL      Had -179.29095   59.42377    1.07619    Cag    Caf    Cae
+ICOOR_INTERNAL      Caj   25.10196   58.13608    1.41018    Cai    Caf    Cae
+ICOOR_INTERNAL      Can -152.98490   58.79008    1.40890    Cai    Caf    Cae
+ICOOR_INTERNAL      Cak -177.72591   58.73442    1.39993    Caj    Cai    Caf
+ICOOR_INTERNAL      Hae    3.43795   59.40673    1.08264    Caj    Cai    Caf
+ICOOR_INTERNAL      Cam  178.35095   58.24946    1.39413    Can    Cai    Caf
+ICOOR_INTERNAL      Hah   -0.32413   58.96461    1.08083    Can    Cai    Caf
+ICOOR_INTERNAL      Cao -127.44152   58.99265    1.40143    Cah    Cab    Cag
+ICOOR_INTERNAL      Cas   47.56538   59.65847    1.40207    Cah    Cab    Cag
+ICOOR_INTERNAL      Cal    0.04844   58.84018    1.39420    Cak    Caj    Cai
+ICOOR_INTERNAL      Haf  179.06566   61.19984    1.08729    Cak    Caj    Cai
+ICOOR_INTERNAL      Hag  179.71326   60.81742    1.08301    Cam    Can    Cai
+ICOOR_INTERNAL      Cat  177.72996   59.58975    1.51730    Cal    Cak    Caj
+ICOOR_INTERNAL      Nab -133.70538   71.24528    1.46154    Cat    Cal    Cak
+ICOOR_INTERNAL      Ham  -12.06124   70.04389    1.08563    Cat    Cal    Cak
+ICOOR_INTERNAL      Cgl  107.23247   69.42693    1.53212    Cat    Cal    Cak
+ICOOR_INTERNAL      Car    2.14779   59.11827    1.39779    Cas    Cah    Cao
+ICOOR_INTERNAL      Hal -178.71047   60.07524    1.09188    Cas    Cah    Cao
+ICOOR_INTERNAL      Cap   -3.61699   59.54804    1.40228    Cao    Cah    Cas
+ICOOR_INTERNAL      Hai -179.81213   60.12316    1.08637    Cao    Cah    Cas
+ICOOR_INTERNAL      Cbn   98.10663   56.10811    1.38025    Nab    Cat    Cal
+ICOOR_INTERNAL      Han  -56.25053   63.29414    1.01213    Nab    Cat    Cal
+ICOOR_INTERNAL      Hfd   60.09101   68.55456    1.08522    Cgl    Cat    Cal
+ICOOR_INTERNAL      Hfe -179.12077   70.09142    1.09311    Cgl    Cat    Cal
+ICOOR_INTERNAL      Hff  -60.01073   70.04423    1.09695    Cgl    Cat    Cal
+ICOOR_INTERNAL      Cbf -159.30594   60.51794    1.47638    Cbn    Nab    Cat
+ICOOR_INTERNAL      Oac   15.86659   60.78948    1.22315    Cbn    Nab    Cat
+ICOOR_INTERNAL      Cbe  -15.50290   58.68013    1.40570    Cbf    Cbn    Nab
+ICOOR_INTERNAL      Cbg  163.32173   58.93419    1.40816    Cbf    Cbn    Nab
+ICOOR_INTERNAL      Caq -176.99301   59.09620    1.41287    Car    Cas    Hal
+ICOOR_INTERNAL      Hak    0.06208   62.54513    1.08899    Car    Cas    Hal
+ICOOR_INTERNAL      Haj   -0.44414   61.14250    1.09458    Cap    Cao    Hai
+ICOOR_INTERNAL      Cbd  176.98694   59.11215    1.39961    Cbe    Cbf    Cbn
+ICOOR_INTERNAL      Has   -3.35383   58.84733    1.08582    Cbe    Cbf    Cbn
+ICOOR_INTERNAL      Cbh -176.96534   58.91793    1.39728    Cbg    Cbf    Cbn
+ICOOR_INTERNAL      Hat    1.73962   60.77779    1.09403    Cbg    Cbf    Cbn
+ICOOR_INTERNAL      Cbc    0.20653   58.36945    1.40039    Cbd    Cbe    Cbf
+ICOOR_INTERNAL      Har  179.23930   61.78944    1.09083    Cbd    Cbe    Cbf
+ICOOR_INTERNAL      Hau  178.41414   61.59721    1.08931    Cbh    Cbg    Cbf
+ICOOR_INTERNAL      Caz -176.83943   58.56320    1.47648    Cbc    Cbd    Cbe
+ICOOR_INTERNAL      Cau   -5.81953   58.49290    1.48503    Caq    Car    Hak
+ICOOR_INTERNAL      Cay -147.08095   58.67181    1.40136    Caz    Cbc    Cbd
+ICOOR_INTERNAL      Cba   33.29859   59.26034    1.40217    Caz    Cbc    Cbd
+ICOOR_INTERNAL      Cax -179.61572   58.01042    1.40061    Cay    Caz    Cbc
+ICOOR_INTERNAL      Hap    1.50007   59.77546    1.08913    Cay    Caz    Cbc
+ICOOR_INTERNAL      Cav  179.41540   57.84466    1.40246    Cba    Caz    Cbc
+ICOOR_INTERNAL      Haq   -0.51960   61.25539    1.08421    Cba    Caz    Cbc
+ICOOR_INTERNAL      Caw    0.69912   61.63203    1.40517    Cax    Cay    Caz
+ICOOR_INTERNAL      Oan  179.57241   63.75586    1.37597    Cax    Cay    Caz
+ICOOR_INTERNAL      Cbb -178.62141   59.45004    1.48516    Cav    Cba    Caz
+ICOOR_INTERNAL      Hao  178.47402   59.97602    1.08563    Caw    Cax    Cay
+ICOOR_INTERNAL      Cgw  174.15749   61.63809    1.43367    Oan    Cax    Cay
+ICOOR_INTERNAL      Cbi -149.02935   58.50186    1.40563    Cbb    Cav    Cba
+ICOOR_INTERNAL      Cbm   31.88864   59.21469    1.40815    Cbb    Cav    Cba
+ICOOR_INTERNAL      Hfy -175.99007   70.54825    1.10028    Cgw    Oan    Cax
+ICOOR_INTERNAL      Hfz  -56.86489   69.20262    1.09224    Cgw    Oan    Cax
+ICOOR_INTERNAL      Hga   64.96640   69.09070    1.09115    Cgw    Oan    Cax
+ICOOR_INTERNAL      Cbj -179.51482   58.51685    1.39860    Cbi    Cbb    Cav
+ICOOR_INTERNAL      Hav    2.21514   59.99363    1.08798    Cbi    Cbb    Cav
+ICOOR_INTERNAL      Cbl -179.81590   59.12423    1.39696    Cbm    Cbb    Cav
+ICOOR_INTERNAL      Hay    0.29915   59.58523    1.08531    Cbm    Cbb    Cav
+ICOOR_INTERNAL      Cbk    0.11880   59.45131    1.40364    Cbj    Cbi    Cbb
+ICOOR_INTERNAL      Haw  179.87274   60.66194    1.08135    Cbj    Cbi    Cbb
+ICOOR_INTERNAL      Hax  179.88168   61.00177    1.08605    Cbl    Cbm    Cbb
+ICOOR_INTERNAL      Cbo  178.14590   59.52068    1.52003    Cbk    Cbj    Cbi
+ICOOR_INTERNAL      Nac -119.66278   73.22241    1.45475    Cbo    Cbk    Cbj
+ICOOR_INTERNAL      Haz    0.35221   70.94565    1.09403    Cbo    Cbk    Cbj
+ICOOR_INTERNAL      Cgm  120.19576   68.55057    1.52777    Cbo    Cbk    Cbj
+ICOOR_INTERNAL      Cge  129.60168   55.81041    1.37179    Nac    Cbo    Cbk
+ICOOR_INTERNAL      Hba  -21.68430   64.61361    1.01301    Nac    Cbo    Cbk
+ICOOR_INTERNAL      Hfa   62.51003   68.58305    1.09165    Cgm    Cbo    Cbk
+ICOOR_INTERNAL      Hfb -177.43857   70.69816    1.09882    Cgm    Cbo    Cbk
+ICOOR_INTERNAL      Hfc  -58.70598   69.32945    1.09718    Cgm    Cbo    Cbk
+ICOOR_INTERNAL      Cga -154.27171   61.36476    1.47140    Cge    Nac    Cbo
+ICOOR_INTERNAL      Oai   17.62879   60.42112    1.22825    Cge    Nac    Cbo
+ICOOR_INTERNAL      Cfz  157.98084   58.64270    1.41170    Cga    Cge    Nac
+ICOOR_INTERNAL      Cgb  -18.25317   59.08598    1.41612    Cga    Cge    Nac
+ICOOR_INTERNAL      Cfy -171.47866   58.79307    1.39778    Cfz    Cga    Cge
+ICOOR_INTERNAL      Hdx    4.33244   60.61391    1.09151    Cfz    Cga    Cge
+ICOOR_INTERNAL      Cgc  171.35602   59.36452    1.39352    Cgb    Cga    Cge
+ICOOR_INTERNAL      Hdy   -6.80341   59.06014    1.08134    Cgb    Cga    Cge
+ICOOR_INTERNAL      Cfr   -0.41433   59.38482    1.39861    Cfy    Cfz    Cga
+ICOOR_INTERNAL      Hdw  175.67162   60.57810    1.09082    Cfy    Cfz    Cga
+ICOOR_INTERNAL      Hdz -178.14229   61.01663    1.08688    Cgc    Cgb    Cga
+ICOOR_INTERNAL      Cfl  169.90818   58.36835    1.47252    Cfr    Cfy    Cfz
+ICOOR_INTERNAL      Cfm   44.03612   57.22302    1.40759    Cfl    Cfr    Cfy
+ICOOR_INTERNAL      Cfq -131.64026   61.31759    1.39867    Cfl    Cfr    Cfy
+ICOOR_INTERNAL      Cfn -176.18448   59.00895    1.40720    Cfm    Cfl    Cfr
+ICOOR_INTERNAL      Hdp    4.06780   62.38432    1.08756    Cfm    Cfl    Cfr
+ICOOR_INTERNAL      Cfp  174.93532   58.03828    1.39696    Cfq    Cfl    Cfr
+ICOOR_INTERNAL      Hdr   -0.91079   61.02955    1.08287    Cfq    Cfl    Cfr
+ICOOR_INTERNAL      Cfo    1.71195   61.33791    1.39936    Cfn    Cfm    Cfl
+ICOOR_INTERNAL      Oat -179.30102   54.92105    1.37699    Cfn    Cfm    Cfl
+ICOOR_INTERNAL      Cfs -176.03881   60.81758    1.46591    Cfp    Cfq    Cfl
+ICOOR_INTERNAL      Hdq  179.51506   61.55697    1.08674    Cfo    Cfn    Cfm
+ICOOR_INTERNAL      Cgv    5.27543   61.53415    1.43603    Oat    Cfn    Cfm
+ICOOR_INTERNAL      Cft  -42.25053   59.79534    1.40463    Cfs    Cfp    Cfq
+ICOOR_INTERNAL      Cfx  134.61653   58.96724    1.40688    Cfs    Cfp    Cfq
+ICOOR_INTERNAL      Hfv  176.98844   71.02054    1.08899    Cgv    Oat    Cfn
+ICOOR_INTERNAL      Hfw  -63.67570   69.32753    1.09595    Cgv    Oat    Cfn
+ICOOR_INTERNAL      Hfx   57.59426   69.33445    1.09334    Cgv    Oat    Cfn
+ICOOR_INTERNAL      Cfu  175.76557   59.27925    1.39793    Cft    Cfs    Cfp
+ICOOR_INTERNAL      Hds   -4.47878   59.97691    1.08522    Cft    Cfs    Cfp
+ICOOR_INTERNAL      Cfw -175.37767   59.90615    1.39914    Cfx    Cfs    Cfp
+ICOOR_INTERNAL      Hdv    2.82151   60.17403    1.08656    Cfx    Cfs    Cfp
+ICOOR_INTERNAL      Cfv   -0.19645   59.23780    1.40278    Cfu    Cft    Cfs
+ICOOR_INTERNAL      Hdt  179.28350   60.40324    1.09266    Cfu    Cft    Cfs
+ICOOR_INTERNAL      Hdu  178.89107   61.66039    1.08526    Cfw    Cfx    Cfs
+ICOOR_INTERNAL      Cgd -179.59454   60.25345    1.50070    Cfv    Cfu    Cft
+ICOOR_INTERNAL      Nai -119.90912   72.47687    1.45890    Cgd    Cfv    Cfu
+ICOOR_INTERNAL      Hea    0.38247   69.74287    1.10027    Cgd    Cfv    Cfu
+ICOOR_INTERNAL      Cgr  119.62978   67.76342    1.52859    Cgd    Cfv    Cfu
+ICOOR_INTERNAL      Cfj   92.19631   56.47832    1.38690    Nai    Cgd    Cfv
+ICOOR_INTERNAL      Heb  -69.12515   62.35837    1.00703    Nai    Cgd    Cfv
+ICOOR_INTERNAL      Heu   61.99808   69.10749    1.09718    Cgr    Cgd    Cfv
+ICOOR_INTERNAL      Hev -178.37454   69.66206    1.09567    Cgr    Cgd    Cfv
+ICOOR_INTERNAL      Hew  -58.57714   69.78014    1.09252    Cgr    Cgd    Cfv
+ICOOR_INTERNAL      Cfb -165.88651   60.57457    1.47217    Cfj    Nai    Cgd
+ICOOR_INTERNAL      Oah   15.74913   60.54481    1.22580    Cfj    Nai    Cgd
+ICOOR_INTERNAL      Cfa   20.52516   58.48465    1.41188    Cfb    Cfj    Nai
+ICOOR_INTERNAL      Cfc -159.10304   59.46123    1.39925    Cfb    Cfj    Nai
+ICOOR_INTERNAL      Cez -177.12884   58.72669    1.39467    Cfa    Cfb    Cfj
+ICOOR_INTERNAL      Hdg    2.43023   59.39048    1.08651    Cfa    Cfb    Cfj
+ICOOR_INTERNAL      Cfd  176.48210   59.17328    1.39589    Cfc    Cfb    Cfj
+ICOOR_INTERNAL      Hdh   -1.85654   60.25905    1.08724    Cfc    Cfb    Cfj
+ICOOR_INTERNAL      Cey    0.36781   59.62137    1.41159    Cez    Cfa    Cfb
+ICOOR_INTERNAL      Hdf  177.99652   60.63785    1.08065    Cez    Cfa    Cfb
+ICOOR_INTERNAL      Hdi  179.98841   61.41667    1.08963    Cfd    Cfc    Cfb
+ICOOR_INTERNAL      Cev  175.13639   59.03232    1.46735    Cey    Cez    Cfa
+ICOOR_INTERNAL      Ceu   36.91525   57.72844    1.40862    Cev    Cey    Cez
+ICOOR_INTERNAL      Cew -139.74414   60.30270    1.39377    Cev    Cey    Cez
+ICOOR_INTERNAL      Cet -176.80587   58.28242    1.39571    Ceu    Cev    Cey
+ICOOR_INTERNAL      Hdd    3.32038   59.79517    1.08416    Ceu    Cev    Cey
+ICOOR_INTERNAL      Cer  176.77023   57.49043    1.40374    Cew    Cev    Cey
+ICOOR_INTERNAL      Hde    0.73049   61.67211    1.08079    Cew    Cev    Cey
+ICOOR_INTERNAL      Ces    0.08611   61.22367    1.41245    Cet    Ceu    Cev
+ICOOR_INTERNAL      Oas  179.34687   63.62613    1.37804    Cet    Ceu    Cev
+ICOOR_INTERNAL      Cex -176.24591   60.44826    1.46734    Cer    Cew    Cev
+ICOOR_INTERNAL      Hdc -179.58066   59.60811    1.08148    Ces    Cet    Ceu
+ICOOR_INTERNAL      Cgu  171.17033   61.69174    1.43140    Oas    Cet    Ceu
+ICOOR_INTERNAL      Cfe  -34.72160   59.24160    1.41319    Cex    Cer    Cew
+ICOOR_INTERNAL      Cfi  141.33788   58.62615    1.40446    Cex    Cer    Cew
+ICOOR_INTERNAL      Hgb -174.81488   70.44640    1.10005    Cgu    Oas    Cet
+ICOOR_INTERNAL      Hgc  -55.56133   68.85434    1.10000    Cgu    Oas    Cet
+ICOOR_INTERNAL      Hgd   66.14008   69.27846    1.09444    Cgu    Oas    Cet
+ICOOR_INTERNAL      Cff  172.85479   58.79935    1.39288    Cfe    Cex    Cer
+ICOOR_INTERNAL      Hdj   -5.55408   59.66450    1.08568    Cfe    Cex    Cer
+ICOOR_INTERNAL      Cfh -173.20352   59.18354    1.39836    Cfi    Cex    Cer
+ICOOR_INTERNAL      Hdm    3.49982   59.64494    1.09165    Cfi    Cex    Cer
+ICOOR_INTERNAL      Cfg    0.70545   59.41244    1.41202    Cff    Cfe    Cex
+ICOOR_INTERNAL      Hdk -177.17113   61.61687    1.08922    Cff    Cfe    Cex
+ICOOR_INTERNAL      Hdl  176.86040   61.20480    1.09330    Cfh    Cfi    Cex
+ICOOR_INTERNAL      Cfk -172.88308   57.39532    1.51225    Cfg    Cff    Cfe
+ICOOR_INTERNAL      Nah   92.75275   76.53996    1.46222    Cfk    Cfg    Cff
+ICOOR_INTERNAL      Cgq  -26.97885   64.53603    1.53219    Cfk    Cfg    Cff
+ICOOR_INTERNAL      Hdn -148.39333   71.34241    1.09863    Cfk    Cfg    Cff
+ICOOR_INTERNAL      Cdw  121.86986   56.90850    1.37786    Nah    Cfk    Cfg
+ICOOR_INTERNAL      Hdo  -30.85866   63.90394    1.01617    Nah    Cfk    Cfg
+ICOOR_INTERNAL      Hex   66.05792   68.66814    1.08798    Cgq    Cfk    Cfg
+ICOOR_INTERNAL      Hey -174.61754   70.51405    1.10155    Cgq    Cfk    Cfg
+ICOOR_INTERNAL      Hez  -55.34119   70.15422    1.09005    Cgq    Cfk    Cfg
+ICOOR_INTERNAL      Cds -151.00688   60.08147    1.48057    Cdw    Nah    Cfk
+ICOOR_INTERNAL      Oaf   24.45951   60.61305    1.22389    Cdw    Nah    Cfk
+ICOOR_INTERNAL      Cdr -164.33340   59.07472    1.40663    Cds    Cdw    Nah
+ICOOR_INTERNAL      Cdt   18.88957   58.85162    1.41035    Cds    Cdw    Nah
+ICOOR_INTERNAL      Cdq -176.56872   58.69423    1.39173    Cdr    Cds    Cdw
+ICOOR_INTERNAL      Hck    2.21252   60.46792    1.09023    Cdr    Cds    Cdw
+ICOOR_INTERNAL      Cdu  175.86818   59.31094    1.40036    Cdt    Cds    Cdw
+ICOOR_INTERNAL      Hcl   -1.48750   58.51167    1.08490    Cdt    Cds    Cdw
+ICOOR_INTERNAL      Cdj    1.41227   58.85124    1.40744    Cdq    Cdr    Cds
+ICOOR_INTERNAL      Hcj  178.12800   60.73066    1.08342    Cdq    Cdr    Cds
+ICOOR_INTERNAL      Hcm -179.55379   61.07824    1.08559    Cdu    Cdt    Cds
+ICOOR_INTERNAL      Cdd  176.48714   58.77895    1.47272    Cdj    Cdq    Cdr
+ICOOR_INTERNAL      Cde   40.38645   59.08901    1.40943    Cdd    Cdj    Cdq
+ICOOR_INTERNAL      Cdi -137.56403   59.59290    1.40192    Cdd    Cdj    Cdq
+ICOOR_INTERNAL      Cdf -178.02918   59.25384    1.40143    Cde    Cdd    Cdj
+ICOOR_INTERNAL      Hcc    2.80483   61.86662    1.07843    Cde    Cdd    Cdj
+ICOOR_INTERNAL      Cdh  177.35335   58.25819    1.40535    Cdi    Cdd    Cdj
+ICOOR_INTERNAL      Hce   -2.69580   61.54100    1.07745    Cdi    Cdd    Cdj
+ICOOR_INTERNAL      Cdg    0.64366   60.73143    1.39295    Cdf    Cde    Cdd
+ICOOR_INTERNAL      Oaq  179.93633   55.46986    1.38094    Cdf    Cde    Cdd
+ICOOR_INTERNAL      Cdk -177.36549   58.69945    1.48949    Cdh    Cdi    Cdd
+ICOOR_INTERNAL      Hcd  177.53402   62.31458    1.08037    Cdg    Cdf    Cde
+ICOOR_INTERNAL      Cgt    3.90937   61.01163    1.43311    Oaq    Cdf    Cde
+ICOOR_INTERNAL      Cdl -153.02184   58.68767    1.40719    Cdk    Cdh    Cdi
+ICOOR_INTERNAL      Cdp   27.44234   59.25134    1.40531    Cdk    Cdh    Cdi
+ICOOR_INTERNAL      Hca  -62.65227   69.42060    1.09937    Cgt    Oaq    Cdf
+ICOOR_INTERNAL      Hfg   58.24707   69.45667    1.09763    Cgt    Oaq    Cdf
+ICOOR_INTERNAL      Hge  177.62856   70.15395    1.08277    Cgt    Oaq    Cdf
+ICOOR_INTERNAL      Cdm -178.61514   59.15382    1.40787    Cdl    Cdk    Cdh
+ICOOR_INTERNAL      Hcf    2.06741   59.30724    1.08397    Cdl    Cdk    Cdh
+ICOOR_INTERNAL      Cdo  178.68101   59.09440    1.40136    Cdp    Cdk    Cdh
+ICOOR_INTERNAL      Hci    1.19425   58.88677    1.08088    Cdp    Cdk    Cdh
+ICOOR_INTERNAL      Cdn   -0.56610   58.95367    1.39459    Cdm    Cdl    Cdk
+ICOOR_INTERNAL      Hcg  179.38301   61.34837    1.08747    Cdm    Cdl    Cdk
+ICOOR_INTERNAL      Hch -179.66146   62.09856    1.08789    Cdo    Cdp    Cdk
+ICOOR_INTERNAL      Cdv  179.66392   60.09085    1.51743    Cdn    Cdm    Cdl
+ICOOR_INTERNAL      Naf -145.85170   68.93653    1.45829    Cdv    Cdn    Cdm
+ICOOR_INTERNAL      Cgo   94.13102   70.04749    1.52624    Cdv    Cdn    Cdm
+ICOOR_INTERNAL      Hcn  -24.16026   70.75092    1.10263    Cdv    Cdn    Cdm
+ICOOR_INTERNAL      Cep   87.04812   57.03135    1.37946    Naf    Cdv    Cdn
+ICOOR_INTERNAL      Hco  -65.73206   63.51349    1.01049    Naf    Cdv    Cdn
+ICOOR_INTERNAL      Her   60.60571   69.07680    1.08743    Cgo    Cdv    Cdn
+ICOOR_INTERNAL      Hes -178.76680   69.56654    1.09151    Cgo    Cdv    Cdn
+ICOOR_INTERNAL      Het  -59.56151   69.66989    1.09626    Cgo    Cdv    Cdn
+ICOOR_INTERNAL      Ceh -156.54205   61.38707    1.47424    Cep    Naf    Cdv
+ICOOR_INTERNAL      Oag   16.23617   59.92646    1.22935    Cep    Naf    Cdv
+ICOOR_INTERNAL      Ceg  149.44097   59.72796    1.40303    Ceh    Cep    Naf
+ICOOR_INTERNAL      Cei  -28.52848   58.55724    1.40787    Ceh    Cep    Naf
+ICOOR_INTERNAL      Cef -174.61343   59.03911    1.40304    Ceg    Ceh    Cep
+ICOOR_INTERNAL      Hct    2.49658   60.33954    1.09073    Ceg    Ceh    Cep
+ICOOR_INTERNAL      Cej  175.64956   59.27583    1.39971    Cei    Ceh    Cep
+ICOOR_INTERNAL      Hcu   -3.97282   59.34446    1.08674    Cei    Ceh    Cep
+ICOOR_INTERNAL      Cee   -1.10817   59.54153    1.40773    Cef    Ceg    Ceh
+ICOOR_INTERNAL      Hcs  178.23085   60.92907    1.08577    Cef    Ceg    Ceh
+ICOOR_INTERNAL      Hcv -177.73785   60.70833    1.08467    Cej    Cei    Ceh
+ICOOR_INTERNAL      Ceb  175.40990   59.66362    1.47719    Cee    Cef    Ceg
+ICOOR_INTERNAL      Cea  141.74509   58.21978    1.40068    Ceb    Cee    Cef
+ICOOR_INTERNAL      Cec  -40.90058   60.53921    1.39610    Ceb    Cee    Cef
+ICOOR_INTERNAL      Cdz  177.77282   58.33999    1.39761    Cea    Ceb    Cee
+ICOOR_INTERNAL      Hcq   -3.30085   59.64707    1.08194    Cea    Ceb    Cee
+ICOOR_INTERNAL      Cdx -176.78598   58.12208    1.40744    Cec    Ceb    Cee
+ICOOR_INTERNAL      Hcr   -0.40719   60.74083    1.08872    Cec    Ceb    Cee
+ICOOR_INTERNAL      Cdy   -1.01498   61.72577    1.41654    Cdz    Cea    Ceb
+ICOOR_INTERNAL      Oar  179.79466   63.59720    1.37219    Cdz    Cea    Ceb
+ICOOR_INTERNAL      Ced  176.17500   59.85175    1.47353    Cdx    Cec    Ceb
+ICOOR_INTERNAL      Hcp -179.79183   60.03198    1.08848    Cdy    Cdz    Cea
+ICOOR_INTERNAL      Cgs  178.84603   61.39083    1.43353    Oar    Cdz    Cea
+ICOOR_INTERNAL      Cek   34.66312   59.19685    1.40886    Ced    Cdx    Cec
+ICOOR_INTERNAL      Ceo -142.16802   58.77360    1.40200    Ced    Cdx    Cec
+ICOOR_INTERNAL      Hbm   60.86383   69.12935    1.09279    Cgs    Oar    Cdz
+ICOOR_INTERNAL      Hfh  -60.33070   69.09683    1.10036    Cgs    Oar    Cdz
+ICOOR_INTERNAL      Hfi -179.62286   70.24836    1.09257    Cgs    Oar    Cdz
+ICOOR_INTERNAL      Cel -175.82489   58.93916    1.40075    Cek    Ced    Cdx
+ICOOR_INTERNAL      Hcw    4.63433   59.35950    1.09229    Cek    Ced    Cdx
+ICOOR_INTERNAL      Cen  175.52578   59.24297    1.40506    Ceo    Ced    Cdx
+ICOOR_INTERNAL      Hcz   -1.61386   59.82044    1.08683    Ceo    Ced    Cdx
+ICOOR_INTERNAL      Cem    0.62746   59.14264    1.40121    Cel    Cek    Ced
+ICOOR_INTERNAL      Hcx  178.35759   61.60538    1.08600    Cel    Cek    Ced
+ICOOR_INTERNAL      Hcy -177.65267   61.24252    1.08494    Cen    Ceo    Ced
+ICOOR_INTERNAL      Ceq  175.44629   57.88529    1.52033    Cem    Cel    Cek
+ICOOR_INTERNAL      Nag   44.76872   66.15626    1.45887    Ceq    Cem    Cel
+ICOOR_INTERNAL      Cgp  -84.45757   70.12889    1.54266    Ceq    Cem    Cel
+ICOOR_INTERNAL      Hda  161.30194   72.40128    1.09471    Ceq    Cem    Cel
+ICOOR_INTERNAL      Cgf  -91.21423   50.86216    1.38008    Nag    Ceq    Cem
+ICOOR_INTERNAL      Hdb   99.04544   62.72136    1.01222    Nag    Ceq    Cem
+ICOOR_INTERNAL      Heo   54.90867   69.29328    1.09119    Cgp    Ceq    Cem
+ICOOR_INTERNAL      Hep  175.38541   69.77642    1.08968    Cgp    Ceq    Cem
+ICOOR_INTERNAL      Heq  -64.13412   69.95813    1.09366    Cgp    Ceq    Cem
+ICOOR_INTERNAL      Oaj   13.99706   59.27165    1.22041    Cgf    Nag    Ceq
+ICOOR_INTERNAL      Oak -166.98397   67.18354    1.35901    Cgf    Nag    Ceq
+ICOOR_INTERNAL      Cgg  178.46765   59.04544    1.44174    Oak    Cgf    Nag
+ICOOR_INTERNAL      Cgh   66.63645   68.26226    1.54207    Cgg    Oak    Cgf
+ICOOR_INTERNAL      Cgi -176.31713   75.28010    1.53330    Cgg    Oak    Cgf
+ICOOR_INTERNAL      Cgj  -58.96648   67.34070    1.53809    Cgg    Oak    Cgf
+ICOOR_INTERNAL      Hec  -70.32665   68.52490    1.09115    Cgh    Cgg    Oak
+ICOOR_INTERNAL      Hed   50.35317   69.34801    1.08922    Cgh    Cgg    Oak
+ICOOR_INTERNAL      Hee  170.47206   69.83382    1.09590    Cgh    Cgg    Oak
+ICOOR_INTERNAL      Hef  -58.95192   69.44262    1.08950    Cgi    Cgg    Oak
+ICOOR_INTERNAL      Heg   60.50949   69.92066    1.09800    Cgi    Cgg    Oak
+ICOOR_INTERNAL      Heh -179.44048   69.08603    1.09366    Cgi    Cgg    Oak
+ICOOR_INTERNAL      Hei   74.68680   68.37201    1.09595    Cgj    Cgg    Oak
+ICOOR_INTERNAL      Hej -166.14036   70.04421    1.09936    Cgj    Cgg    Oak
+ICOOR_INTERNAL      Hek  -46.85989   69.35989    1.08747    Cgj    Cgg    Oak
+ICOOR_INTERNAL      Oab -165.92807   59.64796    1.22348    Cau    Caq    Car
+ICOOR_INTERNAL      Nad    5.17854   60.00606    1.37801    Cau    Caq    Car
+ICOOR_INTERNAL      Cci -144.68586   57.11796    1.46792    Nad    Cau    Caq
+ICOOR_INTERNAL      Hbn    7.00513   64.30113    1.00827    Nad    Cau    Caq
+ICOOR_INTERNAL      Cce   92.30375   68.80355    1.52387    Cci    Nad    Cau
+ICOOR_INTERNAL      Cgn -146.88874   72.16332    1.52125    Cci    Nad    Cau
+ICOOR_INTERNAL      Hbz  -28.83125   69.78845    1.09513    Cci    Nad    Cau
+ICOOR_INTERNAL      Ccd -164.15850   59.92298    1.40406    Cce    Cci    Nad
+ICOOR_INTERNAL      Ccf   15.75678   57.35334    1.41206    Cce    Cci    Nad
+ICOOR_INTERNAL      Hfj  -61.98863   69.24711    1.09955    Cgn    Cci    Nad
+ICOOR_INTERNAL      Hfk  178.16080   69.15581    1.09348    Cgn    Cci    Nad
+ICOOR_INTERNAL      Hfl   57.62316   69.56161    1.09786    Cgn    Cci    Nad
+ICOOR_INTERNAL      Ccc -179.79077   58.61569    1.40153    Ccd    Cce    Cci
+ICOOR_INTERNAL      Hbj   -0.19102   60.66337    1.08692    Ccd    Cce    Cci
+ICOOR_INTERNAL      Ccg -179.18544   58.61130    1.39478    Ccf    Cce    Cci
+ICOOR_INTERNAL      Hbk   -0.68722   58.77982    1.08743    Ccf    Cce    Cci
+ICOOR_INTERNAL      Cbv   -0.30427   59.16697    1.40531    Ccc    Ccd    Cce
+ICOOR_INTERNAL      Hbi  178.18216   61.18199    1.08485    Ccc    Ccd    Cce
+ICOOR_INTERNAL      Hbl  178.00234   61.76639    1.08241    Ccg    Ccf    Cce
+ICOOR_INTERNAL      Cbp -179.77932   57.74713    1.48155    Cbv    Ccc    Ccd
+ICOOR_INTERNAL      Cbq   33.29012   58.77197    1.40528    Cbp    Cbv    Ccc
+ICOOR_INTERNAL      Cbu -147.81094   59.73247    1.39818    Cbp    Cbv    Ccc
+ICOOR_INTERNAL      Cbr  178.33334   59.26141    1.41340    Cbq    Cbp    Cbv
+ICOOR_INTERNAL      Hbb   -0.35825   61.14049    1.08393    Cbq    Cbp    Cbv
+ICOOR_INTERNAL      Cbt -177.47585   57.84223    1.39603    Cbu    Cbp    Cbv
+ICOOR_INTERNAL      Hbd    1.54285   60.71968    1.08931    Cbu    Cbp    Cbv
+ICOOR_INTERNAL      Cbs   -0.66983   61.31117    1.39277    Cbr    Cbq    Cbp
+ICOOR_INTERNAL      Oao -178.93836   55.33630    1.37408    Cbr    Cbq    Cbp
+ICOOR_INTERNAL      Cbw  178.70101   59.44313    1.48479    Cbt    Cbu    Cbp
+ICOOR_INTERNAL      Hbc  179.73426   62.22751    1.08540    Cbs    Cbr    Cbq
+ICOOR_INTERNAL      Cgy   -8.79516   61.40173    1.43419    Oao    Cbr    Cbq
+ICOOR_INTERNAL      Cbx -143.34399   59.25297    1.40036    Cbw    Cbt    Cbu
+ICOOR_INTERNAL      Ccb   35.62201   59.16297    1.40389    Cbw    Cbt    Cbu
+ICOOR_INTERNAL      Hfp -173.95876   70.67146    1.09881    Cgy    Oao    Cbr
+ICOOR_INTERNAL      Hfq  -55.32334   69.18248    1.09750    Cgy    Oao    Cbr
+ICOOR_INTERNAL      Hfr   66.88830   69.28177    1.09110    Cgy    Oao    Cbr
+ICOOR_INTERNAL      Cby  178.41954   59.43110    1.40666    Cbx    Cbw    Cbt
+ICOOR_INTERNAL      Hbe   -0.28197   59.09543    1.08337    Cbx    Cbw    Cbt
+ICOOR_INTERNAL      Cca -178.33177   58.84862    1.39736    Ccb    Cbw    Cbt
+ICOOR_INTERNAL      Hbh    2.62086   60.08289    1.08471    Ccb    Cbw    Cbt
+ICOOR_INTERNAL      Cbz   -0.07703   58.88364    1.40467    Cby    Cbx    Cbw
+ICOOR_INTERNAL      Hbf -179.64060   61.36114    1.08678    Cby    Cbx    Cbw
+ICOOR_INTERNAL      Hbg -179.53845   62.38421    1.08023    Cca    Ccb    Cbw
+ICOOR_INTERNAL      Cch  179.68744   59.62550    1.48479    Cbz    Cby    Cbx
+ICOOR_INTERNAL      Oad   -1.07831   59.41522    1.22094    Cch    Cbz    Cby
+ICOOR_INTERNAL      Nae -179.69105   59.48465    1.38355    Cch    Cbz    Cby
+ICOOR_INTERNAL      Cdb  172.91633   55.95609    1.46782    Nae    Cch    Cbz
+ICOOR_INTERNAL      Hcb   -3.90098   62.22628    1.00960    Nae    Cch    Cbz
+ICOOR_INTERNAL      Cct  158.33914   68.89879    1.51162    Cdb    Nae    Cch
+ICOOR_INTERNAL      Hgf   37.97372   70.60969    1.09558    Cdb    Nae    Cch
+ICOOR_INTERNAL      Cha  -81.38373   71.16376    1.53447    Cdb    Nae    Cch
+ICOOR_INTERNAL      Ccs -141.54676   60.87401    1.40075    Cct    Cdb    Nae
+ICOOR_INTERNAL      Ccu   40.07867   57.46695    1.40787    Cct    Cdb    Nae
+ICOOR_INTERNAL      Hgg  -59.21959   68.98262    1.09041    Cha    Cdb    Nae
+ICOOR_INTERNAL      Hgh   61.92371   69.83829    1.09608    Cha    Cdb    Nae
+ICOOR_INTERNAL      Hgi -179.41586   70.20688    1.10313    Cha    Cdb    Nae
+ICOOR_INTERNAL      Ccr -176.76001   59.34318    1.39842    Ccs    Cct    Cdb
+ICOOR_INTERNAL      Hbs    1.58252   59.95579    1.08582    Ccs    Cct    Cdb
+ICOOR_INTERNAL      Ccv  177.58865   59.49960    1.39975    Ccu    Cct    Cdb
+ICOOR_INTERNAL      Hbt   -0.08642   59.67775    1.08416    Ccu    Cct    Cdb
+ICOOR_INTERNAL      Ccq   -1.20461   58.61636    1.39402    Ccr    Ccs    Cct
+ICOOR_INTERNAL      Hbr  179.40563   60.80637    1.09046    Ccr    Ccs    Cct
+ICOOR_INTERNAL      Hbu -178.70318   60.90700    1.09184    Ccv    Ccu    Cct
+ICOOR_INTERNAL      Ccn  177.75015   59.08475    1.47082    Ccq    Ccr    Ccs
+ICOOR_INTERNAL      Ccm  136.47599   58.61251    1.40007    Ccn    Ccq    Ccr
+ICOOR_INTERNAL      Cco  -43.77046   59.86591    1.39818    Ccn    Ccq    Ccr
+ICOOR_INTERNAL      Ccl -179.53316   58.32026    1.39907    Ccm    Ccn    Ccq
+ICOOR_INTERNAL      Hbp   -0.83743   59.46790    1.08637    Ccm    Ccn    Ccq
+ICOOR_INTERNAL      Ccj -178.74041   58.19964    1.40136    Cco    Ccn    Ccq
+ICOOR_INTERNAL      Hbq   -0.23700   61.09276    1.08379    Cco    Ccn    Ccq
+ICOOR_INTERNAL      Cck   -0.98500   61.72645    1.41524    Ccl    Ccm    Ccn
+ICOOR_INTERNAL      Oap  179.27146   63.46394    1.37189    Ccl    Ccm    Ccn
+ICOOR_INTERNAL      Ccp  178.31002   59.62129    1.48007    Ccj    Cco    Ccn
+ICOOR_INTERNAL      Hbo -177.45598   60.17026    1.08157    Cck    Ccl    Ccm
+ICOOR_INTERNAL      Cgz -175.59289   61.41121    1.44087    Oap    Ccl    Ccm
+ICOOR_INTERNAL      Ccw  -37.80972   59.62972    1.40371    Ccp    Ccj    Cco
+ICOOR_INTERNAL      Cda  142.94403   58.08866    1.39703    Ccp    Ccj    Cco
+ICOOR_INTERNAL      Hfm  176.79729   70.48192    1.09389    Cgz    Oap    Ccl
+ICOOR_INTERNAL      Hfn  -63.88591   69.32015    1.09485    Cgz    Oap    Ccl
+ICOOR_INTERNAL      Hfo   57.47986   69.31866    1.09458    Cgz    Oap    Ccl
+ICOOR_INTERNAL      Ccx  179.47322   58.56200    1.40164    Ccw    Ccp    Ccj
+ICOOR_INTERNAL      Hbv   -0.28064   59.63521    1.08430    Ccw    Ccp    Ccj
+ICOOR_INTERNAL      Ccz -179.87004   58.31780    1.39846    Cda    Ccp    Ccj
+ICOOR_INTERNAL      Hby   -1.09159   60.32208    1.08977    Cda    Ccp    Ccj
+ICOOR_INTERNAL      Ccy    0.95403   59.44722    1.40716    Ccx    Ccw    Ccp
+ICOOR_INTERNAL      Hbw  179.97443   60.98628    1.07954    Ccx    Ccw    Ccp
+ICOOR_INTERNAL      Hbx  178.70775   60.50708    1.08701    Ccz    Cda    Ccp
+ICOOR_INTERNAL      Cdc -179.74872   59.06180    1.47959    Ccy    Ccx    Ccw
+ICOOR_INTERNAL      Oae   -1.52782   61.81762    1.23215    Cdc    Ccy    Ccx
+ICOOR_INTERNAL      Oal  178.56087   62.43086    1.36422    Cdc    Ccy    Ccx
+ICOOR_INTERNAL      Cgk -179.41538   64.39897    1.44212    Oal    Cdc    Ccy
+ICOOR_INTERNAL      Hel  -60.57080   69.28106    1.08840    Cgk    Oal    Cdc
+ICOOR_INTERNAL      Hem   59.65294   69.57139    1.09307    Cgk    Oal    Cdc
+ICOOR_INTERNAL      Hen  179.20878   70.06666    1.09183    Cgk    Oal    Cdc

@@ -15,5 +15,6 @@ def init(**kwargs):
             init_string += key + " " + cg_pyrosetta.cmd_line_options_defaults[key] + " "
 
     print(init_string)
+    print(cg_pyrosetta.pyrosetta.__file__)
     cg_pyrosetta.pyrosetta.init(init_string)
 

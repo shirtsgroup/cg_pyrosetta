@@ -2,7 +2,7 @@ import cg_pyrosetta as cgpy
 
 def main():
 
-    cgpy.change_parameters.changeAtomParameters({"CG1" : ['X', 1.5, 0.2]},
+    cgpy.parameters.changeAtomParameters({"CG1" : ['X', 1.5, 0.2]},
                                     atom_types_path="atom_properties.txt",
                                     mm_atom_types_path = "mm_atom_type_sets/mm_atom_properties.txt")
 

@@ -13,19 +13,19 @@ def initializeParameters():
     import cg_pyrosetta
     import pyrosetta
 
-    cg_pyrosetta.change_parameters.changeTorsionParameters(
+    cg_pyrosetta.parameters.changeTorsionParameters(
     {'CG1 CG1 CG1 CG1':[0,0,0],
     'CG2 CG1 CG1 CG2':[0,0,0],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]}
     )
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
     {'CG1 CG1 CG1':[0,0],
      'CG2 CG1 CG1':[0,0],
      'X CG2 CG1':[0,0]}
     )
 
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {'CG1':['X', 1.0, 0.2],
          'CG2':['X', 1.0, 0.2],
          'CG3':['X', 1.0, 0.2],
@@ -53,7 +53,7 @@ def runMultiProcess(list_of_params):
     runAnnealingProcess(list_of_params[0], list_of_params[1], list_of_params[2], list_of_params[3])
 
 def main():
-    from cg_pyrosetta.change_parameters import changeAtomParameters
+    from cg_pyrosetta.parameters import changeAtomParameters
     # Reset all parameters to zero
 
     # Would like to generalize this work flow to:

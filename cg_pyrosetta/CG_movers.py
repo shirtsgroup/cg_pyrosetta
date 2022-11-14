@@ -301,8 +301,8 @@ class setBondLengths(CGBondLengthMover):
         -------
 
         >>>pose = pyrosetta.pose_from_seqence('X[CG11]X[CG11]X[CG11]X[CG11]')
-        >>>randomizer = cg_pyrosetta.CG_movers.randomizeBackBoneAngles(pose)
-        >>>randomizer.apply(pose)
+        >>>set_bond_length = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 SC1":sc, "BB2 SC2":sc, "BB3 SC3":sc})
+        >>>set_bond_length.apply(pose)
 
         """
         CGBondLengthMover.__init__(self, pose)
@@ -332,6 +332,62 @@ class setBondLengths(CGBondLengthMover):
                 # print(self.bond_length_dict[rev_bond_name])
                 # print("Changing", rev_bond_name, "to a length of:", self.bond_length_dict[rev_bond_name])
                 conf.set_bond_length(bond_atoms[1], bond_atoms[0], self.bond_length_dict[rev_bond_name])
+                
+            else:
+                continue
+
+class setBondAngle(CGSmallAngleMover):
+    def __init__(self, pose, bond_angle_dict, radians = False):
+        """
+        Build setBackBone Mover for CG models
+
+        Arguments
+        ---------
+
+        pose : pyrosetta.Pose()
+            used to generate list of possible dihedrals used in randomizing pose
+        bond_length_dicts : dict
+            dictionary with bond names and their desired length in r_bb
+
+        Example
+        -------
+
+        >>>pose = pyrosetta.pose_from_seqence('X[CG11]X[CG11]X[CG11]X[CG11]')
+        >>>set_bond_angle = cg_pyrosetta.CG_movers.set_BondAngle(pose)
+        >>>set_bond_angle.apply(pose)
+
+        """
+        CGSmallAngleMover.__init__(self, pose)
+        self.bond_angle_dict = bond_angle_dict
+        if radians is False:
+            for key in self.bond_angle_dict.keys():
+                self.bond_angle_dict[key] = self.bond_angle_dict[key] * np.pi / 180
+        self.angle_names = []
+        for i in range(len(self.bond_angles)):
+            atom_1_name = pose.residue(self.bond_angles[i][0].rsd()).atom_name(self.bond_angles[i][0].atomno()).rstrip()
+            atom_2_name = pose.residue(self.bond_angles[i][1].rsd()).atom_name(self.bond_angles[i][1].atomno()).rstrip()
+            atom_3_name = pose.residue(self.bond_angles[i][2].rsd()).atom_name(self.bond_angles[i][2].atomno()).rstrip()
+            self.angle_names.append(atom_1_name+" "+atom_2_name+" "+atom_3_name)
+
+    def apply(self, pose):
+        """
+        Apply bondlength changer to desired pose
+        """
+        conf = pose.conformation()
+        for angle_atoms, angle_name in zip(self.bond_angles, self.angle_names):
+            print(angle_name)
+            print(self.bond_angle_dict.keys())
+            rev_angle_name = angle_name.split(" ")
+            rev_angle_name.reverse()
+            rev_angle_name = " ".join(rev_angle_name)
+            if angle_name in self.bond_angle_dict.keys():
+                print(self.bond_angle_dict[angle_name])
+                print("Changing", angle_name, "to a length of:", self.bond_angle_dict[angle_name])
+                conf.set_bond_angle(angle_atoms[0], angle_atoms[1], angle_atoms[2], self.bond_angle_dict[angle_name])
+            elif rev_angle_name in self.bond_angle_dict.keys():
+                print(self.bond_angle_dict[rev_angle_name])
+                print("Changing", rev_angle_name, "to a length of:", self.bond_angle_dict[rev_angle_name])
+                conf.set_bond_angle(angle_atoms[2], angle_atoms[1], angle_atoms[0], self.bond_angle_dict[rev_angle_name])
                 
             else:
                 continue

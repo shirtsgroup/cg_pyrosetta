@@ -12,13 +12,13 @@ import os
 
 
 def initializeParameters():
-    cg_pyrosetta.change_parameters.changeTorsionParameters(
+    cg_pyrosetta.parameters.changeTorsionParameters(
     {'CG1 CG1 CG1 CG1':[0,0,0],
     'CG2 CG1 CG1 CG2':[0,0,0],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]}
     )
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
     {'CG1 CG1 CG1':[0,0],
      'CG2 CG1 CG1':[0,0],
      'X CG2 CG1':[0,0]},
@@ -31,7 +31,7 @@ def buildTorsionParamDict(name, force_constant, periodicity):
 
 
 def updateParameters(param_dict):
-    cg_pyrosetta.change_parameters.changeTorsionParameters(param_dict)
+    cg_pyrosetta.parameters.changeTorsionParameters(param_dict)
     cg_pyrosetta.builder.buildCGPyRosetta()
     
 

@@ -45,25 +45,25 @@ def build_inputs(seqences, name, rep, kts):
 if __name__ == '__main__':
     p = Pool(16)
 
-    cg_pyrosetta.change_parameters.changeTorsionParameters(
+    cg_pyrosetta.parameters.changeTorsionParameters(
         {'CG1 CG1 CG1 CG1':[0,0,0],
             'CG2 CG1 CG1 CG2':[1.579/2,1,0],
             'CG2 CG1 CG1 CG1':[0,0,0],
             'X CG2 CG1 CG1':[0,0,0]},
     )
 
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {'CG1 CG1 CG1':[0,0],
         'CG2 CG1 CG1':[0,0],
         'CG1 CG1 CG2':[0,0],
         'X CG2 CG1':[0,0]}        
     )
 
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {'CG2':['X', 1 , 0]} # Large sidechain
     )
 
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {'CG1 CG1 CG1':[1, 90],
         'CG2 CG1 CG1':[0,0],
         'CG1 CG1 CG2':[0,0],

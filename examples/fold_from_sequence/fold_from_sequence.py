@@ -27,14 +27,14 @@ kt_i = 100
 kt_anneal = [kt_i*(0.9)**i for i in range(50)]
 
 
-cg_pyrosetta.change_parameters.changeTorsionParameters(
+cg_pyrosetta.parameters.changeTorsionParameters(
    {'CG1 CG1 CG1 CG1':[3,3,0],
     'CG2 CG1 CG1 CG2':[3,2,120],
     'CG2 CG1 CG1 CG1':[0,0,0],
     'X CG2 CG1 CG1':[0,0,0]},
     )
 
-cg_pyrosetta.change_parameters.changeAngleParameters(
+cg_pyrosetta.parameters.changeAngleParameters(
     {'CG1 CG1 CG1':[2,70],
      'CG2 CG1 CG1':[2,70],
      'CG1 CG1 CG2':[0,0],
