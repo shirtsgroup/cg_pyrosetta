@@ -28,10 +28,10 @@ CG Movers
 
 Folding CG Models
 =================
-.. autoclass:: CG_folding
+.. automodule:: CG_folding
     :members:
 
-.. autoclass:: cg_monte_carlo
+.. automodule:: cg_monte_carlo
     :members:
 
 
