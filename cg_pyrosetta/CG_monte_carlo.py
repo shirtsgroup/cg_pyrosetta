@@ -171,7 +171,22 @@ class KTObserver(Observer):
                     f.write(str(kt) + "\n")
 
 class AcceptanceRatioObserver(Observer):
+    """
+    Observer object to calculate acceptance ratio of MC simulation objects
+    """
     def __init__(self, subject, write_file = True, file_name = "acc_ratio.txt"):
+        """
+        AcceptanceRatioObserver constructor
+
+        Parameters
+        ----------
+        subject : Subject
+            Subject object (CGMonteCarlo) to pull acceptance ratios from
+        write_file : bool
+            Flag on whether to write acceptance ratios to a file
+        file_name : str
+            Output file name
+        """
         self.acc_ratios = []
         self.subject = subject
         self.write_file = write_file
@@ -180,6 +195,9 @@ class AcceptanceRatioObserver(Observer):
             os.remove(file_name)
 
     def update(self):
+        """
+        This function pull acceptance ratios from the CGMonteCarlo object
+        """
         acc_ratio = self.subject.get_accept_ratio(reset = False)
         if self.write_file is True:
             if os.path.isfile(self.file_name):
@@ -191,23 +209,11 @@ class AcceptanceRatioObserver(Observer):
                     f.write(str(self.subject._total_trials) + ",")
                     f.write(str(acc_ratio) + "\n")
 
-#old
-class MinEnergyConfigObserver(Observer):
-    def __init__(self, subject):
-        self.structures = []
-        self.energies = []
-        self.subject = subject
-
-    def update(self):
-        self.energies.append(self.subject.get_energy())
-        self.structures.append(self.subject.pose.clone())
-
 
 class CGMonteCarlo(Subject):
     """
-    Docstring here
+    Object used to run a PyRosetta Monte Carlo simulation
     """
-
     def __init__(self,
                  pose: object = None,  # pyrosetta.rosetta.core.pose.Pose, Pose of starting structure
                  score: object = None,  # pyrosetta.ScoreFunction, # scorefunction from pyrosetta
@@ -216,7 +222,26 @@ class CGMonteCarlo(Subject):
                  kT: float = 1,
                  output: bool = True,
                  out_freq: int = 500,):
+        """
+        CGMonteCarlo constructor
 
+        Parameters
+        ----------
+        pose : pyrosetta.rosetta.core.pose.Pose
+            Pose object to perform MC simulation with
+        score : pyrosetta.ScoreFunction
+            Scorefunction object to score pose with
+        seq_mover : pyrosetta.rosetta.protocols.moves.SequenceMover
+            Sequence mover with desired moves for MC simulation
+        n_steps : int
+            Number of steps to run MC simulation for
+        kT : float
+            Temperature to evaluate energy differences in during the metropolis criteron
+        output : bool
+            Flag to print output to terminal
+        out_freq : int
+            Frequency of steps between outputs
+        """
         super().__init__()
 
         # initialize input values
@@ -242,6 +267,9 @@ class CGMonteCarlo(Subject):
 
     @property
     def out_freq(self):
+        """
+        Get or set output frequency
+        """
         return(self._out_freq)
 
     @out_freq.setter
@@ -250,6 +278,9 @@ class CGMonteCarlo(Subject):
     
     @property
     def kT(self):
+        """
+        Get or set MC simulation kT
+        """
         return(self._kT)
 
     @kT.setter
@@ -259,10 +290,16 @@ class CGMonteCarlo(Subject):
         self.mc_trial = pyrosetta.TrialMover(self.seq_mover, self.mc)
 
     def get_energy(self):
+        """
+        Evaluate energy of scorefunction with given pose
+        """
         return(self._score(self.pose))
 
     # def __call__():
     def run(self):
+        """
+        Run MC simulation for specified number of steps (self.n_steps)
+        """
         rep_mover = pyrosetta.RepeatMover(self.mc_trial, self._out_freq)
         for _ in range(int(self.n_steps/self._out_freq)):
             rep_mover.apply(self.pose)
@@ -274,30 +311,58 @@ class CGMonteCarlo(Subject):
             self.notifyObservers()
 
     def get_accept_ratio(self, reset = True):
+        """
+        Calculate the acceptance ratio from the MC simulation
+
+        Parameters
+        ----------
+        reset : bool (True)
+            Flag to reset counts each time acceptance ratio is calculated.
+        """
         acc_ratio = self.mc_trial.acceptance_rate()
         if reset:
             self.mc.reset_counters()
         return acc_ratio
 
     def get_pose(self):
+        """
+        Get the Pose object in the MC simulation
+        """
         return(self.pose)
 
     def get_minimum_energy_pose(self):
+        """
+        Get the minimum energy pose found in the MC simulation
+        """
         return(self.mc.lowest_score_pose())
 
 
 class CGMonteCarloAnnealer:
     """
-    Docstring here
+    Annealer object used to make simulated annealing MC simulations
+    using CGMonteCarlo objects
     """
-
     def __init__(self,
                  seq_mover: object = None,
                  score_function: object = None,
                  pose: object = None,
                  param_file_object: object = None,
                  ):
+        """
+        CGMonteCarloAnnealr constructor
 
+        Parameters
+        ----------
+        seq_mover : pyrosetta.rosetta.protocols.moves.SequenceMover
+            Sequence mover with desired moves for MC simulation
+        score_function : pyrosetta.ScoreFunction
+            Scorefunction object to score pose with
+        pose : pyrosetta.rosetta.core.pose.Pose
+            Pose object to perform MC simulation with
+        param_file_object : CGMonteCarloAnnealerParameters
+            Parameter object used to store relevant parameters for annealer
+            objects
+        """
         self.seq_mover = seq_mover
         self.score_function = score_function
         self.pose = pose
@@ -312,6 +377,9 @@ class CGMonteCarloAnnealer:
         self.kt_anneals = copy.deepcopy(param_file_object.t_anneals)
 
     def run_schedule(self):
+        """
+        Runs annealing cycles using parameters defined in the CGMonteCarloAnnealerParameter object
+        """
         for kt in self.kt_anneals:
             print("Current kT = ", kt)
             self._cg_mc_sim.kT = kt
@@ -321,21 +389,51 @@ class CGMonteCarloAnnealer:
             self.kt_anneals = self.kt_anneals[1:]
 
     def get_mc_sim(self):
+        """
+        Returns the CGMonteCarlo object used within this object
+        """
         return self._cg_mc_sim
             
     def _get_score_function(self):
+        """
+        Gets the score function object
+        """
         return self.score_function
 
     def _get_seq_mover(self):
+        """
+        Gets the sequence mover object 
+        """
         return self.seq_mover
 
     def _add_to_schedule(self, kT):
+        """
+        Add new temperature values to the annealing schedule
+
+        Parameters
+        ----------
+        kT : float
+        """
         self.kt_anneals.append(kT)
 
     def registerObserver(self, observer):
+        """
+        Add new observers to observer list
+
+        Parameters
+        ----------
+        observer : Observer
+        """
         self._cg_mc_sim.registerObserver(observer)
 
     def removeObserver(self, observer):
+        """
+        Remove observer from observer list
+
+        Parameters
+        ----------
+        observer : Observer
+        """
         self._cg_mc_sim.removeObserver(observer)
 
 class CGMonteCarloDynamicAnnealer:
@@ -343,13 +441,27 @@ class CGMonteCarloDynamicAnnealer:
     A MC annealing object that dynamically adjusts temperature according
     to specific criteria objects
     """
-
     def __init__(self,
                 seq_mover: object = None,
                 score_function: object = None,
                 pose: object = None,
                 dynamic_param_file_object: object = None,
                 ):
+        """
+        CGMonteCarloDynamicAnnealer constructor
+
+        Parameters
+        ----------
+        seq_mover : pyrosetta.rosetta.protocols.moves.SequenceMover
+            Sequence mover with desired moves for MC simulation
+        score_function : pyrosetta.ScoreFunction
+            Scorefunction object to score pose with
+        pose : pyrosetta.rosetta.core.pose.Pose
+            Pose object to perform MC simulation with
+        dynamic_param_file_object : CGMonteCarloDynamicAnnealerParameters
+            Parameter object used to store relevant parameters for the dynamic 
+            annealer objects
+        """
         self.seq_mover = seq_mover
         self.score_function = score_function
         self.pose = pose
@@ -363,8 +475,17 @@ class CGMonteCarloDynamicAnnealer:
     
     def estimate_starting_kt(self, base = 10, factor = 1):
         """
-        Function to estimate a good starting kT value. A base of 1 will just
-        return the absolute value of the initial energy.
+        Function to estimate a good starting kT value. Gives an initial
+        temperature in the order of magnitude of the initial energy of the
+        MC simulation. Setting `base=1` will return the absolute value
+        of the initial energy.
+        
+        Parameters
+        ----------
+        base : float (10)
+            Base value to use for order of magnitude estimate
+        factor : float (1)
+            Factor by which to multiply the base estimate
         """
         energy = self._cg_mc_sim.get_energy()
         if base == 1:
@@ -376,6 +497,7 @@ class CGMonteCarloDynamicAnnealer:
 
     def run_annealing(self):
         """
+        Run the annealing schedule
         """
         for i in range(self.dynamic_params.n_cycles):
             print("Current kT: ", self._cg_mc_sim.kT)
@@ -384,6 +506,13 @@ class CGMonteCarloDynamicAnnealer:
         
 
     def adjust_kt(self):
+        """
+        Adjust kT value based on acceptance ratio. If the acceptance
+        ratio is too large, kT will be decreased by a factor of
+        `self.dynamic_params.anneal_rate`, if the acceptance ratio
+        is too small, kT will be increased by a factor of 
+        `self.dynamic_params.anneal_rate`.
+        """
         acc_ratio = self._cg_mc_sim.get_accept_ratio(reset = True)
         print("Cycle acceptance ratio: " + str(acc_ratio))
         print("Target acceptance ratio: " + str(self.dynamic_params.target_ratio))
@@ -393,18 +522,41 @@ class CGMonteCarloDynamicAnnealer:
             self._cg_mc_sim.kT /= self.dynamic_params.anneal_rate
         
     def get_mc_sim(self):
+        """
+        Get MC simulation object
+        """
         return self._cg_mc_sim
             
     def _get_score_function(self):
+        """
+        Get scoreterm object
+        """
         return self.score_function
 
     def _get_seq_mover(self):
+        """
+        Get sequence mover object
+        """
         return self.seq_mover
 
     def registerObserver(self, observer):
+        """
+        Add new observers to observer list
+
+        Parameters
+        ----------
+        observer : Observer
+        """
         self._cg_mc_sim.registerObserver(observer)
 
     def removeObserver(self, observer):
+        """
+        Remove observer from observer list
+
+        Parameters
+        ----------
+        observer : Observer
+        """
         self._cg_mc_sim.removeObserver(observer)
     
 
@@ -414,7 +566,8 @@ class Convergence(ABC):
 
 class Repeat10Convergence(Convergence):
     """
-    convergence object 
+    Convergence object, used to evaluate the convergence of an MC simulation
+    at a given condition. Here convergence is met with 10 iteration
     """
     def __init__(self):
         self.counter = 0
@@ -429,7 +582,8 @@ class Repeat10Convergence(Convergence):
 
 class Repeat1Convergence(Convergence):
     """
-    convergence object 
+    Convergence object, used to evaluate the convergence of an MC simulation
+    at a given condition. Here convergence is met with 1 iteration
     """
     def __init__(self):
         self.counter = 0
@@ -480,7 +634,10 @@ class CGMonteCarloDynamicAnnealerParameters:
         # list of annealing temps
 
 class SequenceMoverFactory:
-
+    """
+    Factory object for building pyrosetta.SequenceMover() objects with
+    specific movers
+    """
     def __init__(self, pose, extra_movers_dict = None):
         self.methods = {
             'small_dihe': cg_pyrosetta.CG_movers.CGSmallMover(pose),
@@ -508,7 +665,10 @@ class SequenceMoverFactory:
 
 
 class EnergyFunctionFactory:
-
+    """
+    Factory object for building pyrosetta.ScoreFunction()
+    objects with specific score terms
+    """
     def __init__(self):
         self.methods = {}
         for method in dir(pyrosetta.rosetta.core.scoring):

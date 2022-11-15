@@ -161,6 +161,14 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
             
 
     def is_new_torsion(self, torsion):
+        """
+        Function which check if a torsion is present in the mover's torsion list
+
+        Parameters
+        ----------
+        torsion : list of pyrosetta.rosetta.core.id.AtomID
+            List of atoms present in torsion
+        """
         for old_torsion in self.torsions:
             if old_torsion[0].rsd() == torsion[0].rsd() and \
                 old_torsion[0].atomno() == torsion[0].atomno() and \
@@ -182,12 +190,28 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
                 return(False)
         return(True)
     def is_new_atom(self, atom):
+        """
+        Function which check if an atom is present in the mover's atom list
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
             return(False)
         else:
             return(True)
     
     def get_neighbors(self, atom):
+        """
+        Get neighbors of an atom within the pose object
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
 
     def apply(self, pose):
@@ -464,6 +488,9 @@ class setBondAngle(CGSmallAngleMover):
 # Backbone/Sidechain specific movers
 
 class CGBBSmallMover(CGSmallMover):
+    """
+    Variant of CGSmall mover which only moves backbone torsions
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
         for torsion in self.torsions:
@@ -474,6 +501,9 @@ class CGBBSmallMover(CGSmallMover):
                 self.torsions.remove(torsion)
 
 class CGSCSmallMover(CGSmallMover):
+    """
+    Variant of CGSmall mover which only moves torsions with SC atoms
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
         for torsion in self.torsions:
@@ -484,6 +514,9 @@ class CGSCSmallMover(CGSmallMover):
                 self.torsions.remove(torsion)
 
 class CGBBSmallAngleMover(CGSmallAngleMover):
+    """
+    Variant of CGSmallAngleMover which only moves backbone angles
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
         for angle in self.bond_angles:
@@ -494,6 +527,9 @@ class CGBBSmallAngleMover(CGSmallAngleMover):
                 self.bond_angles.remove(angle)
 
 class CGSCSmallAngleMover(CGSmallAngleMover):
+    """
+    Variant of CGSmallAngleMover which only moves angles with SC atoms
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
         for angle in self.bond_angles:

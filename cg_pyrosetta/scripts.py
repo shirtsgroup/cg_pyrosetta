@@ -4,6 +4,9 @@ from .parameters import ItpFileObject
 
 
 def itp_to_rosetta_params():
+    """
+    Convert GROMACS itp file and structure file to Rosetta .param files
+    """
     def parse_args():
         parser = argparse.ArgumentParser(
             description = "This script converts between Gromacs .itp files \
