@@ -18,7 +18,7 @@ def set_parameters(job):
     os.chdir(job.ws)
     # set parameters
     print("Changing parameters in", os.path.abspath(""))
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {
          'CG1' : ['X', np.power(2, 1/6) , 0.2],
          'CG2' : ['X', np.power(2, 1/6) , 0.2],
@@ -29,7 +29,7 @@ def set_parameters(job):
 
     print("hinge angle 1:", job.sp.hinge_angle)
     print("hinge angle 2:", np.divide(180 - job.sp.hinge_angle, 2) + 90)
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {
          'CG2 CG2 CG2' : [800, job.sp.hinge_angle], #[k_theta, angle (degrees)]
          'CG1 CG2 CG2' : [800, np.divide(180 - job.sp.hinge_angle, 2) + 90], #[k_theta, angle (degrees)]

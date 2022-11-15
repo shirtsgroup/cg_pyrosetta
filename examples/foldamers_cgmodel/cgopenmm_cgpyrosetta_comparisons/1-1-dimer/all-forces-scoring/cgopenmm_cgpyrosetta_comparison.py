@@ -1,5 +1,5 @@
 import cg_pyrosetta
-from cg_pyrosetta.change_parameters import assign_mm_atom_properties_with_cgopenmm_cgmodel
+from cg_pyrosetta.parameters import assign_mm_atom_properties_with_cgopenmm_cgmodel
 import os
 from simtk import unit
 from cg_openmm.simulation.tools import *
@@ -171,14 +171,14 @@ def build_scorefxn(cgmodel,mm=False):
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_atr, 1)
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_atr, 1)
          scorefxn.set_weight(pyrosetta.rosetta.core.scoring.fa_intra_rep, 1)
-         cg_pyrosetta.change_parameters.changeTorsionParameters(
+         cg_pyrosetta.parameters.changeTorsionParameters(
           {'CG1 CG1 CG1 CG1':[0,0,0],
           'CG2 CG1 CG1 CG2':[0,0,0],
           'CG2 CG1 CG1 CG1':[0,0,0],
           'X CG2 CG1 CG1':[0,0,0]}
         )
 
-         cg_pyrosetta.change_parameters.changeAngleParameters(
+         cg_pyrosetta.parameters.changeAngleParameters(
           {'CG1 CG1 CG1':[0,0],
           'CG2 CG1 CG1':[0,0],
           'CG1 CG1 CG2':[0,0],

@@ -9,11 +9,11 @@ import numpy as np
 
 
 def test_read_in_pdb_functional():
-    cg_pyrosetta.change_parameters.changeAtomParameters({"CG1": ['X', 1.0, 0.2],
+    cg_pyrosetta.parameters.changeAtomParameters({"CG1": ['X', 1.0, 0.2],
                                                          "CG2": ['X', 1.0, 0.2]})
-    cg_pyrosetta.change_parameters.changeAngleParameters({"CG1 CG1 CG1": [0, 0],
+    cg_pyrosetta.parameters.changeAngleParameters({"CG1 CG1 CG1": [0, 0],
                                                           "CG2 CG1 CG1": [0, 0]})
-    cg_pyrosetta.change_parameters.changeTorsionParameters({"CG1 CG1 CG1 CG1": [0, 0, 0],
+    cg_pyrosetta.parameters.changeTorsionParameters({"CG1 CG1 CG1 CG1": [0, 0, 0],
                                                             "CG2 CG1 CG1 CG2": [0, 0, 0]})
     cg_pyrosetta.builder.buildCGPyRosetta()
 

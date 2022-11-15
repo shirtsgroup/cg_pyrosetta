@@ -69,11 +69,11 @@ def main():
 
     # for param_type in params:
     #     if param_type == "atoms":
-    #         cg_pyrosetta.change_parameters.changeAtomParameters(params["atoms"])
+    #         cg_pyrosetta.parameters.changeAtomParameters(params["atoms"])
     #     if param_type == "dihedrals":
-    #         cg_pyrosetta.change_parameters.changeTorsionParameters(params["dihedrals"])
+    #         cg_pyrosetta.parameters.changeTorsionParameters(params["dihedrals"])
     #     if param_type == "angles":
-    #         cg_pyrosetta.change_parameters.changeAngleParameters(params["angles"])
+    #         cg_pyrosetta.parameters.changeAngleParameters(params["angles"])
     #     else:
     #         print("Input YAML file had a key for", param_type+".", "This key is not a valid parameter type for this model.", file=sys.stderr)
     #         print("Ignoring", param_type, "and continuing!", file=sys.stderr)

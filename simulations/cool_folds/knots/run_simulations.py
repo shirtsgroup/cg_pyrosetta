@@ -18,7 +18,7 @@ def set_parameters(job):
     os.chdir(job.ws)
     # set parameters
     print("Changing parameters in", os.path.abspath(""))
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {
          'CG1' : ['X', np.power(2, 1/6) , 0.2],
          'CG2' : ['X', np.power(2, 1/6) , 0.2],
@@ -29,7 +29,7 @@ def set_parameters(job):
         mm_atom_types_path = "parameters/mm_atom_type_sets/mm_atom_properties.txt"
     )
 
-    cg_pyrosetta.change_parameters.changeAngleParameters(
+    cg_pyrosetta.parameters.changeAngleParameters(
         {
          'CG1 CG1 CG1' : [800, job.sp.bond_angle], #[k_theta, angle (degrees)]
         },

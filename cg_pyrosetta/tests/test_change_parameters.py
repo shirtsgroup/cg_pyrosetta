@@ -13,7 +13,7 @@ pyrosetta_top_path = os.path.join(data_path, '../../PyRosetta4.modified')
 
 
 def test_change_atom_parameters():
-    cg_pyrosetta.change_parameters.changeAtomParameters(
+    cg_pyrosetta.parameters.changeAtomParameters(
         {'CG1': ['X', 1.0, 0.2, 1.0, 1.5, 23.7]})
 
     # check local data dir (mm + fa_standard)

@@ -6,17 +6,15 @@ import sys
 import os
 from setuptools import setup, find_packages
 import versioneer
-import yaml
+import pyrosetta
 short_description = __doc__.split("\n")
 
 
 # Setting up PyRosetta Build within package
 
                         #### CHANGE THIS PATH #####
-config_file =  open('.configs.yml', 'r')
-configs = yaml.load(config_file)
-fresh_pyrosetta_path = configs['clean_pyrosetta_path']
-pyrosetta_path = os.path.abspath('PyRosetta4.modified')
+fresh_pyrosetta_path = pyrosetta.__path__[0]
+pyrosetta_path = os.path.abspath('pyrosetta_modified')
 input_path = os.path.abspath('cg_pyrosetta/data')
 
 from cg_pyrosetta.build_cg_pyrosetta import PyRosettaBuilder
@@ -74,5 +72,10 @@ setup(
 
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
     # zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'itp_to_rosetta_params = cg_pyrosetta.scripts:itp_to_rosetta_params',
+        ]
+    }
 
 )
