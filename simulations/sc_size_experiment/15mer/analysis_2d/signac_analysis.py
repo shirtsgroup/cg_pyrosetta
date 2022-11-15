@@ -120,6 +120,7 @@ def matching_paramfile_statepoint(job):
 @FlowProject.post(energy_trajectory)
 def get_energy_trajectory(job):
     param_dict = get_clustering_parameters(job)
+    print(job.fn(""))
     old_project = signac.get_project(root=param_dict["signac_dir"])
 
     # kT values for tempeature plot
@@ -141,20 +142,27 @@ def get_energy_trajectory(job):
     
     aspect_ratios = [[10,10], [15,10]]
     for ar in aspect_ratios:
+        plt.rcParams.update({'font.size' : 18})
+
         # Energy trajectory plot
         fig, ax1 = plt.subplots(1,1,figsize = ar, dpi=600)
         ax2 = ax1.twinx()
-        ax2.plot(out_steps, kts/0.2, 'r')
         # ax2.set_xlim([0, 500000])
         ax2.set_ylabel(r'Simulated Temperature ($\epsilon_{B}$)', color = 'r', fontsize=20)
-        plt.rcParams.update({'font.size' : 18})
+        # plot energy trajectories
         for traj in energy_traj:
             ax1.plot(energies.values[:,0], traj/0.2, alpha = 0.4, lw=2)
-            ax1.set_xlabel("Steps", fontsize=20)
-            ax1.set_ylabel(r'Energy ($\epsilon_{B}$)', fontsize=20)
-            ax1.set_title(r'$SC$ = ' + str(round(job.sp['sc_size'],4)) + r'$R^{min}_{B}$', fontsize=20)
-            ax1.tick_params(axis = "both", labelsize=16)
-            ax2.tick_params(axis = "both", labelsize=16)
+        # Plot temperature        
+        ax2.plot(out_steps, kts/0.2, 'r')
+
+        # Lables & Titles
+        ax1.set_xlabel("Steps", fontsize=20)
+        ax1.set_ylabel(r'Energy ($\epsilon_{B}$)', fontsize=20)
+        ax1.set_title(r'$SC$ = ' + str(round(job.sp['sc_size'],4)) + r'$R^{min}_{B}$', fontsize=20)
+        ax1.tick_params(axis = "both", labelsize=16)
+        ax2.tick_params(axis = "both", labelsize=16)
+
+        # Save figures
         fig.savefig(job.fn("energy_trajectory_" + "_".join([str(i) for i in ar]) + ".jpg"), bbox_inches="tight")
         fig.savefig(job.fn("energy_trajectory_" + "_".join([str(i) for i in ar]) + ".pdf"), bbox_inches="tight")
         
@@ -165,8 +173,6 @@ def get_energy_trajectory(job):
     
     plt.close("all")
 
-    for a in energy_traj:
-        print("Sim. steps:", len(a))
     job.stores['traj']['energy_traj'] = np.array(energy_traj)
     job.stores['traj']['all_energies'] = all_energies
     

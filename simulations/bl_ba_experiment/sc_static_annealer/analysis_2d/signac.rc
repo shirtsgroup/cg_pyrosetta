@@ -1,0 +1,3 @@
+project = sc_params_analysis
+workspace_dir = workspace
+schema_version = 1
