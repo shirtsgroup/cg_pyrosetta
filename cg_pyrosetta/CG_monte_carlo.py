@@ -13,11 +13,6 @@ import os
 import sys
 import warnings
 import cg_pyrosetta.CG_movers
-
-
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-
 import pyrosetta
 
 class Subject(ABC):
@@ -218,6 +213,9 @@ class CGMonteCarlo(Subject):
             if self._output is True:
                 print("Step :", self._total_trials)
                 print("Energy : ", self.get_energy())
+                print("Energy Decomposition:")
+                for scoretype in self._score.get_nonzero_weighted_scoretypes():
+                    print(str(scoretype).split(".")[-1], self._score.score_by_scoretype(self.pose, scoretype), end = " ")
                 self.pymol.apply(self.pose)
             self.notifyObservers()
 

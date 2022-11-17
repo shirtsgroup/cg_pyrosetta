@@ -11,33 +11,32 @@ def run_mc_simulation(job):
     os.chdir(job.ws)
     cg_pyrosetta.init(add_atom_types = "fa_standard parameters/atom_properties.txt", 
                       add_mm_atom_type_set_parameters = "fa_standard parameters/mm_atom_properties.txt",
-                      extra_res_fa = "parameters/HEX.param",
+                      extra_res_fa = "parameters/mop_hexamer.param",
                       extra_mm_params_dir = "parameters",
                       mute = "no")
 
     # Build Annealer Parameters
     annealer_params = cg_pyrosetta.CG_monte_carlo.\
         CGMonteCarloAnnealerParameters(n_inner = 10000,
-                                       t_init = 1000,
+                                       t_init = 25,
                                        anneal_rate = 0.9,
                                        n_anneals = 50,
                                        annealer_criteron = cg_pyrosetta.CG_monte_carlo.Repeat1Convergence,
                                        mc_output = True,
-                                       out_freq = 100,
+                                       out_freq = 500,
     )
 
     # Build Energy Function
     energy_function = cg_pyrosetta.CG_monte_carlo.EnergyFunctionFactory().build_energy_function(
         {
-            "mm_twist" : 1,
+            "mm_twist" : 20,
             # "mm_stretch" : 1,
             "mm_bend" : 1,
             "fa_atr" : 1,
             "fa_rep" : 1,
             "fa_intra_rep" : 1,
             "fa_intra_atr" : 1,
-            "fa_elec" : 1,
-            "fa_intra_elec" : 1
+            "fa_elec" : 1
         }
     )
 
@@ -61,9 +60,7 @@ def run_mc_simulation(job):
 
     mini.movemap(movemap)
 
-    smaller_dihe = cg_pyrosetta.CG_movers.CGSmallMover(pose, angle = 180)
-
-    # Remove aromatic torsions that would break rings
+    smaller_dihe = cg_pyrosetta.CG_movers.CGSmallMover(pose, angle = 90)
 
     # Build Sequence Mover for MC object
     sequence_mover_factory = cg_pyrosetta.CG_monte_carlo.SequenceMoverFactory(pose, {"mini" : mini, "smaller_dihe" : smaller_dihe})
