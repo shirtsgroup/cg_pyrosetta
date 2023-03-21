@@ -1,7 +1,6 @@
 Coarse Grained PyRosetta
 ==============================
 
-# (Badges)
 [![DOI](https://zenodo.org/badge/187856626.svg)](https://zenodo.org/badge/latestdoi/187856626)
 
 ### Description
