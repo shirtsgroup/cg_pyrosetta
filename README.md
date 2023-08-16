@@ -1,26 +1,26 @@
-Coarse Grained PyRosetta
+Coarse-Grained PyRosetta
 ==============================
 
 [![DOI](https://zenodo.org/badge/187856626.svg)](https://zenodo.org/badge/latestdoi/187856626)
 
 ### Description
 
-An implementation of Pyrosetta with CG capabilities. CG PyRosetta can fold arbitrary CG models using a variety of MC minimization methods. In this repository we use the Python wrapper PyRosetta to build a framework to run CG folding simulations. Currently we have:
-- working 1-1, 2-1, 3-1, 1-2 and 1-3 models
-- working generalized movers for bond angles and torsions
-- working MC objects
-- working MC annealing folding objects
-- working torsion energies (mm_twist)
+A package that implements arbitrary CG models in Pyrosetta. Poses with CG atoms can be folded using the MC objects provided in this package, or using other Rosetta sampling objects. 
 
 ### Installation
 
-To install a local version of this package, first change the `clean_pyrosetta_path` variable in setup.py to a working version of PyRosetta4.
+To install a local version of this package, create a new `conda` environment using the `environment.yml` file included in the root directory of this package:
 
-`clean_pyrosetta_path = /path/to/PyRosetta4`
+`conda env create --name cg_pyrosetta --file environment.yml`
 
-Then run the following from the top directory:
+Once installed, activate the `conda` environment with:
+`conda activate cg_pyrosetta`
+
+Now we can install CG Pyrosetta into this new conda environment with:
 
 `pip install -e .`
+
+The `-e` flag is optional, however, it compiles the package in developer mode, which lets users make and use changes to the code without needing to reinstall the program.
 
 ### Copyright
 
