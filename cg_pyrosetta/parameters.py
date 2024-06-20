@@ -685,7 +685,15 @@ class ItpFileObject:
             # Find 2 more heavy atoms bonded to
 
             for atom_2 in self.get_neighbors(start_atoms[0]):
+                print("atom 2 selection")
                 if self.is_hydrogen(self.atoms[atom_2-1]):
+                    continue
+                if len(self.get_neighbors(atom_2)) == 1:
+                    continue
+                h_neighbors = []
+                for neighbors in self.get_neighbors(atom_2):
+                    h_neighbors.append(self.is_hydrogen(self.atoms[neighbors-1]))
+                if all(h_neighbors):
                     continue
                 else:
                     start_atoms.append(atom_2)
@@ -702,6 +710,7 @@ class ItpFileObject:
                         continue
             
             # Z-matrix entry 1
+            print(start_atoms)
             z_entry = ["ICOOR_INTERNAL",
                        self.atoms[start_atoms[0]-1]["atom"],
                        0,
