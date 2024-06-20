@@ -121,9 +121,11 @@ def remove_existing_atom_types(atom_properties_file, list_of_atoms_to_remove):
     Parameters
     ----------
 
-    atom_properties_file: Path to the PyRosetta database file containing atom type properties ('atom_properties.txt')
+    atom_properties_file : str
+        Path to the PyRosetta database file containing atom type properties ('atom_properties.txt')
 
-    list_of_atoms_to_remove: List of atom types to remove from the database.
+    list_of_atoms_to_remove : list
+        List of atom types to remove from the database.
 
     """
     file_obj = open(atom_properties_file, 'r')
@@ -145,12 +147,14 @@ def get_existing_atom_types(atom_properties_file):
     Parameters
     ----------
 
-    atom_properties_file: Path to the PyRosetta database file containing atom type properties ('atom_properties.txt')
+    atom_properties_file : str
+        Path to the PyRosetta database file containing atom type properties ('atom_properties.txt')
 
     Returns
     -------
 
-    existing_atom_types_list: List of existing atom types.
+    existing_atom_types_list : list
+        List of existing atom types.
 
     """
     existing_atom_types_list = []
@@ -538,7 +542,7 @@ def compare_openmm_energy_pyrosetta_score(cgmodel):
         Parameters
         ----------
 
-        cgmodel: Coarse grained model class object.
+        cgmodel : cg_openmm.model.CGModelCoarse grained model class object.
 
         """
 
@@ -562,38 +566,39 @@ def compare_openmm_energy_pyrosetta_score(cgmodel):
     return
 
 
-# Set values for the parameters in our coarse grained model:
-polymer_length = 8
-backbone_length = [1, 2]
-sidechain_length = 1
-sidechain_positions = [0]
-mass = unit.Quantity(10.0, unit.amu)
-sigma = unit.Quantity(2.4, unit.angstrom)
-bond_length = unit.Quantity(1.0, unit.angstrom)
-epsilon = unit.Quantity(0.5, unit.kilocalorie_per_mole)
-# charge = unit.Quantity(0.0,unit.elementary_charge)
+def main():
+    # Set values for the parameters in our coarse grained model:
+    polymer_length = 8
+    backbone_length = [1, 2]
+    sidechain_length = 1
+    sidechain_positions = [0]
+    mass = unit.Quantity(10.0, unit.amu)
+    sigma = unit.Quantity(2.4, unit.angstrom)
+    bond_length = unit.Quantity(1.0, unit.angstrom)
+    epsilon = unit.Quantity(0.5, unit.kilocalorie_per_mole)
+    # charge = unit.Quantity(0.0,unit.elementary_charge)
 
-# Define PDB files to test our PDB writing ability
-openmm_pdb_file = 'test_1_1_openmm.pdb'
-rosetta_pdb_file = 'test_1_1_rosetta.pdb'
+    # Define PDB files to test our PDB writing ability
+    openmm_pdb_file = 'test_1_1_openmm.pdb'
+    rosetta_pdb_file = 'test_1_1_rosetta.pdb'
 
-# Build a coarse grained model
-cgmodel = basic_cgmodel(polymer_length=polymer_length, backbone_length=backbone_length, sidechain_length=sidechain_length,
-                        sidechain_positions=sidechain_positions, mass=mass, bond_length=bond_length, sigma=sigma, epsilon=epsilon)
-# write_pdbfile_without_topology(cgmodel,openmm_pdb_file)
-pyrosetta_sequence = ''.join([str('['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
-# Compare OpenMM and PyRosetta energies
-# (This function is also where we initialize new residue/monomer
-#  types in the PyRosetta database.)
-compare_openmm_energy_pyrosetta_score(cgmodel)
-pose_from_sequence = pyrosetta.pose_from_sequence(pyrosetta_sequence, 'coarse_grain')
-# Test our ability to write a PDB file using our pose and new residue type sets.
-pyrosetta.rosetta.core.io.pdb.dump_pdb(pose, rosetta_pdb_file)
-# Test our ability to read a pose from the PDB file we wrote
-pose_from_pdb = pyrosetta.pose_from_pdb(rosetta_pdb_file)
-# Define scorefunction terms
-pyrosetta_scorefxn = build_scorefxn(cgmodel)
-# Compare poses built from a PDB file and from the polymer sequence
-compare_pose_scores(pyrosetta_scorefxn, pose_from_pdb, pose_from_sequence, compare_pdb_sequence=True)
+    # Build a coarse grained model
+    cgmodel = basic_cgmodel(polymer_length=polymer_length, backbone_length=backbone_length, sidechain_length=sidechain_length,
+                            sidechain_positions=sidechain_positions, mass=mass, bond_length=bond_length, sigma=sigma, epsilon=epsilon)
+    # write_pdbfile_without_topology(cgmodel,openmm_pdb_file)
+    pyrosetta_sequence = ''.join([str('['+str(monomer['monomer_name'])+']') for monomer in cgmodel.sequence])
+    # Compare OpenMM and PyRosetta energies
+    # (This function is also where we initialize new residue/monomer
+    #  types in the PyRosetta database.)
+    compare_openmm_energy_pyrosetta_score(cgmodel)
+    pose_from_sequence = pyrosetta.pose_from_sequence(pyrosetta_sequence, 'coarse_grain')
+    # Test our ability to write a PDB file using our pose and new residue type sets.
+    pyrosetta.rosetta.core.io.pdb.dump_pdb(pose, rosetta_pdb_file)
+    # Test our ability to read a pose from the PDB file we wrote
+    pose_from_pdb = pyrosetta.pose_from_pdb(rosetta_pdb_file)
+    # Define scorefunction terms
+    pyrosetta_scorefxn = build_scorefxn(cgmodel)
+    # Compare poses built from a PDB file and from the polymer sequence
+    compare_pose_scores(pyrosetta_scorefxn, pose_from_pdb, pose_from_sequence, compare_pdb_sequence=True)
 
-exit()
+    exit()

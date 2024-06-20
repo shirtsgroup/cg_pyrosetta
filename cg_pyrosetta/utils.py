@@ -1,6 +1,11 @@
 import cg_pyrosetta
 
 def init(**kwargs):
+    """
+    Function used to initialize CG PyRosetta. This function calls the
+    pyrosetta.init() function with the proper commandline values to 
+    read in the CG models implemented in this package.
+    """
     if kwargs is not None:
         for key in kwargs.keys():
             rosetta_key = "--" + key

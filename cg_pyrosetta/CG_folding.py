@@ -27,8 +27,8 @@ class CGFoldingAlgorithm():
         folding object used for easily implementing different
         movers into a single folding algorithm.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
 
         sequence : str
             Sequence of CG residues
@@ -36,6 +36,10 @@ class CGFoldingAlgorithm():
             Desired angle of all B-B-B angles. Generalizes to all backbone models (not working)
         BBBB_angle : float
             Desired dihedral of all B-B-B-B torsion angles. Generalizes to all backbone models (not working)
+        file_name : string
+            output file name for the trajectory of the folding object
+        energy_graph_output : Bool
+            Flag for outputting graph a graph of the folding simulation
 
 
         """
@@ -108,10 +112,14 @@ class CGFoldingAlgorithm():
     def set_BBB_angles(self, pose, angle):
         """
         set initial B-B-B angle for each residue to a certain value
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
 
-        works for any object with 1-bead backbone
+        Parameters
+        ----------
+        pose : pyrosetta.Pose()
+            Pose object to change angles to
+        angle : float
+            Angle to set BBB angles to in degrees
+
         """
         for i in range(2, pose.size()):
             pose.conformation().set_bond_angle(pyrosetta.AtomID(1, int(i-1)),
@@ -123,11 +131,14 @@ class CGFoldingAlgorithm():
 
     def set_BBBB_dihe(self, pose, angle):
         """
-        set initial B-B-B angle for each residue to a certain value
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
-
-        works for any object with 1-bead backbone
+        set initial B-B-B-B torsion for each residue to a certain value
+        
+        Parameters
+        ----------
+        pose : pyrosetta.Pose()
+            Pose object to change angles to
+        angle : float
+            Torsion angle to set BBBB angles to in degrees
         """
         for i in range(2, pose.size()-1):
             pose.conformation().set_torsion_angle(pyrosetta.AtomID(1, int(i-1)),
@@ -141,10 +152,11 @@ class CGFoldingAlgorithm():
     def random_BBBB_dihe(self, pose):
         """
         set random initial B-B-B-B angle for each residue
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
-
-        works for any object with 1-bead backbone
+        
+        Parameters
+        ----------
+        pose : pyrosetta.Pose()
+            Pose object to change angles to
         """
         for i in range(2, pose.size()-1):
             angle = np.random.rand()*2*np.pi
@@ -161,15 +173,23 @@ class CGFoldingAlgorithm():
         Add a new entry to the folding protocols dictionary
         Can be used to create custom sequences of movers
 
-        name : str of name of folding algorithm
+        Parameters
+        ----------
+        name : str
+            String key of name of folding move added to the protocol
         """
         self.folding_protocols[name] = pyrosetta.SequenceMover()
 
     def add_folding_move(self, name, mover):
         """
         Add new mover to a entry in the folding protocols dictionary
-        name : str of folding algorithm
-        mover : mover object to be added to this folding sequence (e.g. small, shear, mc_trial)
+
+        Parameters
+        ----------
+        name : str
+            Stirng key of folding algorithm
+        mover : pyrosetta.rosetta.protocols.moves.Mover
+            Mover object to be added to this folding sequence (e.g. small, shear, mc_trial)
         """
         self.folding_protocols[name].add_mover(mover)
 
@@ -178,7 +198,11 @@ class CGFoldingAlgorithm():
         Write any sequence mover (stored in 'folding_protocols') to a trial object for
         MC simulations. Depends on MC mover, so change any mc parameters (kT, pose, etc.)
         before running this.
-        mover: mover object to be added to TrialMover object
+
+        Parameters
+        ----------
+        mover: pyrosetta.rosetta.protocols.moves.Mover
+            Mover object to be added to TrialMover object
         """
         self.trial_mc = pyrosetta.TrialMover(mover, self.mc)
 
@@ -186,8 +210,13 @@ class CGFoldingAlgorithm():
         """
         Runs any given mover object iter times as an MC trial steps useful for
         running multiple steps with the same parameters.
-        name : str of folding algorithm (key of self.folding_algorithm)
-        iter : integer of times to repeat TrialMC object
+        
+        Parameters
+        ----------
+        name : str
+            String key of folding algorithm (key of self.folding_algorithm)
+        iter : int
+            Integer of times to repeat TrialMC object
         """
         print('Building MC Trial Mover...')
         self.build_trial_mc_alg(self.folding_protocols[name])
@@ -200,12 +229,15 @@ class CGFoldingAlgorithm():
         """
         Runs any specified mover object iter times as an MC trial step, while
         also anealling kT to achieve extremely small changes towards the end
-        of the simulation.
-        name : str of folding algorithm (key of self.folding_algorithm)
-        iter : interger of times to repeat TrialMC object
-        kt_range : array of kT values to run folding algorithm
+        of the simulation. This will run `len(kt_range)*iter` trial MC steps
 
-        Note will run len(kt_range)*iter trial MC steps
+        Parameters
+        ----------
+        name : str
+            Sring of folding algorithm (key of self.folding_algorithm)
+        iter : int
+            Interger of times to repeat TrialMC object
+        kt_range : array of kT values to run folding algorithm
         """
         if self.energy_graph_output:
             e_graph = []

@@ -16,9 +16,21 @@ import pyrosetta
 
 class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
-    Implementing a small angle mover for moving all angles within a CG model
+    Small angle mover for moving all angles within a CG model. Will move a random angle
+    by an angle uniformly distributed between `self.angle/2` and `-self.angle/2`.
     """
     def __init__(self, pose, angle = 5):
+        """
+        CG SmallAngleMover constructor
+
+        Parameters
+        ----------
+        pose : pyrosetta.rosetta.protocols.moves.Mover
+            Pose to apply this mover to. Mover needs the pose object to find 
+            all the bond-angles present in the model
+        angle : float (5)
+            2x the max angle moves can be
+        """
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.angle = angle
@@ -46,6 +58,14 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
             
 
     def is_new_angle(self, angle):
+        """
+        Function which check if an angle is present in the mover's angle list
+
+        Parameters
+        ----------
+        angle : list of pyrosetta.rosetta.core.id.AtomID
+            List of atoms present in angle
+        """
         for old_angle in self.bond_angles:
             if old_angle[0].rsd() == angle[0].rsd() and \
                 old_angle[0].atomno() == angle[0].atomno() and \
@@ -62,16 +82,36 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
                 old_angle[2].atomno() == angle[0].atomno():
                 return(False)
         return(True)
+
     def is_new_atom(self, atom):
+        """
+        Function which check if an atom is present in the mover's atom list
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
             return(False)
         else:
             return(True)
     
     def get_neighbors(self, atom):
+        """
+        Get neighbors of an atom within the pose object
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
 
     def apply(self, pose):
+        """
+        Apply mover to pose intially given to mover object
+        """
         d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
         angle_i = np.random.randint(0, len(self.bond_angles))  # has to be able to move only bb atoms
         old = self.conf.bond_angle(*self.bond_angles[angle_i])
@@ -81,9 +121,21 @@ class CGSmallAngleMover(pyrosetta.rosetta.protocols.moves.Mover):
 
 class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
-    Implementing a small angle mover for moving all angles within a CG model
+    Small torsion mover for moving all angles within a CG model. Will move a random angle
+    by an angle uniformly distributed between `self.angle/2` and `-self.angle/2`.
     """
     def __init__(self, pose, angle = 180):
+        """
+        CG SmallMover constructor
+
+        Parameters
+        ----------
+        pose : pyrosetta.rosetta.protocols.moves.Mover
+            Pose to apply this mover to. Mover needs the pose object to find 
+            all the bond-angles present in the model
+        angle : float (180)
+            2x the max angle moves can be
+        """
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.angle = angle
@@ -109,6 +161,14 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
             
 
     def is_new_torsion(self, torsion):
+        """
+        Function which check if a torsion is present in the mover's torsion list
+
+        Parameters
+        ----------
+        torsion : list of pyrosetta.rosetta.core.id.AtomID
+            List of atoms present in torsion
+        """
         for old_torsion in self.torsions:
             if old_torsion[0].rsd() == torsion[0].rsd() and \
                 old_torsion[0].atomno() == torsion[0].atomno() and \
@@ -130,15 +190,34 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
                 return(False)
         return(True)
     def is_new_atom(self, atom):
+        """
+        Function which check if an atom is present in the mover's atom list
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         if [atom.rsd(), atom.atomno()] in [[old_atom.rsd(), old_atom.atomno()] for old_atom in self.atoms]:
             return(False)
         else:
             return(True)
     
     def get_neighbors(self, atom):
+        """
+        Get neighbors of an atom within the pose object
+
+        Parameters
+        ----------
+        atom : pyrosetta.rosetta.core.id.AtomID
+            AtomID to check
+        """
         return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
 
     def apply(self, pose):
+        """
+        Apply mover to pose intially given to mover object
+        """
         d_angle = (np.random.rand()-0.5)*self.angle/180*np.pi
         angle_i = np.random.randint(0, len(self.torsions))  # has to be able to move only bb atoms
         old = self.conf.torsion_angle(*self.torsions[angle_i])
@@ -148,9 +227,20 @@ class CGSmallMover(pyrosetta.rosetta.protocols.moves.Mover):
 
 class CGBondLengthMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
-    Implementing a small mover for perturbing bondlengths moving all angles within a CG model
+    Small bond-lenght mover for a CG pose model
     """
     def __init__(self, pose, d_bond = 0.1):
+        """
+        CG SmallBondLengthMover constructor
+
+        Parameters
+        ----------
+        pose : pyrosetta.rosetta.protocols.moves.Mover
+            Pose to apply this mover to. Mover will the pose object to find 
+            all the bond-lenghts present in the model
+        d_bond : float (0.1)
+            2x the max distance bond-length moves can be
+        """
         pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.pose = pose
         self.d_bond = d_bond
@@ -191,6 +281,9 @@ class CGBondLengthMover(pyrosetta.rosetta.protocols.moves.Mover):
         return(self.conf.bonded_neighbor_all_res(pyrosetta.AtomID(atom.atomno(), atom.rsd())))
 
     def apply(self, pose):
+        """
+        Apply mover to pose intially given to mover object
+        """
         d_bond = (np.random.rand()-0.5)*self.d_bond
         bond_i = np.random.randint(0, len(self.bond_lengths))  # has to be able to move only bb atoms
         old = self.conf.bond_angle(*self.bond_lengths[bond_i])
@@ -395,6 +488,9 @@ class setBondAngle(CGSmallAngleMover):
 # Backbone/Sidechain specific movers
 
 class CGBBSmallMover(CGSmallMover):
+    """
+    Variant of CGSmall mover which only moves backbone torsions
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
         for torsion in self.torsions:
@@ -405,6 +501,9 @@ class CGBBSmallMover(CGSmallMover):
                 self.torsions.remove(torsion)
 
 class CGSCSmallMover(CGSmallMover):
+    """
+    Variant of CGSmall mover which only moves torsions with SC atoms
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
         for torsion in self.torsions:
@@ -415,6 +514,9 @@ class CGSCSmallMover(CGSmallMover):
                 self.torsions.remove(torsion)
 
 class CGBBSmallAngleMover(CGSmallAngleMover):
+    """
+    Variant of CGSmallAngleMover which only moves backbone angles
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
         for angle in self.bond_angles:
@@ -425,6 +527,9 @@ class CGBBSmallAngleMover(CGSmallAngleMover):
                 self.bond_angles.remove(angle)
 
 class CGSCSmallAngleMover(CGSmallAngleMover):
+    """
+    Variant of CGSmallAngleMover which only moves angles with SC atoms
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
         for angle in self.bond_angles:
