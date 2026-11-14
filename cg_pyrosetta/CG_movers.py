@@ -428,42 +428,41 @@ class setTorsions(CGSmallMover):
 
 # Backbone/Sidechain specific movers
 
+def _all_backbone(conf, atoms):
+    return all(conf.atom_is_backbone_norefold(atom.rsd(), atom.atomno()) for atom in atoms)
+
+
 class CGBBSmallMover(CGSmallMover):
+    """
+    CGSmallMover restricted to torsions made up only of backbone atoms
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
-        for torsion in self.torsions:
-            is_bb = []
-            for atom in torsion:
-                is_bb.append(self.conf.atom_is_backbone_norefold(atom))
-            if not all(is_bb):
-                self.torsions.remove(torsion)
+        self.torsions = [torsion for torsion in self.torsions if _all_backbone(self.conf, torsion)]
+
 
 class CGSCSmallMover(CGSmallMover):
+    """
+    CGSmallMover restricted to torsions that include at least one sidechain atom
+    """
     def __init__(self, pose, angle = 180):
         super().__init__(pose, angle)
-        for torsion in self.torsions:
-            is_sc = []
-            for atom in torsion:
-                is_sc.append(not self.conf.atom_is_backbone_norefold(atom))
-            if not any(is_sc):
-                self.torsions.remove(torsion)
+        self.torsions = [torsion for torsion in self.torsions if not _all_backbone(self.conf, torsion)]
+
 
 class CGBBSmallAngleMover(CGSmallAngleMover):
+    """
+    CGSmallAngleMover restricted to bond angles made up only of backbone atoms
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
-        for angle in self.bond_angles:
-            is_bb = []
-            for atom in angle:
-                is_bb.append(self.conf.atom_is_backbone_norefold(atom))
-            if not all(is_bb):
-                self.bond_angles.remove(angle)
+        self.bond_angles = [atoms for atoms in self.bond_angles if _all_backbone(self.conf, atoms)]
+
 
 class CGSCSmallAngleMover(CGSmallAngleMover):
+    """
+    CGSmallAngleMover restricted to bond angles that include at least one sidechain atom
+    """
     def __init__(self, pose, angle = 10):
         super().__init__(pose, angle)
-        for angle in self.bond_angles:
-            is_sc = []
-            for atom in angle:
-                is_sc.append(not self.conf.atom_is_backbone_norefold(atom))
-            if not any(is_sc):
-                self.bond_angles.remove(angle)
+        self.bond_angles = [atoms for atoms in self.bond_angles if not _all_backbone(self.conf, atoms)]
