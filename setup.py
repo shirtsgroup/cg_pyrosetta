@@ -6,22 +6,10 @@ import sys
 import os
 from setuptools import setup, find_packages
 import versioneer
-import pyrosetta
 short_description = __doc__.split("\n")
 
-
-# Setting up PyRosetta Build within package
-
-                        #### CHANGE THIS PATH #####
-fresh_pyrosetta_path = pyrosetta.__path__[0]
-pyrosetta_path = os.path.abspath('pyrosetta_modified')
-input_path = os.path.abspath('cg_pyrosetta/data')
-
-from cg_pyrosetta.build_cg_pyrosetta import PyRosettaBuilder
-
-builder = PyRosettaBuilder(fresh_pyrosetta_path ,pyrosetta_path, input_path)
-builder.buildCGPyRosetta()
-
+# The modified copy of PyRosetta is built on first import of cg_pyrosetta
+# (see cg_pyrosetta/__init__.py), so nothing PyRosetta-specific happens here.
 
 # from https://github.com/pytest-dev/pytest-runner#conditional-requirement
 needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
@@ -63,12 +51,13 @@ setup(
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
-    # install_requires=['numpy', 'os', 'sys'],              # Required packages, pulls from pip if needed; do not use for Conda deployment
+    # PyRosetta is not distributed on PyPI and must be installed separately (see README.md)
+    install_requires=['numpy', 'pyyaml', 'mdtraj'],
     # platforms=['Linux',
     #            'Mac OS-X',
     #            'Unix',
     #            'Windows'],            # Valid platforms your code works on, adjust to your flavor
-    # python_requires=">=3.5",          # Python version restrictions
+    python_requires=">=3.8",
 
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
     # zip_safe=False,

@@ -11,15 +11,17 @@ import yaml
 import pyrosetta as old_pyrosetta
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-pyrosetta_path = os.path.join(current_path, '../pyrosetta_modified')
+pyrosetta_path = os.path.abspath(os.path.join(current_path, '..', 'pyrosetta_modified'))
 data_path    = os.path.join(current_path, 'data')
 clean_pyrosetta_path = old_pyrosetta.__path__[0]
 
 if not os.path.isdir(pyrosetta_path):
     builder = PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
     builder.buildCGPyRosetta()
-else:
-    add_import_path(pyrosetta_path)
+
+# pyrosetta_modified is imported as a top-level package, so the directory that
+# contains it has to be on the import path, whatever the working directory is.
+add_import_path(os.path.dirname(pyrosetta_path))
 
 import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
@@ -29,17 +31,16 @@ import cg_pyrosetta.scripts
 from cg_pyrosetta.utils import init
 import pyrosetta_modified as pyrosetta
 
-extra_residue_files = [os.path.abspath(os.path.join(current_path, "data", "residue_type_sets", a)) \
-    for a in os.listdir(os.path.join(current_path, "data", "residue_type_sets"))]
-
-for filename in extra_residue_files:
-    if ".params" not in filename:
-        extra_residue_files.remove(filename)
+extra_residue_files = sorted(
+    os.path.abspath(os.path.join(current_path, "data", "residue_type_sets", a))
+    for a in os.listdir(os.path.join(current_path, "data", "residue_type_sets"))
+    if a.endswith(".params")
+)
 
 
 cmd_line_options_defaults = {"--add_atom_types" : "fa_standard " + os.path.join(current_path, "data", "atom_type_sets", "atom_properties.txt"),
 "--add_mm_atom_type_set_parameters" : "fa_standard " + os.path.join(current_path, "data", "mm_atom_type_sets", "mm_atom_properties.txt"),
-"--extra_mm_params_dir" : "fa_standard " + os.path.join(current_path, "data", "mm_atom_type_sets"),
+"--extra_mm_params_dir" : os.path.join(current_path, "data", "mm_atom_type_sets"),
 "--mute" : "all",
 "--extra_res_fa" : extra_residue_files,
 }

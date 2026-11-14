@@ -5,9 +5,6 @@ import os
 import sys
 import math
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-
 import pyrosetta
 
 # pyrosetta.init("--add_mm_atom_type_set_parameters fa_standard mm_atom_type_sets/mm_atom_properties.txt " +
@@ -42,8 +39,6 @@ class CGFoldingAlgorithm():
         # Build CG model and set desired initial angles
         self.pose = pyrosetta.pose_from_sequence(sequence, auto_termini=False)
         self.energy_graph_output = energy_graph_output
-        # self.pose = self.set_BBB_angles(self.pose, BBB_angle)
-        # self.pose = self.set_BBBB_dihe(self.pose, BBBB_dihe)
         # PyMOL mover, if wanting to visualize
         self.pymol = pyrosetta.PyMOLMover()
         self.pymol.apply(self.pose)
@@ -104,57 +99,6 @@ class CGFoldingAlgorithm():
 
         # self.add_folding_move('default', self.PDB_writer)
         # self.add_folding_move('default', self.pymol)
-
-    def set_BBB_angles(self, pose, angle):
-        """
-        set initial B-B-B angle for each residue to a certain value
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
-
-        works for any object with 1-bead backbone
-        """
-        for i in range(2, pose.size()):
-            pose.conformation().set_bond_angle(pyrosetta.AtomID(1, int(i-1)),
-                                               pyrosetta.AtomID(1, int(i)),
-                                               pyrosetta.AtomID(1, int(i+1)),
-                                               angle*np.pi/180)
-
-        return(pose)
-
-    def set_BBBB_dihe(self, pose, angle):
-        """
-        set initial B-B-B angle for each residue to a certain value
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
-
-        works for any object with 1-bead backbone
-        """
-        for i in range(2, pose.size()-1):
-            pose.conformation().set_torsion_angle(pyrosetta.AtomID(1, int(i-1)),
-                                                  pyrosetta.AtomID(1, int(i)),
-                                                  pyrosetta.AtomID(1, int(i+1)),
-                                                  pyrosetta.AtomID(1, int(i+2)),
-                                                  angle*np.pi/180)
-
-        return(pose)
-
-    def random_BBBB_dihe(self, pose):
-        """
-        set random initial B-B-B-B angle for each residue
-        pose : pyrosetta.Pose() object
-        angle : angle in degrees
-
-        works for any object with 1-bead backbone
-        """
-        for i in range(2, pose.size()-1):
-            angle = np.random.rand()*2*np.pi
-            pose.conformation().set_torsion_angle(pyrosetta.AtomID(1, int(i-1)),
-                                                  pyrosetta.AtomID(1, int(i)),
-                                                  pyrosetta.AtomID(1, int(i+1)),
-                                                  pyrosetta.AtomID(1, int(i+2)),
-                                                  angle)
-
-        return(pose)
 
     def build_fold_alg(self, name):
         """

@@ -15,9 +15,6 @@ import warnings
 import cg_pyrosetta.CG_movers
 
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-
 import pyrosetta
 
 class Subject(ABC):
@@ -427,6 +424,14 @@ class CGMonteCarloDynamicAnnealerParameters:
         self.ratio_tolerance = ratio_tolerance
         # list of annealing temps
 
+# Movers written in Python (see CG_movers.py) only work while a Python
+# reference to them exists. A SequenceMover holds them through C++ alone, so
+# once the factory that built them is garbage collected, applying the
+# SequenceMover fails with 'Tried to call pure virtual function "Mover::apply"'.
+# Movers handed out by SequenceMoverFactory are kept alive here.
+_MOVER_REFERENCES = []
+
+
 class SequenceMoverFactory:
 
     def __init__(self, pose, extra_movers_dict = None):
@@ -443,14 +448,19 @@ class SequenceMoverFactory:
             
 
     def build_seq_mover(self, mover_freq_map):
+        """
+        Build a SequenceMover from a dictionary of mover names and the number
+        of times each mover is repeated per Monte Carlo trial. Names without
+        an implemented mover are skipped with a warning.
+        """
         seq_mover = pyrosetta.SequenceMover()
-        movers = [pyrosetta.RepeatMover(self.methods[mover], mover_freq_map[mover]) for mover in  mover_freq_map.keys()]
-        for i, mover in enumerate(mover_freq_map.keys()):
-            print(mover)
-            if mover in self.methods.keys():
-                seq_mover.add_mover(movers[i])
-            else:
+        for mover, freq in mover_freq_map.items():
+            method = self.methods.get(mover)
+            if method is None or isinstance(method, NotImplementedError):
                 warnings.warn("Unimplemented Mover : "+mover+"\n Skipping mover", UserWarning)
+                continue
+            _MOVER_REFERENCES.append(method)
+            seq_mover.add_mover(pyrosetta.RepeatMover(method, freq))
 
         return(seq_mover)
 
