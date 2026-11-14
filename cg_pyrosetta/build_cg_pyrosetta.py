@@ -320,10 +320,12 @@ class PyRosettaBuilder():
 
 def add_import_path(path):
     """
-    singler liner to import custom version of pyrosetta given any path
+    Add a directory to the front of the import path. To import the modified
+    copy of PyRosetta, pass the directory that contains pyrosetta_modified.
     """
     import sys
-    sys.path.insert(0, path)
+    if path not in sys.path:
+        sys.path.insert(0, path)
 
 def get_residue_commandline_option():
     pass    

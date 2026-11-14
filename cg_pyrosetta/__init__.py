@@ -11,15 +11,17 @@ import yaml
 import pyrosetta as old_pyrosetta
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-pyrosetta_path = os.path.join(current_path, '../pyrosetta_modified')
+pyrosetta_path = os.path.abspath(os.path.join(current_path, '..', 'pyrosetta_modified'))
 data_path    = os.path.join(current_path, 'data')
 clean_pyrosetta_path = old_pyrosetta.__path__[0]
 
 if not os.path.isdir(pyrosetta_path):
     builder = PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, data_path)
     builder.buildCGPyRosetta()
-else:
-    add_import_path(pyrosetta_path)
+
+# pyrosetta_modified is imported as a top-level package, so the directory that
+# contains it has to be on the import path, whatever the working directory is.
+add_import_path(os.path.dirname(pyrosetta_path))
 
 import cg_pyrosetta.CG_movers
 import cg_pyrosetta.CG_folding
