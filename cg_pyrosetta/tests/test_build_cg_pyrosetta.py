@@ -1,64 +1,67 @@
 """
-Unit and regression test for the cg_pyrosetta package.
+Tests confirming the modified copy of PyRosetta was built correctly.
 """
 
-# File containing tests to confirm the build_cg_pyrosetta script is working
-import pytest
-import sys
 import os
+
 import cg_pyrosetta
 
+FA_STANDARD_ATOMS = ('database', 'chemical', 'atom_type_sets', 'fa_standard')
+FA_STANDARD_RESIDUES = ('database', 'chemical', 'residue_type_sets', 'fa_standard')
 
-def testPyRosettaModified():
+
+def test_modified_pyrosetta_exists():
     """
-    Confirms presences of working PyRosetta buld in PyRosetta4.modified
+    Confirms the modified copy of PyRosetta is present and has a database
     """
     pyrosetta_path = os.path.abspath(cg_pyrosetta.pyrosetta_path)
-    assert 'pyrosetta' in os.listdir(pyrosetta_path)
+    assert os.path.isfile(os.path.join(pyrosetta_path, '__init__.py'))
+    assert os.path.isdir(os.path.join(pyrosetta_path, 'database'))
 
 
-def testAtoms():
+def test_modified_pyrosetta_is_used(pyrosetta):
     """
-    Checks to see if header was written into the atom_properties.txt file
+    Confirms cg_pyrosetta.pyrosetta is the modified copy, not the installed one
     """
-    with open(os.path.join(cg_pyrosetta.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'atom_type_sets', 'fa_standard', 'atom_properties.txt')) as atom_file:
-        lines = atom_file.readlines()
-    assert '## Custom Added Atom Types ###\n' in lines
-
-# def testResidueDir():
-#     assert os.path.isdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
-
-# def testResiduefiles():
-#     """
-#     Confirms the 'custom directory' is populated
-#     """
-#
-#     assert os.listdir(os.path.join(cg_pyrosetta.pyrosetta_path,'pyrosetta','database','chemical','residue_type_sets','fa_standard','residue_types','custom'))
+    module_dir = os.path.dirname(os.path.abspath(pyrosetta.__file__))
+    assert os.path.samefile(module_dir, cg_pyrosetta.pyrosetta_path)
 
 
-def testExtras():
+def test_extras_are_turned_off():
     """
-    Confirms the comments in extras.txt file in atom_type_set dir
+    Confirms every line of extras.txt in the atom type set is commented out
     """
-    with open(os.path.join(cg_pyrosetta.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'atom_type_sets', 'fa_standard', 'extras.txt')) as exf:
+    with open(os.path.join(cg_pyrosetta.pyrosetta_path, *FA_STANDARD_ATOMS, 'extras.txt')) as exf:
         lines = exf.readlines()
 
-    assert all([line[0] == '#' for line in lines])
+    assert all(line[0] == '#' for line in lines)
 
 
-def testResidueTypetxt():
+def test_patches_are_added_once():
     """
-    confirms atom residue types are written to residue_types.txt by checking the header
+    Confirms the custom patches are listed in patches.txt exactly once
     """
-    with open(os.path.join(cg_pyrosetta.pyrosetta_path, 'pyrosetta', 'database', 'chemical', 'residue_type_sets', 'fa_standard', 'residue_types.txt'), 'r') as rtf:
-        lines = rtf.readlines()
-    assert '### custom residues\n' in lines
+    with open(os.path.join(cg_pyrosetta.pyrosetta_path, *FA_STANDARD_RESIDUES, 'patches.txt')) as patch_file:
+        lines = patch_file.readlines()
+
+    assert lines.count('### custom patches residues\n') == 1
+    for patch in ('CG_lower_patch.txt', 'CG_upper_patch.txt'):
+        assert sum(line.rstrip('\n').endswith(patch) for line in lines) == 1
 
 
-def testPoseSequence():
+def test_pose_from_sequence(pyrosetta):
     """
-    confirms 1-1 CG model has correct atom types in them
+    Confirms a 1-1 CG model is built with the expected atoms
     """
-    seq = cg_pyrosetta.CG_folding.pyrosetta.pose_from_sequence(
-        'X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]X[CG11]')
-    assert seq.residue(1).atom_name(1) == 'BB1 '
+    pose = pyrosetta.pose_from_sequence('X[CG11]' * 8)
+    assert pose.size() == 8
+    assert pose.residue(1).atom_name(1) == 'BB1 '
+    assert pose.residue(1).atom_name(2) == 'SC1 '
+
+
+def test_terminal_patches_apply(pose):
+    """
+    Confirms the custom terminus patches can be applied to a CG residue
+    """
+    assert pose.residue(1).name() == 'CG11x3:CGLower'
+    assert pose.residue(pose.size()).name() == 'CG11x3:CGUpper'

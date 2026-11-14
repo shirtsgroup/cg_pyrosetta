@@ -1,174 +1,178 @@
 """
-Unit and regression test for the cg_pyrosetta package.
+Tests for the movers in cg_pyrosetta.CG_movers.
 """
 
-import cg_pyrosetta
-import pyrosetta
 import numpy as np
 import pytest
-import sys
-import pytest
 
-pyrosetta.init()
-
-# @pytest.fixture()
-# def pose():
-#     return(pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]'))
+import cg_pyrosetta
+from cg_pyrosetta import CG_movers
 
 
-def testCGSmallMover():
+def coordinates(pose):
+    return np.array([[pose.xyz(cg_pyrosetta.pyrosetta.AtomID(atom, residue))[i] for i in range(3)]
+                     for residue in range(1, pose.size() + 1)
+                     for atom in range(1, pose.residue(residue).natoms() + 1)])
+
+
+def atom_key(atom):
+    return (atom.rsd(), atom.atomno())
+
+
+@pytest.mark.parametrize("mover_class", [
+    CG_movers.CGSmallMover,
+    CG_movers.CGSmallAngleMover,
+    CG_movers.CGBondLengthMover,
+    CG_movers.CGBBSmallMover,
+    CG_movers.CGSCSmallMover,
+    CG_movers.CGBBSmallAngleMover,
+    CG_movers.CGSCSmallAngleMover,
+])
+def test_perturbation_movers_move_atoms(pose, mover_class):
     """
-    Testing CGSmallMover works
+    Each perturbation mover must change the coordinates of the pose
     """
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-    x_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    small_mover = cg_pyrosetta.CG_movers.CGSmallMover(pose)
-
-    for _ in range(200):
-        small_mover.apply(pose)
-
-    x_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    assert x_new != x_old
-    assert y_new != y_old
-    assert z_new != z_old
+    old = coordinates(pose)
+    mover = mover_class(pose)
+    for _ in range(50):
+        mover.apply(pose)
+    assert not np.allclose(old, coordinates(pose))
 
 
-def testCGShearMover():
-    """
-    Testing CGShearMover works
-    """
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-
-    x_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    small_mover = cg_pyrosetta.CG_movers.CGShearMover(pose)
-
-    for _ in range(200):
-        small_mover.apply(pose)
-
-    x_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    assert x_new != x_old
-    assert y_new != y_old
-    assert z_new != z_old
+def test_internal_coordinates_are_found(pose):
+    assert len(CG_movers.CGSmallMover(pose).torsions) > 0
+    assert len(CG_movers.CGSmallAngleMover(pose).bond_angles) > 0
+    assert len(CG_movers.CGBondLengthMover(pose).bond_lengths) > 0
 
 
-def test_cgsmallscmover():
-    pass
-    # assert False
-
-
-def testCGSmallAngleMover():
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-
-    x_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_old = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    small_angle_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(pose)
-
-    for _ in range(200):
-        small_angle_mover.apply(pose)
-
-    x_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).x
-    y_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).y
-    z_new = pose.xyz(pyrosetta.AtomID(1, pose.size())).z
-
-    assert x_new != x_old
-    assert y_new != y_old
-    assert z_new != z_old
-
-
-def test_randomizeBB():
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-
-    small = cg_pyrosetta.CG_movers.CGSmallMover(pose)
-    old_angles = []
-    for atoms in small.dihes:
-        old_angles.append(pose.conformation().torsion_angle(atoms[0], atoms[1], atoms[2], atoms[3]))
-
-    randomize = cg_pyrosetta.CG_movers.randomizeBackBone(pose)
-    randomize.apply(pose)
-
-    new_angles = []
-    for atoms in small.dihes:
-        new_angles.append(pose.conformation().torsion_angle(atoms[0], atoms[1], atoms[2], atoms[3]))
-
-    bool_array = [old_angles[i] != new_angles[i] for i in range(len(small.dihes))]
-    assert(all(bool_array))
-
-
-def test_randomizeBBAngles():
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-
-    small_angle = cg_pyrosetta.CG_movers.CGSmallAngleMover(pose)
-    old_angles = []
-    for atoms in small_angle.angles:
-        old_angles.append(pose.conformation().bond_angle(atoms[0], atoms[1], atoms[2]))
-
-    randomize = cg_pyrosetta.CG_movers.randomizeBackBoneAngles(pose)
-    randomize.apply(pose)
-
-    new_angles = []
-    for atoms in small_angle.angles:
-        new_angles.append(pose.conformation().bond_angle(atoms[0], atoms[1], atoms[2]))
-
-    bool_array = [old_angles[i] != new_angles[i] for i in range(len(small_angle.angles))]
-    assert(all(bool_array))
-
-
-def test_setBBBL():
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
-    set_bbbl = cg_pyrosetta.CG_movers.setBondLengths(pose,
-                                                             {
-                                                              "BB1 BB2": 20.3,
-                                                              "BB2 BB3": 20.3,
-                                                              "BB1 BB3": 20.3,
-                                                             })
-    set_bbbl.apply(pose)
-    for atom1, atom2 in set_bbbl.bb_bonds[1:-1]:
-        assert pose.conformation().bond_length(atom1, atom2) == 20.3
-
-
-def test_setBBBL_variable_bb():
-    pose = cg_pyrosetta.pyrosetta.pose_from_sequence('X[CG31]'*10)
-    set_bbbl = cg_pyrosetta.CG_movers.setBondLengths(pose, {"BB1 BB2": 2.3, "BB3 BB1": 3.3})
-    set_bbbl.apply(pose)
-    assert pose.conformation().bond_length(cg_pyrosetta.pyrosetta.AtomID(2, 1),
-                                           cg_pyrosetta.pyrosetta.AtomID(3, 1),
-                                           ) == pytest.approx(1.0)
-
-
-def test_setBBAngles():
-    pass
-
-def test_CGSmallAngleMover():
-    pymol = pyrosetta.PyMOLMover()
-    pose = pyrosetta.pose_from_sequence('X[CG11x3:CGLower]X[CG11x3]X[CG11x3][CG11x3:CGUpper]')
+def test_bond_length_mover_changes_one_bond_length(pose):
+    mover = CG_movers.CGBondLengthMover(pose, d_bond=0.5)
     conf = pose.conformation()
-    small_mover = cg_pyrosetta.CG_movers.CGSmallAngleMover(pose)
-    # print(small_mover.bond_angles)
-    assert len(small_mover.bond_angles) != 0
-    pymol.apply(pose)
-    for angle in small_mover.bond_angles:
-        print("Changing Angle:", angle[0], angle[1], angle[2])
-        old_angle = conf.bond_angle(angle[0], angle[1], angle[2])
-        conf.set_bond_angle(
-                            angle[0],
-                            angle[1],
-                            angle[2], 
-                            old_angle + 10 * np.pi / 180
-                            )
-        pymol.apply(pose)
-        assert conf.bond_angle(angle[0], angle[1], angle[2]) == pytest.approx(old_angle + 10 * np.pi / 180)
-    # assert False
+    old = [conf.bond_length(*bond) for bond in mover.bond_lengths]
+    mover.apply(pose)
+    new = [conf.bond_length(*bond) for bond in mover.bond_lengths]
+    changed = [not np.isclose(a, b) for a, b in zip(old, new)]
+    assert sum(changed) == 1
+    assert max(abs(a - b) for a, b in zip(old, new)) <= 0.25
+
+
+@pytest.mark.parametrize("all_class, bb_class, sc_class, attribute", [
+    (CG_movers.CGSmallMover, CG_movers.CGBBSmallMover, CG_movers.CGSCSmallMover, "torsions"),
+    (CG_movers.CGSmallAngleMover, CG_movers.CGBBSmallAngleMover, CG_movers.CGSCSmallAngleMover, "bond_angles"),
+])
+def test_backbone_and_sidechain_movers_partition_the_move_set(pose, all_class, bb_class, sc_class, attribute):
+    """
+    Backbone movers hold only backbone atoms, sidechain movers hold at least
+    one sidechain atom, and together they cover the unrestricted move set
+    """
+    conf = pose.conformation()
+    everything = getattr(all_class(pose), attribute)
+    backbone = getattr(bb_class(pose), attribute)
+    sidechain = getattr(sc_class(pose), attribute)
+
+    assert len(backbone) > 0
+    assert len(sidechain) > 0
+    assert len(backbone) + len(sidechain) == len(everything)
+    for atoms in backbone:
+        assert all(conf.atom_is_backbone_norefold(atom.rsd(), atom.atomno()) for atom in atoms)
+    for atoms in sidechain:
+        assert not all(conf.atom_is_backbone_norefold(atom.rsd(), atom.atomno()) for atom in atoms)
+
+
+def test_randomizeTorsions(pose):
+    conf = pose.conformation()
+    randomize = CG_movers.randomizeTorsions(pose)
+    old = [conf.torsion_angle(*atoms) for atoms in randomize.torsions]
+    randomize.apply(pose)
+    new = [conf.torsion_angle(*atoms) for atoms in randomize.torsions]
+    assert not np.allclose(old, new)
+
+
+def test_randomizeAngles(pose):
+    conf = pose.conformation()
+    randomize = CG_movers.randomizeAngles(pose)
+    old = [conf.bond_angle(*atoms) for atoms in randomize.bond_angles]
+    randomize.apply(pose)
+    new = [conf.bond_angle(*atoms) for atoms in randomize.bond_angles]
+    assert not np.allclose(old, new)
+
+
+def test_setBondLengths(pose):
+    conf = pose.conformation()
+    set_lengths = CG_movers.setBondLengths(pose, {"BB1 SC1": 2.5, "BB2 BB3": 1.7})
+    set_lengths.apply(pose)
+
+    checked = {"BB1 SC1": 0, "BB2 BB3": 0}
+    for atoms, name in zip(set_lengths.bond_lengths, set_lengths.bond_names):
+        reverse_name = " ".join(reversed(name.split(" ")))
+        if name == "BB1 SC1" or reverse_name == "BB1 SC1":
+            assert conf.bond_length(*atoms) == pytest.approx(2.5)
+            checked["BB1 SC1"] += 1
+        elif name == "BB2 BB3" or reverse_name == "BB2 BB3":
+            assert conf.bond_length(*atoms) == pytest.approx(1.7)
+            checked["BB2 BB3"] += 1
+        else:
+            assert conf.bond_length(*atoms) == pytest.approx(1.0)
+    assert all(count > 0 for count in checked.values())
+
+
+def test_setBondAngle_degrees(pose):
+    conf = pose.conformation()
+    angles = {"BB1 BB2 BB3": 100}
+    set_angle = CG_movers.setBondAngle(pose, angles)
+    set_angle.apply(pose)
+
+    # the caller's dictionary must not be converted in place
+    assert angles == {"BB1 BB2 BB3": 100}
+
+    n_checked = 0
+    for atoms, name in zip(set_angle.bond_angles, set_angle.angle_names):
+        if name in ("BB1 BB2 BB3", "BB3 BB2 BB1"):
+            assert conf.bond_angle(*atoms) == pytest.approx(100 * np.pi / 180)
+            n_checked += 1
+    assert n_checked > 0
+
+
+def test_setBondAngle_radians(pose):
+    conf = pose.conformation()
+    set_angle = CG_movers.setBondAngle(pose, {"BB1 BB2 BB3": 2.0}, radians=True)
+    set_angle.apply(pose)
+    for atoms, name in zip(set_angle.bond_angles, set_angle.angle_names):
+        if name in ("BB1 BB2 BB3", "BB3 BB2 BB1"):
+            assert conf.bond_angle(*atoms) == pytest.approx(2.0)
+
+
+def test_setTorsions(pose):
+    """
+    Each named torsion is set to the requested value. Torsions that share a
+    central bond are coupled, so only one torsion name is set here.
+    """
+    conf = pose.conformation()
+    set_torsions = CG_movers.setTorsions(pose, {"BB1 BB2 BB3 BB1": 60})
+    set_torsions.apply(pose)
+
+    n_checked = 0
+    for atoms, name in zip(set_torsions.torsions, set_torsions.torsion_names):
+        if name == "BB1 BB2 BB3 BB1":
+            assert conf.torsion_angle(*atoms) == pytest.approx(60 * np.pi / 180)
+            n_checked += 1
+    assert n_checked > 0
+
+
+def test_setTorsions_reversed_name(pose):
+    conf = pose.conformation()
+    set_torsions = CG_movers.setTorsions(pose, {"BB1 BB3 BB2 BB1": -45})
+    set_torsions.apply(pose)
+
+    n_checked = 0
+    for atoms, name in zip(set_torsions.torsions, set_torsions.torsion_names):
+        if name == "BB1 BB2 BB3 BB1":
+            assert conf.torsion_angle(*atoms) == pytest.approx(-45 * np.pi / 180)
+            n_checked += 1
+    assert n_checked > 0
+
+
+def test_setTorsions_ignores_unknown_names(pose):
+    old = coordinates(pose)
+    CG_movers.setTorsions(pose, {"NOT A REAL TORSION": 60}).apply(pose)
+    assert np.allclose(old, coordinates(pose))
