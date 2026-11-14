@@ -123,3 +123,6 @@ slurm-*.out
 .*
 !/.gitignore
 view
+
+# Local modified copy of PyRosetta built on first import
+pyrosetta_modified/
