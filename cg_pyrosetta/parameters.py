@@ -15,17 +15,61 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(current_path, 'data')
 
 
-def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path = None):
+LJ_CONVENTIONS = ('rmin_half', 'rmin', 'sigma')
+
+
+def lj_size_to_rosetta_radius(value, lj_convention = 'rmin_half'):
+    """
+    Convert a Lennard-Jones size parameter to the LJ_RADIUS used by Rosetta.
+
+    Rosetta stores LJ_RADIUS = r_min / 2, where r_min is the separation at the
+    minimum of the Lennard-Jones potential between two atoms of the same type.
+    For the 12-6 potential r_min = 2**(1/6) * sigma, where sigma is the
+    separation at which the potential is zero.
+
+    Arguments
+    ---------
+
+    value : float
+        Lennard-Jones size parameter, in Angstroms
+    lj_convention : str
+        How `value` is defined: 'rmin_half' (r_min / 2, Rosetta's LJ_RADIUS),
+        'rmin' (r_min) or 'sigma' (sigma)
+
+    Returns
+    -------
+
+    float
+        LJ_RADIUS in Angstroms
+    """
+    if lj_convention == 'rmin_half':
+        return float(value)
+    if lj_convention == 'rmin':
+        return float(value) / 2
+    if lj_convention == 'sigma':
+        return float(value) * 2 ** (1 / 6) / 2
+    raise ValueError("lj_convention must be one of %s, got %r" % (LJ_CONVENTIONS, lj_convention))
+
+
+def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path = None, lj_convention = 'rmin_half'):
     """
     function to change atom parameters on the fly
 
     Arguments
     ---------
 
-    dict : dict
+    param_dict : dict
         Dictionary containing name of atom and list of specific parameters for
         that atom type. (Parameters are expected in the following order
-        ATOM LJ_RADIUS LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME)
+        ATOM LJ_SIZE LJ_WDEPTH LK_DGFREE LK_LAMBDA LK_VOLUME)
+    atom_types_path : str
+        atom_properties.txt file to rewrite (defaults to the packaged file)
+    mm_atom_types_path : str
+        mm_atom_properties.txt file to rewrite (defaults to the packaged file)
+    lj_convention : str
+        Definition of LJ_SIZE in param_dict: 'rmin_half' (default, the value
+        Rosetta stores as LJ_RADIUS), 'rmin' or 'sigma'. Values are converted
+        to LJ_RADIUS before they are written. See lj_size_to_rosetta_radius.
 
     Examples
     --------
@@ -33,7 +77,13 @@ def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path 
     params = {'CG1':['X', 1.0, 0.2, 1.0, 3.5, 23.7]}
     cg_pyrosetta.parameters.changeAtomParameters(params)
 
+    params = {'CG1':['X', 2.0, 0.2]}
+    cg_pyrosetta.parameters.changeAtomParameters(params, lj_convention = 'sigma')
+
     """
+    if lj_convention not in LJ_CONVENTIONS:
+        raise ValueError("lj_convention must be one of %s, got %r" % (LJ_CONVENTIONS, lj_convention))
+
     if atom_types_path is None:
         atom_types_path = os.path.join(data_path, 'atom_type_sets', 'atom_properties.txt')
     
@@ -54,7 +104,7 @@ def changeAtomParameters(param_dict, atom_types_path = None, mm_atom_types_path 
 
         # extract LJ parameters and atom name
         atom_type = param_dict[name][0]
-        lj_radius = param_dict[name][1]
+        lj_radius = lj_size_to_rosetta_radius(param_dict[name][1], lj_convention)
         lj_wdepth = param_dict[name][2]
 
         # can take either a list of length 3 or 6
