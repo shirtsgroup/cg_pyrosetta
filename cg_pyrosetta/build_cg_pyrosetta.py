@@ -50,7 +50,8 @@ class PyRosettaBuilder():
 
         # self.addAtomTypes(os.path.join(self.inputs, 'atom_type_sets'), header=True)
         self.turnOffExtras()
-        # self.addResidueTypes(os.path.join(self.inputs, 'residue_type_sets'), header=True)
+        # Residue types are not written into the database. They are passed to
+        # PyRosetta at init time with --extra_res_fa (see cg_pyrosetta/__init__.py).
         # self.addMMTorsionTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
         self.addPatches(os.path.join(self.inputs, 'residue_type_sets', 'patches'))
         # self.addMMAtomTypes(os.path.join(self.inputs, 'mm_atom_type_sets'))
@@ -280,41 +281,6 @@ class PyRosettaBuilder():
             with open(os.path.join(self.pyrosetta_path,  'database', 'chemical', 'atom_type_sets', 'fa_standard', 'extras.txt'), 'w') as exf:
                 exf.writelines(extras)
 
-    def addResidueTypes(self, path, header=False):
-        """
-        Method for adding new residue types to a PyRosetta4 build
-
-        Parameters
-        ----------
-        self: PyRosettaBuilder Class
-            object running addResidueTypes
-        path : str
-            string indicating path to direcctory where residue.param files are
-        header : Bool
-            whether to include a header denoting custom residues
-
-        """
-
-        rel_path = os.path.relpath(path, os.path.join(self.pyrosetta_path, 
-                                                      'database', 'chemical', 'residue_type_sets', 'fa_standard'))
-
-        with open(os.path.join(self.pyrosetta_path,  'database', 'chemical', 'residue_type_sets', 'fa_standard', 'residue_types.txt'), 'r') as atom_file:
-            original_file = atom_file.readlines()
-            original_file = original_file[:1042]  # should get this number when building PyRosetta.modified
-            # This cuts off the Dihedral portion of the parameter file, but this is fine since we read in dihedrals separately.
-
-        with open(os.path.join(self.pyrosetta_path,  'database', 'chemical', 'residue_type_sets', 'fa_standard', 'residue_types.txt'), 'w') as atom_file:
-            atom_file.writelines(original_file)
-
-        with open(os.path.join(self.pyrosetta_path,  'database', 'chemical', 'residue_type_sets', 'fa_standard', 'residue_types.txt'), 'a') as rtf:
-
-            if header:
-                rtf.write('### custom residues\n')
-            # writting custom lines first
-            for residue in os.listdir(path):
-                if residue.endswith('.params'):
-                    rtf.write(os.path.join(rel_path, residue)+'\n')
-
     def addPatches(self, path):
         """
         Method for adding new patches to a PyRosetta4 build
@@ -364,10 +330,17 @@ def get_residue_commandline_option():
 
 
 def main():
-    pyrosetta_path = os.path.abspath('PyRosetta4.modified')
-    input_path = 'inputs'
+    """
+    Build a modified copy of the installed PyRosetta in ./pyrosetta_modified
+    using the parameter files packaged with cg_pyrosetta.
+    """
+    import pyrosetta
 
-    builder = PyRosettaBuilder(pyrosetta_path, input_path)
+    clean_pyrosetta_path = pyrosetta.__path__[0]
+    pyrosetta_path = os.path.abspath('pyrosetta_modified')
+    input_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+    builder = PyRosettaBuilder(clean_pyrosetta_path, pyrosetta_path, input_path)
     builder.buildCGPyRosetta()
 
 
