@@ -209,7 +209,7 @@ def changeAngleParameters(param_dict, angle_file = None):
     """
 
     if angle_file is None:
-        angle_file = os.path.join(data_path, 'mm_atom_type_sets', 'mm_angle_params.txt')
+        angle_file = os.path.join(data_path, 'mm_atom_type_sets', 'mm_bond_angle_params.txt')
 
     with open(angle_file, 'r') as f:
         angle_lines = f.readlines()

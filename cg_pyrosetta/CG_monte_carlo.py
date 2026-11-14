@@ -15,9 +15,6 @@ import warnings
 import cg_pyrosetta.CG_movers
 
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(current_path + '/../PyRosetta4.modified'))
-
 import pyrosetta
 
 class Subject(ABC):
